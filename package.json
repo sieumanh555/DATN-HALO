@@ -3,15 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
+    "lucide-react": "^0.475.0",
     "next": "^15.1.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-fast-marquee": "^1.6.5",
+    "react-redux": "^9.2.0",
+    "swr": "^2.3.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
