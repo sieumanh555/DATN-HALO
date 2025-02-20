@@ -1,8 +1,4 @@
 "use client";
-import Image from "next/image";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import Link from "next/link";
 // import { useState } from "react";
 // import useSWR from "swr";
@@ -11,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // import { addItem } from "@/redux/slices/cartSlice";
 // import { PackageX } from "lucide-react";
+import Product from "./components/product";
 export default function Home() {
   // const [quantity] = useState<number>(1);
   // const dispatch = useDispatch();
@@ -78,7 +75,7 @@ export default function Home() {
         </video>
       </div>
       <div className="flex flex-row mx-5 gap-2">
-        <div className="relative flex min-w-[50%] min-h-[450px] overflow-hidden">
+        <div className="relative flex  min-h-[450px] overflow-hidden" style={{ minWidth: "calc(50% - 5px)" }}>
           <div className="flex gap-2 flex-col my-6 font-bold uppercase">
             <div className="relative z-30 p-5 text-[40px] bg-opacity-50 rounded-xl">
               Bộ sưu tập nam
@@ -100,7 +97,7 @@ export default function Home() {
             Your browser does not support the video tag.
           </video>
         </div>
-        <div className="relative flex min-w-[50%] min-h-[450px] overflow-hidden">
+        <div className="relative flex overflow-hidden" style={{ minWidth: "calc(50% - 5px)" }}>
           <div className="flex gap-2 flex-col my-6 font-bold uppercase">
             <div className="relative z-30 p-5 text-[40px] bg-opacity-50 rounded-xl">
               Bộ sưu tập nam
@@ -123,64 +120,20 @@ export default function Home() {
           </video>
         </div>
       </div>
-      <div>
-        <span>Sản phẩm mới ra mắt</span>
-        <span>Xem tất cả --</span>
+      <div className="text-gray-900 mx-5 my-5 py-8 flex justify-between items-center border-b-4 border-b-gray-900">
+        <span className="text-[28px]">Sản phẩm mới ra mắt</span>
+        <span className="text-[16px]">Xem tất cả --</span>
       </div>
-      <div>
-        <div className="w-[321px] min-h-[456] bg-slate-400 flex flex-col gap-5 ">
-          <div className="overflow-hidden w-[321] h-[290]">
-            <Image
-              src="https://i.pinimg.com/736x/a0/34/5f/a0345fdbcf2697e90a1b1241437870ad.jpg"
-              width={321}
-              height={205}
-              alt="Hình ảnh mô tả"
-            />
-          </div>
-          <div className="flex flex-row">
-            <Image
-              src="https://i.pinimg.com/736x/a0/34/5f/a0345fdbcf2697e90a1b1241437870ad.jpg"
-              width={50}
-              height={50}
-              alt="Hình ảnh mô tả"
-            />
-            <Image
-              src="https://i.pinimg.com/736x/a0/34/5f/a0345fdbcf2697e90a1b1241437870ad.jpg"
-              width={50}
-              height={50}
-              alt="Hình ảnh mô tả"
-            />
-          </div>
-          <div
-            className="text-lg antialiased md:subpixel-antialiased"
-            style={{
-              wordWrap: "break-word",
-              overflowWrap: "break-word",
-              width: "321px",
-            }}
-          >
-            <h1>Áo Thun Local Brand Unisex Teelab Seasonal Tshirt TS295 </h1>
-          </div>
 
-          <div>
-            <span>10.000VNĐ</span>
-            <span className="px-2 line-through">20.000VNĐ</span>
-          </div>
-          <div>
-            <span>
-              <FontAwesomeIcon icon={faStar} />
-              <FontAwesomeIcon icon={faStar} />
-              <FontAwesomeIcon icon={faStar} />
-              <FontAwesomeIcon icon={faStar} />
-              <FontAwesomeIcon icon={faStar} />
-            </span>
-            <span className="px-2">Đã bán hơn 2,4k</span>
-          </div>
-          <div className="flex flex-row gap-2 items-center">
-            <FontAwesomeIcon icon={faLocationDot} className="text-lg" />
-            <span className="text-lg relative top-0.5">Hồ Chí Minh</span>
-          </div>
-        </div>
+      <div className="mx-5 grid grid-cols-5 gap-7">
+        <Product></Product>
+        <Product></Product>
+        <Product></Product>
+        <Product></Product>
+        <Product></Product>
+        <Product></Product>
+        <Product></Product>
+        <Product></Product>
       </div>
     </div>
   );
