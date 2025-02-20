@@ -3,12 +3,13 @@ import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
 import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../redux/store"
 
 import { addItem } from "@/redux/slices/cartSlice";
 export default function Home() {
-  const [quantity, setQuantity] = useState(1);
+  const [quantity] = useState<number>(1);
   const dispatch = useDispatch();
-  const cart = useSelector((state: any) => state.cart);
+  const cart = useSelector((state: RootState) => state.cart);
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR("http://localhost:3000/products", fetcher, {
