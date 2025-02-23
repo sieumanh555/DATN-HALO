@@ -9,9 +9,8 @@ export default function Navbar() {
   const cartQuantity = cart.length;
   return (
     <header className="text-xl text-gray-800 font-medium mx-12 py-4">
-
-      <div className="w-[90%] mx-auto max-sm:hidden">
-        <div className="text-center uppercase pb-4 border-b-[3px] flex justify-between items-center">
+      <div className="container">
+        <div className="w-[90%] text-center mx-auto uppercase mx-auto pb-2 border-b-[3px] flex justify-between items-center">
           <Link href="/" className="w-[20%] hover:text-gray-400">
             trang chủ
           </Link>
@@ -23,7 +22,7 @@ export default function Navbar() {
           <Link href="/" className="w-[16%]">
             <div className="w-full flex justify-center">
               <Image
-                src="/assets/images/logo.jpg"
+                src="/images/logo.jpg"
                 alt="Logo"
                 width={120}
                 height={120}
@@ -41,7 +40,7 @@ export default function Navbar() {
               <Search className="w-6 h-6 cursor-pointer" />
               <Heart className="w-6 h-6 cursor-pointer" />
               <User className="w-6 h-6 cursor-pointer" />
-              <Link href="/page/cart">
+              <Link href="/cart">
                 <div className="relative">
                   <ShoppingBag className="w-6 h-6 cursor-pointer" />
                   <div className="absolute top-3 -right-2 w-[20px] h-[20px] bg-[#034292] rounded-full flex items-center justify-center">
@@ -53,9 +52,8 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
-      <div className="w-[90%] mx-auto mt-4 max-sm:hidden">
-        <div className="flex justify-between">
+      <div className="container mt-4">
+        <div className="w-[90%] mx-auto flex justify-between">
           <Link href="/" className="hover:text-gray-400">
             Tất cả sản phẩm
           </Link>
