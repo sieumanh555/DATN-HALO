@@ -101,7 +101,7 @@ export default function Footer() {
             title="Facebook"
           >
             <img
-              src="/images/facebook-icon.png"
+              src="/assets/images/facebook-icon.png"
               alt="Facebook"
               width={32}
               height={32}
