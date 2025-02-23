@@ -8,20 +8,20 @@ export default function Footer() {
     <footer className="tracking-wide py-10 px-6 md:px-12">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
         <div className="space-y-4 md:col-span-2">
-          <h2 className="text-lg font-semibold text-gray-950">Về HALO</h2>
+          <h2 className="text-lg font-semibold">Về HALO</h2>
           <p className="text-sm text-gray-600">
             HALO - “Highlight Alluring Lifestyle Outfit” tượng trưng cho phong
             cách thời trang nổi bật và cuốn hút.
           </p>
-          <h2 className="text-lg font-semibold text-gray-950">Công ty TNHH HALO</h2>
+          <h2 className="text-lg font-semibold">Công ty TNHH HALO</h2>
           <p className="text-sm text-gray-600">
             0315986019 cấp ngày 31/10/2019 tại Sở kế hoạch đầu tư TPHCM
           </p>
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-950">Địa chỉ</h2>
-          <p className="text-sm font-semibold text-gray-950">Tp Hồ Chí Minh:</p>
+          <h2 className="text-lg font-semibold">Địa chỉ</h2>
+          <p className="text-sm font-semibold">Tp Hồ Chí Minh:</p>
           <ul className="list-inside list-disc text-sm text-gray-600">
             <li>43 Huỳnh Văn Bánh, P.17, Q.Phú Nhuận.</li>
           </ul>
@@ -34,7 +34,7 @@ export default function Footer() {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-950">Hỗ trợ khách hàng</h2>
+          <h2 className="text-lg font-semibold">Hỗ trợ khách hàng</h2>
           <ul className="text-sm text-gray-600 space-y-2">
             <li>
               <Link href="/" className="hover:text-[#034292]">
@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-950">Điều khoản & điều kiện</h2>
+          <h2 className="text-lg font-semibold">Điều khoản & điều kiện</h2>
           <ul className="text-sm text-gray-600 space-y-2">
             <li>
               <Link href="/" className="hover:text-[#034292]">
@@ -82,7 +82,7 @@ export default function Footer() {
       </div>
 
       <div className="container mx-auto mt-4">
-        <h2 className="text-lg font-semibold text-gray-950">Đăng ký nhận tin</h2>
+        <h2 className="text-lg font-semibold">Đăng ký nhận tin</h2>
         <form className="relative w-[320px] bg-[#fff] mt-4 flex items-center border rounded">
           <input
             type="email"
@@ -101,7 +101,7 @@ export default function Footer() {
             title="Facebook"
           >
             <img
-              src="/communication.png"
+              src="/images/facebook-icon.png"
               alt="Facebook"
               width={32}
               height={32}
@@ -114,7 +114,7 @@ export default function Footer() {
             title="Instagram"
           >
             <img
-              src="instagram.png"
+              src="/images/instagram-icon.png"
               alt="Instagram"
               width={32}
               height={32}
@@ -123,7 +123,7 @@ export default function Footer() {
 
           <Link href="https://www.tiktok.com/" target="_blank" title="TikTok">
             <Image
-              src="/tik-tok.png"
+              src="/images/tiktok-icon.png"
               alt="TikTok"
               width={32}
               height={32}
