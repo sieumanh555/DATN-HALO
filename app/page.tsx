@@ -2,13 +2,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { addItem } from "@/redux/slices/cartSlice";
 export default function Home() {
   const [quantity, setQuantity] = useState(1);
   const dispatch = useDispatch();
-  const cart = useSelector((state: any) => state.cart);
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR("http://localhost:3000/products", fetcher, {
@@ -19,15 +18,15 @@ export default function Home() {
 
   return (
     <div className="m-[48px]">
-      <Link href="/cart">
+      <Link href="/page/cart">
         <div>giỏ hàng</div>
       </Link>
       {data.map((product: any) => (
         <div
-          key={product.id}
+          key={product._id}
           className="w-[20%] bg-[#fff] rounded-lg mx-auto my-[8px] p-[14px] hover:shadow-lg flex flex-col space-y-[8px]"
         >
-          <img src={`/images/${product.image}`} alt="" className="rounded" />
+          <img src={`assets/images/${product.image}`} alt="" className="rounded" />
           <p>{product.name}</p>
           <div className="text-[#D92D20]">
             {product.price}
@@ -37,7 +36,7 @@ export default function Home() {
               </span>
             )}
           </div>
-          <p>{product.id} lượt mua</p>
+          <p>300 lượt mua</p>
           <button
             onClick={() =>
               dispatch(addItem({ ...product, quantity: quantity }))

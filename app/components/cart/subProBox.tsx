@@ -1,8 +1,18 @@
 import Image from "next/image";
-export default function NewProBox({ data }: { data: any }) {
+import Product from "../../models/Product";
+
+export default function NewProBox({ data }: { data: Product }) {
   return (
     <div className="relative bg-[#fff] rounded-lg my-2 p-[14px] hover:shadow-lg flex flex-col space-y-2">
-      <Image src={`/images/${data.image}`} alt="" width={200} height={200} className="rounded" />
+      <div className="w-full relative">
+        <Image
+          src={`/assets/images/${data.image}`}
+          alt=""
+          width={200}
+          height={200}
+          className="object-cover "
+        />
+      </div>
       <p>{data.name}</p>
       <div className="text-[#D92D20]">
         {data.price.toLocaleString("vi-VN")}đ

@@ -1,13 +1,19 @@
-type Product = {
-  id: string | undefined;
-  name: string | undefined;
-  image: string | undefined;
-  price: number | undefined;
-  priceSale: number | undefined;
-  idProduct: string | undefined;
-  idCategory: string | undefined;
-  size: string | undefined;
-  color: string | undefined;
-  hot: number | undefined;
-};
+interface Product {
+    _id: string;
+    brand: string;
+    category: {
+        [key: string]: string
+    };
+    hot: number;
+    image: string;
+    name: string;
+    price: number;
+    priceSale: number;
+    sizes: {
+        [key: string]: number
+    };
+    sku: string;
+    subImage: string[]
+}
+
 export default Product;
