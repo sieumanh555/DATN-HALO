@@ -11,7 +11,8 @@ export default function DropDown() {
     <>
       <button
         onClick={toggleDropdown}
-        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        className="text-gray-400/90 bg-gray-50 hover:bg-gray-500/50 focus:ring-4 border-gray-900/40 border-2 focus:ring-blue-300 
+        font-medium rounded-lg text-sm px-14 py-3 text-center inline-flex items-center dark:bg-gray-50 dark:hover:bg-gray-400 dark:focus:ring-gray-800"
         type="button"
       >
         Dropdown button
