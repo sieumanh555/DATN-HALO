@@ -114,7 +114,7 @@ export default function Footer() {
             title="Instagram"
           >
             <img
-              src="/images/instagram-icon.png"
+              src="/assets/images/instagram-icon.png"
               alt="Instagram"
               width={32}
               height={32}
@@ -123,7 +123,7 @@ export default function Footer() {
 
           <Link href="https://www.tiktok.com/" target="_blank" title="TikTok">
             <Image
-              src="/images/tiktok-icon.png"
+              src="/assets/images/tiktok-icon.png"
               alt="TikTok"
               width={32}
               height={32}

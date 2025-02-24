@@ -22,7 +22,7 @@ export default function Navbar() {
           <Link href="/" className="w-[16%]">
             <div className="w-full flex justify-center">
               <Image
-                src="/images/logo.jpg"
+                src="/assets/images/logo.jpg"
                 alt="Logo"
                 width={120}
                 height={120}
