@@ -1,7 +1,12 @@
+"use client"
 import { useState, useEffect } from "react";
 
 export default function DropDown() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // useEffect(() => {
+  //   setIsDropdownOpen(true);
+  // }, []);
 
   // Toggle dropdown visibility
   const toggleDropdown = () => {

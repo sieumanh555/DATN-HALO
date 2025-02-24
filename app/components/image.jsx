@@ -1,7 +1,4 @@
 import Image from "next/image";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Images() {
   return (

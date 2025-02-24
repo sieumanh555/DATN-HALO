@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { faStar, faLocationDot } from "@fortawesome/free-solid-svg-icons";

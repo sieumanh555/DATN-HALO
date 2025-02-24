@@ -15,7 +15,7 @@ export default function ProBox({data}: { data: Product }) {
     const dispatch = useDispatch();
 
     const handleDecrease = (product: Product) => {
-        if (product.quantity === 1) {
+        if (product.quanlity === 1) {
             const text = `Xóa sản phẩm ${product.name}`;
             if (confirm(text) == true) {
                 alert("Xóa thành công");
@@ -76,7 +76,7 @@ export default function ProBox({data}: { data: Product }) {
                     <input
                         type="number"
                         id="quantity"
-                        value={data.quantity}
+                        value={data.quanlity}
                         readOnly
                         className="w-full text-center focus:outline-none"
                     />
@@ -94,7 +94,7 @@ export default function ProBox({data}: { data: Product }) {
             </div>
 
             <div className="w-[14%] text-center opacity-50">
-                <p>{(data.price * data.quantity).toLocaleString("vi-VN")}đ</p>
+                <p>{(data.price * data.quanlity).toLocaleString("vi-VN")}đ</p>
             </div>
 
             <button

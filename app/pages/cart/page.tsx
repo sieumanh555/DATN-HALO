@@ -2,7 +2,7 @@
 import useSWR from "swr";
 import Link from "next/link";
 import {useSelector} from "react-redux";
-import {useMemo, useState} from "react";
+import {useState, useEffect} from "react";
 import {ArrowLeft} from 'lucide-react';
 
 import Product from "../../models/Product";
@@ -19,7 +19,6 @@ interface CartState {
 }
 
 export default function Cart() {
-    const cart = useSelector((state: CartState) => state.cart.products || []);
     const [shipping, setShipping] = useState(40000);
     const [discount, setDiscount] = useState<Discount>({
         id: "",
@@ -31,28 +30,36 @@ export default function Cart() {
         expire: 0,
     });
 
-    const calSubTotal = () =>
-        cart.reduce(
-            (total: number, item: Product) => total + item.price * item.quantity,
-            0
-        );
+    const reduxCart = useSelector((state: CartState) => state.cart.products || []);
+    const [cart, setCart] = useState<Product[]>([]);
 
-    const calTotal = () => {
-        let total = 0;
-        let discountValue = 0;
-        if (subTotal >= discount.condition) {
-            if (discount.minus > 0) {
-                discountValue = discount.minus;
-            } else {
-                discountValue = (subTotal * discount.percent) / 100;
-            }
-        }
-        total = subTotal + shipping - discountValue;
-        return total;
-    };
+    useEffect(() => {
+        setCart(reduxCart); // Đảm bảo cart chỉ cập nhật trên client
+    }, [reduxCart]);
 
-    const subTotal = useMemo(() => calSubTotal(), [cart]);
-    const total = useMemo(() => calTotal(), [shipping, discount, cart]);
+    // const calSubTotal = () =>
+    //     cart.reduce(
+    //         (total: number, item: Product) => total + item.price * item.quanlity,
+    //         0
+    //     );
+
+    // const calTotal = () => {
+    //     let total = 0;
+    //     let discountValue = 0;
+    //     if (subTotal >= discount.condition) {
+    //         if (discount.minus > 0) {
+    //             discountValue = discount.minus;
+    //         } else {
+    //             discountValue = (subTotal * discount.percent) / 100;
+    //         }
+    //     }
+    //     total = subTotal + shipping - discountValue;
+    //     return total;
+    // };
+
+    // const subTotal = useMemo(() => calSubTotal(), [cart]);
+    // const total = useMemo(() => calTotal(), [shipping, discount, cart]);
+
 
     async function getDiscount(discountID: string) {
         try {
@@ -110,9 +117,9 @@ export default function Cart() {
     if (!data) return <div>Loading...</div>;
     if (error) return <div>Lỗi fetching data: {error.message}</div>;
 
-    const percent = Math.floor(
-        ((total - (subTotal + shipping)) * 100) / (subTotal + shipping)
-    );
+    // const percent = Math.floor(
+    //     ((total - (subTotal + shipping)) * 100) / (subTotal + shipping)
+    // );
 
     return (
         <section className="p-12 bg-[#F2F4F7] tracking-wide">
@@ -169,7 +176,7 @@ export default function Cart() {
                                 <p className="w-[40%] text-xl font-medium">Tổng đơn hàng</p>
 
                                 <p className="w-[40%] text-right">
-                                    {subTotal.toLocaleString("vi-VN")}đ
+                                    {/* {subTotal.toLocaleString("vi-VN")}đ */}
                                 </p>
                             </div>
                             <div>
@@ -223,12 +230,12 @@ export default function Cart() {
                                 <p className="w-[40%] text-xl font-medium">Tổng tiền</p>
 
                                 <div className="w-[40%] text-[#D92D20] flex space-x-[6px] justify-end">
-                                    <p>{total.toLocaleString("vi-VN")}đ</p>
-                                    {percent < 0 ? (
+                                    {/* <p>{total.toLocaleString("vi-VN")}đ</p> */}
+                                    {/* {percent < 0 ? (
                                         <p>({percent}%)</p>
                                     ) : (
                                         <div className="hidden"></div>
-                                    )}
+                                    )} */}
                                 </div>
                             </div>
 

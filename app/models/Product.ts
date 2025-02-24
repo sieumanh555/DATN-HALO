@@ -9,6 +9,7 @@ interface Product {
     name: string;
     price: number;
     priceSale: number;
+    quanlity:number;
     sizes: {
         [key: string]: number
     };
