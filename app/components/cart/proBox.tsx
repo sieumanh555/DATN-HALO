@@ -2,13 +2,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import {useDispatch} from "react-redux";
-import {Plus, Minus} from 'lucide-react';
+import {Minus, Plus} from 'lucide-react';
 
-import {
-    removeItem,
-    increaseQuantity,
-    decreaseQuantity,
-} from "@/redux/slices/cartSlice";
+import {decreaseQuantity, increaseQuantity, removeItem,} from "@/redux/slices/cartSlice";
 import Product from "../../models/Product";
 
 export default function ProBox({data}: { data: Product }) {
@@ -46,16 +42,16 @@ export default function ProBox({data}: { data: Product }) {
                     <div className="opacity-60">Mã sản phẩm: {data.sku}</div>
                     <div className="opacity-60">Mã danh mục: {data.category.categoryName}</div>
                     <div className="opacity-60 flex items-center justify-between">
-                    <div className={`w-[30%]`}>Size:</div>
+                        <div className={`w-[30%]`}>Size:</div>
                         <div
-                        className={`w-[60%]text-sm flex justify-between`}>
-                        {Object.keys(data.sizes).map((size, index) => (
-                            <div key={index}
-                                 className={`w-8 h-8 border-2 rounded-lg flex items-center justify-center`}>
-                                {size}
-                            </div>
-                        ))}
-                    </div>
+                            className={`w-[60%]text-sm flex justify-between`}>
+                            {Object.keys(data.sizes).map((size, index) => (
+                                <div key={index}
+                                     className={`w-8 h-8 border-2 rounded-lg flex items-center justify-center`}>
+                                    {size}
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="opacity-60">Brand: {data.brand}</div>

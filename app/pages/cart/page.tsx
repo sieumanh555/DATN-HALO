@@ -233,7 +233,7 @@ export default function Cart() {
                             </div>
 
                             <div className="w-full border-b-[4px] border-[#000000]"></div>
-                            <Link href="/checkout">
+                            <Link href="/pages/checkout">
                                 <button className="w-full h-[40px] bg-[#034292] text-[#fff] rounded">
                                     Thanh toán
                                 </button>
