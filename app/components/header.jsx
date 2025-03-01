@@ -41,7 +41,7 @@ export default function Navbar() {
                             <Search className="w-6 h-6 cursor-pointer"/>
                             <Heart className="w-6 h-6 cursor-pointer"/>
                             <User className="w-6 h-6 cursor-pointer"/>
-                            <Link href="/cart">
+                            <Link href="/pages/cart">
                                 <div className="relative">
                                     <ShoppingBag className="w-6 h-6 cursor-pointer"/>
                                     <div

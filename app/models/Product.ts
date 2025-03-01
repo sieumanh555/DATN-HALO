@@ -1,19 +1,22 @@
 interface Product {
     _id: string;
+    name: string;
+    sku: string;
     brand: string;
     category: {
         [key: string]: string
     };
-    hot: number;
     image: string;
-    name: string;
+    subImage: string[];
     price: number;
     priceSale: number;
-    sizes: {
-        [key: string]: number
-    };
-    sku: string;
-    subImage: string[]
+    quantity: number;
+    sizes: [
+        { size: number, stock: number }
+    ];
+    selectedSize: number;
+    view: number;
+    hot: number;
 }
 
 export default Product;

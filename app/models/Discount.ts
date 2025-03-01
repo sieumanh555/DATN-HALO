@@ -1,11 +1,11 @@
 interface Discount {
-    id: string;
+    _id: string;
     name: string;
     minus: number;
     percent: number;
     condition: number;
     description: string;
-    expire: number;
+    stock: number;
 }
 
 export default Discount;

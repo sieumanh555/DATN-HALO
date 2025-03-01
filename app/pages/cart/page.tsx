@@ -1,103 +1,63 @@
 "use client";
-import useSWR from "swr";
 import Link from "next/link";
-import {useSelector} from "react-redux";
+import useSWR from "swr";
+import {useDispatch, useSelector} from "react-redux";
 import {useMemo, useState} from "react";
-import {ArrowLeft} from 'lucide-react';
+import {ArrowLeft, Plus, ShoppingCart} from 'lucide-react';
 
 import Product from "../../models/Product";
-import Discount from "../../models/Discount";
-
+import CartState from "../../models/CartState";
+// import Discount from "../../models/Discount";
+import {removeAll} from "@/redux/slices/cartSlice";
 import ProBox from "../../components/cart/proBox";
 import CartEmpty from "../../components/cart/cartEmpty";
 import SubProBox from "../../components/cart/subProBox";
 
-interface CartState {
-    cart: {
-        products: Product[];
-    };
-}
-
 export default function Cart() {
+    const dispatch = useDispatch();
     const cart = useSelector((state: CartState) => state.cart.products || []);
+    const [popup, setPopup] = useState(false)
     const [shipping, setShipping] = useState(40000);
-    const [discount, setDiscount] = useState<Discount>({
-        id: "",
-        name: "",
-        minus: 0,
-        percent: 0,
-        condition: 0,
-        description: "",
-        expire: 0,
-    });
 
-    const calSubTotal = () =>
-        cart.reduce(
+    // const [discount, setDiscount] = useState<Discount>({
+    //     id: "",
+    //     name: "",
+    //     minus: 0,
+    //     percent: 0,
+    //     condition: 0,
+    //     description: "",
+    //     expire: 0,
+    // });
+
+    const calSubTotal = () => {
+        return cart.reduce(
             (total: number, item: Product) => total + item.price * item.quantity,
             0
         );
-
+    }
     const calTotal = () => {
         let total = 0;
-        let discountValue = 0;
-        if (subTotal >= discount.condition) {
-            if (discount.minus > 0) {
-                discountValue = discount.minus;
-            } else {
-                discountValue = (subTotal * discount.percent) / 100;
-            }
-        }
-        total = subTotal + shipping - discountValue;
+        // let discountValue = 0;
+        // if (subTotal >= discount.condition) {
+        //     if (discount.minus > 0) {
+        //         discountValue = discount.minus;
+        //     } else {
+        //         discountValue = (subTotal * discount.percent) / 100;
+        //     }
+        // }
+        total = subTotal + shipping;
         return total;
     };
-
     const subTotal = useMemo(() => calSubTotal(), [cart]);
-    const total = useMemo(() => calTotal(), [shipping, discount, cart]);
+    const total = useMemo(() => calTotal(), [shipping, cart]);
+    // const percent = Math.floor(
+    //     ((total - (subTotal + shipping)) * 100) / (subTotal + shipping)
+    // );
 
-    async function getDiscount(discountID: string) {
-        try {
-            const discounts = await fetch("http://localhost:3000/discounts").then(
-                (res) => res.json()
-            );
-            const discount = discounts.find(
-                (discount: Discount) => discount.id === discountID
-            );
-            if (discount) {
-                setDiscount(discount);
-            } else {
-                console.log("Discount: ", discount);
-                setDiscount((prev) => prev);
-            }
-        } catch (error) {
-            console.log("Lỗi fetching discount: ", error);
-        }
+    function handleClosePopup() {
+        dispatch(removeAll());
+        setPopup(false);
     }
-
-    function handleSubmit(evt: React.FormEvent<HTMLFormElement>) {
-        evt.preventDefault();
-        const form = evt.target as HTMLFormElement;
-        const discountCode = (
-            form.elements.namedItem("discountCode") as HTMLInputElement
-        ).value;
-        if (discountCode === "") {
-            alert("Mã giảm giá không được để trống");
-            setDiscount({
-                id: "",
-                name: "",
-                minus: 0,
-                percent: 0,
-                condition: 0,
-                description: "",
-                expire: 0,
-            });
-        }
-        if (discountCode == discount.id) {
-            alert(`Mã giảm giá ${discount.id} đã được áp dụng`);
-        } else {
-            getDiscount(discountCode);
-        }
-    }
-
 
     const fetcher = (url: string) => fetch(url).then((res) => res.json());
     const {data, error} = useSWR<Product[]>(
@@ -109,18 +69,15 @@ export default function Cart() {
     );
     if (!data) return <div>Loading...</div>;
     if (error) return <div>Lỗi fetching data: {error.message}</div>;
-
-    const percent = Math.floor(
-        ((total - (subTotal + shipping)) * 100) / (subTotal + shipping)
-    );
-
+    // const newPro = () => {
+    //     return data.filter((product) => product.hot !== 0)
+    // }
     return (
-        <section className="p-12 bg-[#F2F4F7] tracking-wide">
+        <section className="px-[100px] py-6 bg-[#F2F4F7] tracking-wide">
             {cart.length > 0 ? (
                 <div>
-                    <p className="text-[28px] uppercase">Giỏ hàng</p>
-                    <div className="w-full border-b-[4px] border-[#000000] mt-[18px]"></div>
-                    <div className="w-full mt-[36px] flex justify-between">
+                    <div className="w-full mt-6 flex justify-between">
+                        {/*cart*/}
                         <div className="w-[60%]">
                             <div className="w-full text-xl px-[20px] flex justify-between">
                                 <p className="w-[52%]">Sản phẩm</p>
@@ -131,43 +88,31 @@ export default function Cart() {
                             {cart.map((product: Product) => (
                                 <ProBox key={product._id} data={product}/>
                             ))}
+                            {/* navigation pages/shop ? delete cart */}
+                            <div className={`w-full mt-[18px] flex justify-between`}>
+                                <Link
+                                    href="#"
+                                    className="flex items-center space-x-2"
+                                >
+                                    <ArrowLeft className={`w-5 h-5`}/>
+                                    <p>Tiếp tục mua hàng</p>
+                                </Link>
+                                <button
+                                    onClick={() => setPopup(true)}
+                                    className={`group hover:text-[#D92D20] flex items-center gap-1`}
+                                >
+                                    <Plus
+                                        className={`w-6 h-6 opacity-0 transition-transform duration-300 group-hover:opacity-100 group-hover:rotate-[135deg]`}/>
+                                    <p>Xóa tất cả</p>
+                                </button>
+                            </div>
                         </div>
 
-                        <div className="w-[38%] bg-[#fff] rounded-lg mt-[46px] p-[40px] space-y-[18px]">
-                            <p className="text-3xl uppercase">đơn hàng</p>
-                            <div className="w-full border-b-[4px] border-[#000000]"></div>
-                            <div className="w-full my-[18px]">
-                                <label htmlFor="discountCode" className="text-xl font-medium">
-                                    Mã giảm giá
-                                </label>
-                                <form
-                                    onSubmit={handleSubmit}
-                                    className="w-[60%] h-[40px] border-[2px] my-[8px]"
-                                >
-                                    <input
-                                        type="text"
-                                        id="discountCode"
-                                        className="w-[70%] h-full px-3 focus:outline-none"
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="w-[30%] h-full bg-[#034292] text-[#fff]"
-                                    >
-                                        Áp dụng
-                                    </button>
-                                </form>
-                                {discount ? (
-                                    <div className="text-sm text-[#D92D20]">
-                                        {discount.description}
-                                    </div>
-                                ) : (
-                                    <div></div>
-                                )}
-                            </div>
-                            <div className="w-full border-b-[4px] border-[#000000]"></div>
+                        {/*checkout information*/}
+                        <div className={`w-[38%] h-[380px] bg-[#fff] rounded-lg mt-[46px] px-10 py-8 space-y-4`}>
+                            <p className="text-3xl font-semibold uppercase">đơn hàng</p>
                             <div className="w-full flex justify-between">
                                 <p className="w-[40%] text-xl font-medium">Tổng đơn hàng</p>
-
                                 <p className="w-[40%] text-right">
                                     {subTotal.toLocaleString("vi-VN")}đ
                                 </p>
@@ -182,7 +127,7 @@ export default function Cart() {
                                     </p>
                                 </div>
 
-                                <div className="my-[8px] ml-[20px] flex items-center">
+                                <div className="my-2 ml-5 flex items-center">
                                     <input
                                         type="radio"
                                         id="giaohangtietkiem"
@@ -194,13 +139,13 @@ export default function Cart() {
                                     />
                                     <label
                                         htmlFor="giaohangtietkiem"
-                                        className="ml-[6px]  cursor-pointer"
+                                        className="ml-[6px] cursor-pointer"
                                     >
                                         Giao hàng tiết kiệm
                                     </label>
                                 </div>
 
-                                <div className="my-[8px] ml-[20px] flex items-center">
+                                <div className="my-2 ml-5 flex items-center">
                                     <input
                                         type="radio"
                                         name="shipping"
@@ -217,43 +162,35 @@ export default function Cart() {
                                     </label>
                                 </div>
                             </div>
-
-                            <div className="w-full border-b-[4px] border-[#000000]"></div>
-                            <div className="w-full flex justify-between">
+                            <div className="w-full border-t-2 border-gray-300 pt-4 flex justify-between">
                                 <p className="w-[40%] text-xl font-medium">Tổng tiền</p>
 
-                                <div className="w-[40%] text-[#D92D20] flex space-x-[6px] justify-end">
+                                <div className="w-[40%] text-right">
                                     <p>{total.toLocaleString("vi-VN")}đ</p>
-                                    {percent < 0 ? (
-                                        <p>({percent}%)</p>
-                                    ) : (
-                                        <div className="hidden"></div>
-                                    )}
+                                    {/*{percent < 0 ? (*/}
+                                    {/*    <p>({percent}%)</p>*/}
+                                    {/*) : (*/}
+                                    {/*    <div className="hidden"></div>*/}
+                                    {/*)}*/}
                                 </div>
                             </div>
 
-                            <div className="w-full border-b-[4px] border-[#000000]"></div>
                             <Link href="/pages/checkout">
-                                <button className="w-full h-[40px] bg-[#034292] text-[#fff] rounded">
+                                <button
+                                    className="w-full h-10 mt-[18px] bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
                                     Thanh toán
                                 </button>
                             </Link>
                         </div>
                     </div>
-                    <Link
-                        href="#"
-                        className="mt-[18px] flex items-center space-x-[8px]"
-                    >
-                        <ArrowLeft/>
-                        <p>Tiếp tục mua hàng</p>
-                    </Link>
+
+
                 </div>
             ) : (
                 <CartEmpty/>
             )}
 
-            {/* cart */}
-
+            {/* recently viewed product */}
             <div className="mt-12">
                 <p className="text-2xl font-medium">Sản phẩm vừa xem</p>
                 <div className="mt-[18px] flex flex-wrap justify-between">
@@ -264,6 +201,8 @@ export default function Cart() {
                     ))}
                 </div>
             </div>
+
+            {/* new product */}
             <div className="mt-12">
                 <p className="text-2xl font-medium">Sản phẩm mới</p>
                 <div className="mt-[18px] flex flex-wrap justify-between">
@@ -274,6 +213,44 @@ export default function Cart() {
                     ))}
                 </div>
             </div>
+
+            {/* Popup */}
+            <div className={`${popup === false ? `hidden` : `block`}`}>
+                <div
+                    onClick={() => setPopup(false)}
+                    className={`bg-[#00000066] w-full h-full fixed top-0 right-0 z-10`}
+                ></div>
+                <div
+                    className={`bg-gray-100 w-[480px] h-[240px] fixed top-[25%] right-[35%] z-20 p-8 rounded-xl flex flex-col justify-center items-center gap-4`}>
+                    <div>
+                        {/*<Image*/}
+                        {/*    src={`/assets/images/logo.jpg`}*/}
+                        {/*    alt={`HaloStore`}*/}
+                        {/*    width={80}*/}
+                        {/*    height={40}*/}
+                        {/*    className={`mix-blend-darken`}*/}
+                        {/*/>*/}
+                        <ShoppingCart className={`w-12 h-12`}/>
+                    </div>
+                    <p>Bạn có muốn xóa {cart.length} sản phẩm trong giỏ hàng?</p>
+                    <div className={`text-sm font-semibold mt-4 flex gap-6`}>
+                        <button
+                            onClick={() => setPopup(false)}
+                            className={`w-[60px] h-10 shadow rounded`}
+                        >
+                            Đóng
+                        </button>
+                        <button
+                            onClick={() => handleClosePopup()}
+                            className={`w-[60px] h-10 bg-[#D92D20] text-white shadow rounded`}
+                        >
+                            Xóa
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
         </section>
     );
 }

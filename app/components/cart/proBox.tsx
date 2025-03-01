@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import {useDispatch} from "react-redux";
-import {Minus, Plus} from 'lucide-react';
+import {Minus, Plus, Trash2} from 'lucide-react';
 
 import {decreaseQuantity, increaseQuantity, removeItem,} from "@/redux/slices/cartSlice";
 import Product from "../../models/Product";
@@ -27,40 +27,37 @@ export default function ProBox({data}: { data: Product }) {
     };
 
     return (
-        <div className="relative w-full bg-[#fff] rounded-lg mt-[18px] p-[20px] flex justify-between hover:shadow-lg">
+        <div className="relative w-full bg-[#fff] rounded-lg mt-[18px] p-[20px] flex justify-between">
             <div className="w-[52%] flex justify-between">
-                <div className={`w-[28%] h-[120px] relative`}>
+                <div className={`h-[120px] flex items-center`}>
                     <Image
                         src={`/assets/images/${data.image}`}
-                        alt=""
-                        fill
-                        className={`object-cover rounded`}
+                        alt={`${data.name}`}
+                        width={120}
+                        height={120}
+                        className={`rounded`}
                     />
                 </div>
-                <div className="w-[68%] flex flex-col space-y-[8px]">
+                <div className="relative w-[68%] flex flex-col space-y-2">
                     <div className="font-semibold">{data.name}</div>
                     <div className="opacity-60">Mã sản phẩm: {data.sku}</div>
-                    <div className="opacity-60">Mã danh mục: {data.category.categoryName}</div>
-                    <div className="opacity-60 flex items-center justify-between">
-                        <div className={`w-[30%]`}>Size:</div>
-                        <div
-                            className={`w-[60%]text-sm flex justify-between`}>
-                            {Object.keys(data.sizes).map((size, index) => (
-                                <div key={index}
-                                     className={`w-8 h-8 border-2 rounded-lg flex items-center justify-center`}>
-                                    {size}
-                                </div>
-                            ))}
-                        </div>
+                    <div className="opacity-60">Chọn size: {data.selectedSize}</div>
+                    <div className={`w-full flex items-center gap-4`}>
+                        <Link href={`/pages/product-detail/${data._id}`}
+                              className="opacity-60 hover:underline hover:text-[#0037B3]">
+                            <div>Xem chi tiết sản phẩm</div>
+                        </Link>
+                        <p>|</p>
+                        <button
+                            onClick={() => dispatch(removeItem(data._id))}
+                            title={`Xóa sản phẩm ${data.name} ?`}
+                            className={`cursor-pointer text-gray-600 hover:text-[#D92D20]`}
+                        >
+                            <Trash2 className={`w-6 h-6 `}/>
+                        </button>
                     </div>
-
-                    <div className="opacity-60">Brand: {data.brand}</div>
-                    <Link href="#" className="opacity-60 underline text-[#0037B3]">
-                        <div>Xem thêm thông tin</div>
-                    </Link>
                 </div>
             </div>
-
             <div className="w-[14%] h-[24px] flex">
                 <button
                     onClick={() => handleDecrease(data)}
@@ -84,31 +81,12 @@ export default function ProBox({data}: { data: Product }) {
                     <Plus className={`w-5`}/>
                 </button>
             </div>
-
-            <div className="w-[14%] text-center opacity-50">
+            <div className="w-[14%] flex justify-center">
                 <p>{data.price.toLocaleString("vi-VN")}đ</p>
             </div>
-
-            <div className="w-[14%] text-center opacity-50">
+            <div className="w-[14%] flex justify-center">
                 <p>{(data.price * data.quantity).toLocaleString("vi-VN")}đ</p>
             </div>
-
-            <button
-                onClick={() => dispatch(removeItem(data._id))}
-                className="absolute top-[-10px] right-[-10px]"
-            >
-                <div
-                    title={`Xóa sản phẩm ${data.name} ?`}
-                    className="relative w-[32px] h-[32px] bg-[#D92D20] hover:shadow-complex transition-shadow rounded-full flex justify-center items-center"
-                >
-                    {/*<img*/}
-                    {/*    src="/images/plus-white-icon.png"*/}
-                    {/*    alt=""*/}
-                    {/*    className="absolute w-[24px] h-[24px] rotate-45"*/}
-                    {/*/>*/}
-                    <Plus className={`text-[#fff] rotate-45`}/>
-                </div>
-            </button>
         </div>
     );
 }
