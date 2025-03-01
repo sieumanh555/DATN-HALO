@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="tracking-wide py-10 px-6 md:px-12">
+    <footer className="tracking-wide px-6 md:px-12">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
         <div className="space-y-4 md:col-span-2">
           <h2 className="text-lg font-semibold text-gray-950">Về HALO</h2>

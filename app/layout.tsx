@@ -27,12 +27,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F2F4F7] md:subpixel-antialiased `}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F2F4F7] md:subpixel-antialiased max-w-full`}
       >
         <ReduxProviders>
           <ClientHeader/>
-          {children}
+          <div className="mx-auto">{children}</div>
           <Footer />
         </ReduxProviders>
       </body>

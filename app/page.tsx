@@ -9,7 +9,6 @@
 // import { PackageX } from "lucide-react";
 import Product from "./components/product";
 import Images from "./components/image";
-import ImagesMini from "./components/imagemini";
 import SlideShow from "./components/slideshow";
 export default function Home() {
   // const [quantity] = useState<number>(1);
@@ -54,7 +53,7 @@ export default function Home() {
     //     </div>
     //   ))}
     // </div>
-    <div>
+    <div className="flex flex-col my-[120px]">
       <div className="relative flex h-screen w-full mb-12 overflow-hidden">
         <div className="flex gap-2 flex-col my-6 font-bold uppercase">
           <div className="relative z-30 p-5 text-[140px] bg-opacity-50 rounded-xl">
@@ -71,13 +70,13 @@ export default function Home() {
           autoPlay={true}
           loop={true}
           muted={true}
-          className="absolute z-10 w-auto min-w-full min-h-full max-w-none"
+          className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="/banner.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </div>
-      <div className="flex flex-row mx-5 gap-2">
+      {/* <div className="flex flex-row gap-5 max-w-[1300px] mx-[340px]">
         <div
           className="relative flex  min-h-[450px] overflow-hidden"
           style={{ minWidth: "calc(50% - 5px)" }}
@@ -128,83 +127,114 @@ export default function Home() {
             Your browser does not support the video tag.
           </video>
         </div>
-      </div>
-      <div className="text-gray-900 mx-5 my-5 py-8 flex justify-between items-center border-b-4 border-b-gray-900">
-        <span className="text-[28px]">Sản phẩm mới ra mắt</span>
-        <span className="text-[16px]">Xem tất cả --</span>
-      </div>
+      </div> */}
+      <div className="flex justify-center justify-items-center">
+        <div className="max-w-[1280px] bg-white rounded-xl">
+          <div className="text-gray-900 mx-5 my-5 py-8 flex justify-between items-center border-b-4 border-b-gray-900">
+            <span className="text-[28px]">Sản phẩm mới ra mắt</span>
+            <span className="text-[16px]">Xem tất cả --</span>
+          </div>
+          <div className="flex flex-row gap-5 max-w-[1300px]">
+            <div
+              className="relative flex  min-h-[450px] w-full overflow-hidden"
+              style={{ minWidth: "calc(50% - 5px)" }}
+            >
+              <div className="flex gap-2 flex-col my-6 font-bold uppercase">
+                <div className="relative z-30 p-5 text-[40px] bg-opacity-50 rounded-xl">
+                  Bộ sưu tập nam
+                </div>
+                <div className="relative z-30 p-5 text-[30px] bg-opacity-50 rounded-xl">
+                  Mùa xuân 2025
+                </div>
+                <div className="relative z-30 p-5 text-[20px] bg-opacity-50 rounded-xl">
+                  Phiên bản giói hạn
+                </div>
+              </div>
+              <video
+                autoPlay={true}
+                loop={true}
+                muted={true}
+                className="absolute z-10 w-auto min-w-full min-h-full max-w-none"
+              >
+                <source src="/banner.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
 
-      <div className="mx-5 grid grid-cols-5 gap-7">
-        <Product></Product>
-        <Product></Product>
-        <Product></Product>
-        <Product></Product>
-        <Product></Product>
-        <Product></Product>
-        <Product></Product>
-        <Product></Product>
-      </div>
-      <div className="text-gray-900 mx-5 my-5 py-8 text-center border-b-4 border-b-gray-900">
-        <span className="text-[28px]">Sản phẩm mới ra mắt</span>
-      </div>
-      <div className="w-full px-5 flex flex-row">
-        <div className="w-[50%]">
-          <video
-            autoPlay={true}
-            loop={true}
-            muted={true}
-            className="relative z-10 w-auto h-auto"
-          >
-            <source src="/banner.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-        <div className="text-gray-900 max-w-[50%] px-10 flex justify-center flex-col gap-5">
-          <h1 className="text-[54px]">Bộ sưu tập nam</h1>
-          <p>
-            This collection brings together dreamy spirit with Hello Kittys
-            timeless adorableness. Designed for dreamers who find beauty in the
-            little things, it serves as a gentle reminder that love, friendship,
-            and imagination are the true colors of life.Step into a world where
-            every piece tells a story of dreams, and every moment radiates
-            cuteness. Be part of a j ourney that inspires you to dream boldly
-            and love endlessly
-          </p>
-          <button className="bg-transparent hover:bg-gray-500 text-gray-900 font-semibold hover:text-white py-2 px-4 border border-gray-900 hover:border-transparent rounded">
-            Button
-          </button>
+          <div className="grid grid-cols-4">
+            <Product></Product>
+            <Product></Product>
+            <Product></Product>
+            <Product></Product>
+            <Product></Product>
+            <Product></Product>
+            <Product></Product>
+            <Product></Product>
+          </div>
         </div>
       </div>
-      <div className="text-gray-900 mx-5 my-5 py-8 text-center border-b-4 border-b-gray-900">
-        <span className="text-[28px]">Sản phẩm mới ra mắt</span>
-      </div>
-      {/* // */}
-      <div className="w-full px-5 flex flex-row">
-        <div className="text-gray-900 max-w-[50%] pr-5 flex justify-center flex-col gap-5">
-          <h1 className="text-[54px]">Bộ sưu tập nam</h1>
-          <p>
-            This collection brings together dreamy spirit with Hello Kittys
-            timeless adorableness. Designed for dreamers who find beauty in the
-            little things, it serves as a gentle reminder that love, friendship,
-            and imagination are the true colors of life.Step into a world where
-            every piece tells a story of dreams, and every moment radiates
-            cuteness. Be part of a j ourney that inspires you to dream boldly
-            and love endlessly
-          </p>
-          <button className="bg-transparent hover:bg-gray-500 text-gray-900 font-semibold hover:text-white py-2 px-4 border border-gray-900 hover:border-transparent rounded">
-            Button
-          </button>
-        </div>
-        <div className="w-[50%]">
-          <video
-            autoPlay={true}
-            loop={true}
-            muted={true}
-            className="relative z-10 w-auto h-auto"
-          >
-            <source src="/banner.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+      <div className="flex justify-center justify-items-center">
+        <div className="max-w-[1280px] bg-white rounded-xl flex flex-col gap-20">
+          <div className="text-gray-900 mx-5 my-5 py-8 text-center border-b-4 border-b-gray-900">
+            <span className="text-[28px]">Sản phẩm mới ra mắt</span>
+          </div>
+          <div className="w-full px-5 flex flex-row">
+            <div className="w-[50%]">
+              <video
+                autoPlay={true}
+                loop={true}
+                muted={true}
+                className="relative z-10 w-auto h-auto"
+              >
+                <source src="/banner.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div className="text-gray-900 max-w-[50%] px-10 flex justify-center flex-col gap-5">
+              <h1 className="text-[54px]">Bộ sưu tập nam</h1>
+              <p>
+                This collection brings together dreamy spirit with Hello Kittys
+                timeless adorableness. Designed for dreamers who find beauty in
+                the little things, it serves as a gentle reminder that love,
+                friendship, and imagination are the true colors of life.Step
+                into a world where every piece tells a story of dreams, and
+                every moment radiates cuteness. Be part of a j ourney that
+                inspires you to dream boldly and love endlessly
+              </p>
+              <button className="bg-transparent hover:bg-gray-500 text-gray-900 font-semibold hover:text-white py-2 px-4 border border-gray-900 hover:border-transparent rounded">
+                Button
+              </button>
+            </div>
+          </div>
+          <div className="w-full px-5 flex flex-row">
+            <div className="text-gray-900 max-w-[50%] pr-5 flex justify-center flex-col gap-5">
+              <h1 className="text-[54px]">Bộ sưu tập nam</h1>
+              <p>
+                This collection brings together dreamy spirit with Hello Kittys
+                timeless adorableness. Designed for dreamers who find beauty in
+                the little things, it serves as a gentle reminder that love,
+                friendship, and imagination are the true colors of life.Step
+                into a world where every piece tells a story of dreams, and
+                every moment radiates cuteness. Be part of a j ourney that
+                inspires you to dream boldly and love endlessly
+              </p>
+              <button className="bg-transparent hover:bg-gray-500 text-gray-900 font-semibold hover:text-white py-2 px-4 border border-gray-900 hover:border-transparent rounded">
+                Button
+              </button>
+            </div>
+            <div className="w-[50%]">
+              <video
+                autoPlay={true}
+                loop={true}
+                muted={true}
+                className="relative z-10 w-auto h-auto"
+              >
+                <source src="/banner.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
         </div>
       </div>
       <div className="text-gray-900 mx-5 my-5 py-8 text-center border-b-4 border-b-gray-900">
@@ -234,26 +264,24 @@ export default function Home() {
           </button>
         </div>
       </div>
-      <div className="text-gray-900 mx-5 my-5 py-8 flex justify-between items-center border-b-4 border-b-gray-900">
-        <span className="text-[28px]">Sản phẩm mới ra mắt</span>
-        <span className="text-[16px]">Xem tất cả --</span>
+      <div className="flex justify-center align">
+        <div className="max-w-[1280px] bg-white rounded-xl">
+          <div className="text-gray-900 mx-5 my-5 py-8 flex justify-between items-center border-b-4 border-b-gray-900">
+            <span className="text-[28px]">Sản phẩm mới ra mắt</span>
+            <span className="text-[16px]">Xem tất cả --</span>
+          </div>
+          <div className="grid grid-cols-3 gap-5">
+            <Images />
+            <Images />
+            <Images />
+            <Images />
+            <Images />
+            <Images />
+          </div>
+        </div>
       </div>
-      <div className="flex mx-5 gap-5 ">
-        <Images />
-        <Images />
-        <Images />
-        <Images />
-      </div>
-      <div>
+      <div className="flex justify-center mt-10">
         <SlideShow />
-      </div>
-      <div className="text-gray-900 mx-5 my-5 py-8 text-center border-b-4 border-b-gray-900">
-        <span className="text-[28px]">Sản phẩm mới ra mắt</span>
-      </div>
-      <div className="flex flex-row flex-wrap mx-5 gap-[0.8rem]">
-        {Array.from({ length: 16 }).map((_, i) => (
-          <ImagesMini key={i} />
-        ))}
       </div>
     </div>
   );

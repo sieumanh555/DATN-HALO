@@ -5,12 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Product() {
   return (
-    <div className="w-[321px] min-h-[456] bg-white flex flex-col gap-5  text-gray-900 py-2 cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105">
+    <div className="w-[321px] min-h-[456] bg-white flex flex-col gap-5  text-gray-900 py-2 border border-gray-500/50 pr-10 overflow-hidden">
       <div className="overflow-hidden w-[321] h-[290]">
         <Image
           src="https://i.pinimg.com/736x/a0/34/5f/a0345fdbcf2697e90a1b1241437870ad.jpg"
           width={321}
           height={205}
+          className="cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105"
           alt="Hình ảnh mô tả"
         />
       </div>

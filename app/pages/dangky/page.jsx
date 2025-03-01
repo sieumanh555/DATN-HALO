@@ -14,7 +14,6 @@ export default function RegisterForm() {
               <input type="text" placeholder="Họ" className="w-1/2 px-3 py-2 border rounded-md" />
               <input type="text" placeholder="Tên" className="w-1/2 px-3 py-2 border rounded-md" />
             </div>
-            
             <div className="mt-3">
               <label className="block text-sm">Ngày sinh</label>
               <div className="flex space-x-2">

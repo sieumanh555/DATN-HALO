@@ -34,10 +34,10 @@ export default function SlideShow() {
     <>
       <div
         id="indicators-carousel"
-        className="relative w-[80%] ml-[10%] my-5"
+        className="relative w-[1280px]"
         data-carousel="static"
       >
-        <div className="relative overflow-hidden rounded-lg md:h-[680px] shadow-lg">
+        <div className="relative overflow-hidden rounded-xl md:h-[680px] shadow-lg">
           {images.map((src, index) => (
             <div
               key={index}

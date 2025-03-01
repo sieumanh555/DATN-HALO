@@ -4,11 +4,11 @@ import Image from "next/image";
 import { Search, Heart, User, ShoppingBag } from "lucide-react";
 import { useSelector } from "react-redux";
 
-export default function Navbar() {
+export default function Header() {
   const cart = useSelector((state) => state.cart.products || []);
   const cartQuantity = cart.length;
   return (
-    <header className="text-xl text-gray-800 font-medium py-4">
+    <header className="text-xl text-gray-800 font-medium py-4 fixed z-50 bg-white w-full">
       <div className=" w-full">
         <div className="text-center mx-auto uppercase pb-2 border-b-[3px] flex items-center">
           <Link href="/" className="w-[20%] hover:text-gray-400">

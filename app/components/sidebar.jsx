@@ -23,7 +23,7 @@ export default function Sidebar({ children }) {
             <li>
               <a
                 href="#"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-gray-900 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-gray-900 font-medium hover:bg-gray-100 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
               >
                 <svg
                   className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -43,7 +43,7 @@ export default function Sidebar({ children }) {
             <li>
               <button
                 type="button"
-                className="flex items-center w-full p-2 text-base text-gray-900 font-medium transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-700"
+                className="flex items-center w-full p-2 text-base text-gray-900 font-medium transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-900 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400"
                 aria-controls="dropdown-example"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown
               >
@@ -87,7 +87,7 @@ export default function Sidebar({ children }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center w-full p-2 gap-5 text-gray-900 font-medium transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-700"
+                    className="flex items-center w-full p-2 gap-5 text-gray-900 font-medium transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-900 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400"
                   >
                     <FontAwesomeIcon className="text-[12px] text-gray-950" icon={faCircle}/>
                     <span>Products</span>
