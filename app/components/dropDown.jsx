@@ -14,8 +14,8 @@ export default function DropDown() {
       {/* Nút dropdown */}
       <button
         onClick={toggleDropdown}
-        className="bg-blue-600 text-white hover:bg-blue-500 focus:ring-4 focus:ring-blue-300 
-        font-medium rounded-lg text-sm px-6 py-3 flex items-center border-2 border-blue-700"
+        className="bg-white hover:bg-gray-300 transition duration-300 text-gray-900 focus:ring-4 focus:ring-blue-300 
+        font-medium rounded-lg text-sm px-6 py-3 flex items-center border-2 border-gray-300"
         type="button"
       >
         Chọn chức năng
