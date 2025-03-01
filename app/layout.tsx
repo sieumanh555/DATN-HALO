@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { VoucherProvider } from "./pages/context/page";
 
 import ReduxProviders from "../redux/Provider";
 const geistSans = Geist({
@@ -35,9 +34,7 @@ export default function RootLayout({
         <ReduxProviders>
           <Header />
           <Marquee />
-          <VoucherProvider>
           {children}
-        </VoucherProvider>
           <Footer />
         </ReduxProviders>
       </body>
