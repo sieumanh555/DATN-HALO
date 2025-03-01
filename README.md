@@ -33,6 +33,11 @@ app/components/
 ```
 - Là những trang nào được tái sử dụng nhiều thì nên tách ra các compoents thì tái sử dụng 
 
+```
+app/pages/
+```
+- Là những chứa các trang chính
+
 Ví dụ:
 
 Compoent được dropDown cho tái sử dụng nhiều lần được:
