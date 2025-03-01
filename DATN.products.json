@@ -1,0 +1,168 @@
+[{
+  "_id": {
+    "$oid": "67b888d7454fd74d65f5ac95"
+  },
+  "name": "Giày Adidas Streetball Black Yellow Pink EF9606",
+  "sku": "EF9606",
+  "brand": "Adidas",
+  "image": "Adidas-Streetball-Black-Yellow-Pink.png",
+  "subImage": [
+    "Adidas-Streetball-Black-Yellow-Pink(1).png",
+    "Adidas-Streetball-Black-Yellow-Pink(2).png",
+    "Adidas-Streetball-Black-Yellow-Pink(3).png",
+    "Adidas-Streetball-Black-Yellow-Pink(4).png"
+  ],
+  "price": 3900000,
+  "priceSale": 0,
+  "sizes": {
+    "39": 100,
+    "40": 100,
+    "41": 0,
+    "42": 0
+  },
+  "hot": 1,
+  "category": {
+    "categoryID": "",
+    "categoryName": "shoes"
+  }
+},
+{
+  "_id": {
+    "$oid": "67b888d7454fd74d65f5ac96"
+  },
+  "name": "Giày Adidas Rivalry Low ‘Dark Grey Red’ HR0464",
+  "sku": "HR0464",
+  "brand": "Adidas",
+  "image": "Adidas-Rivalry-Low-Dark-Grey-Red.png",
+  "subImage": [
+    "Adidas-Rivalry-Low-Dark-Grey-Red(1).png",
+    "Adidas-Rivalry-Low-Dark-Grey-Red(2).png",
+    "Adidas-Rivalry-Low-Dark-Grey-Red(3).png",
+    "Adidas-Rivalry-Low-Dark-Grey-Red(4).png"
+  ],
+  "price": 2500000,
+  "priceSale": 0,
+  "sizes": {
+    "39": 100,
+    "40": 100,
+    "41": 100,
+    "42": 100
+  },
+  "hot": 1,
+  "category": {
+    "categoryID": "",
+    "categoryName": "shoes"
+  }
+},
+{
+  "_id": {
+    "$oid": "67b888d7454fd74d65f5ac97"
+  },
+  "name": "Giày MLB Chunky Runner NY ‘Black White’ 3ASHRJ13N-50BKS",
+  "sku": "3ASHRJ13N-50BKS",
+  "brand": "MLB",
+  "image": "MLB-Chunky-Runner-NY-Black-White.png",
+  "subImage": [
+    "MLB-Chunky-Runner-NY-Black-White(1).png",
+    "MLB-Chunky-Runner-NY-Black-White(2).png",
+    "MLB-Chunky-Runner-NY-Black-White(3).png",
+    "MLB-Chunky-Runner-NY-Black-White(4).png"
+  ],
+  "price": 3500000,
+  "priceSale": 0,
+  "sizes": {
+    "38": 100,
+    "41": 100,
+    "36.5": 100,
+    "38.5": 100
+  },
+  "hot": 1,
+  "category": {
+    "categoryID": "",
+    "categoryName": "shoes"
+  }
+},
+{
+  "_id": {
+    "$oid": "67b888d7454fd74d65f5ac98"
+  },
+  "name": "Giày MLB Chunky Liner Mid NY ‘Green’ 3ASXLMB3N-50GNS",
+  "sku": "3ASXLMB3N-50GNS",
+  "brand": "MLB",
+  "image": "MLB-Chunky-Liner-Mid-NY-Green.png",
+  "subImage": [
+    "MLB-Chunky-Liner-Mid-NY-Green(1).png",
+    "MLB-Chunky-Liner-Mid-NY-Green(2).png",
+    "MLB-Chunky-Liner-Mid-NY-Green(3).png",
+    "MLB-Chunky-Liner-Mid-NY-Green(4).png"
+  ],
+  "price": 4500000,
+  "priceSale": 0,
+  "sizes": {
+    "38": 100,
+    "41": 100,
+    "36.5": 100,
+    "38.5": 100
+  },
+  "hot": 1,
+  "category": {
+    "categoryID": "",
+    "categoryName": "shoes"
+  }
+},
+{
+  "_id": {
+    "$oid": "67b888d7454fd74d65f5ac99"
+  },
+  "name": "Giày Nike Air Force 1 Low ‘Valentine’s Day’ FD4616-161",
+  "sku": "FD4616-161",
+  "brand": "Nike",
+  "image": "Nike-Air-Force-1-Low-Valentine’s-Day.png",
+  "subImage": [
+    "MLB-Chunky-Runner-NY-Black-White(1).png",
+    "MLB-Chunky-Runner-NY-Black-White(2).png",
+    "MLB-Chunky-Runner-NY-Black-White(3).png",
+    "MLB-Chunky-Runner-NY-Black-White(4).png"
+  ],
+  "price": 4900000,
+  "priceSale": 0,
+  "sizes": {
+    "38": 100,
+    "41": 100,
+    "36.5": 100,
+    "38.5": 100
+  },
+  "hot": 1,
+  "category": {
+    "categoryID": "",
+    "categoryName": "shoes"
+  }
+},
+{
+  "_id": {
+    "$oid": "67b888d7454fd74d65f5ac9a"
+  },
+  "name": "Giày Nike Air Force 1 ID ‘Gucci’ CT7875-994",
+  "sku": "CT7875-994",
+  "brand": "Nike",
+  "image": "Nike-Air-Force-1-ID-Gucci.png",
+  "subImage": [
+    "Nike-Air-Force-1-ID-Gucci(1).png",
+    "Nike-Air-Force-1-ID-Gucci(2).png",
+    "Nike-Air-Force-1-ID-Gucci(3).png",
+    "Nike-Air-Force-1-ID-Gucci(4).png"
+  ],
+  "price": 4900000,
+  "priceSale": 0,
+  "sizes": {
+    "38": 100,
+    "41": 100,
+    "36.5": 100,
+    "38.5": 100
+  },
+  "hot": 1,
+  "category": {
+    "categoryID": "",
+    "categoryName": "shoes"
+  }
+}]
