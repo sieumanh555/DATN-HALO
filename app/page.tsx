@@ -43,6 +43,7 @@ export default function Home() {
                     <div>giỏ hàng</div>
                 </Link>
                 {data.map((product: Product) => (
+                    // <Link href={`/pages/product-detail/${product._id}`} key={product._id}>
                     <div
                         key={product._id}
                         className="w-[20%] bg-[#fff] rounded-lg mx-auto my-[8px] p-[14px] hover:shadow-lg flex flex-col space-y-[8px]"
@@ -78,6 +79,8 @@ export default function Home() {
                             Mua
                         </button>
                     </div>
+                    // </Link>
+
                 ))}
             </div>
             {/*<div className="relative flex h-screen w-full mb-12 overflow-hidden">*/}

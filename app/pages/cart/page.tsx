@@ -167,11 +167,6 @@ export default function Cart() {
 
                                 <div className="w-[40%] text-right">
                                     <p>{total.toLocaleString("vi-VN")}đ</p>
-                                    {/*{percent < 0 ? (*/}
-                                    {/*    <p>({percent}%)</p>*/}
-                                    {/*) : (*/}
-                                    {/*    <div className="hidden"></div>*/}
-                                    {/*)}*/}
                                 </div>
                             </div>
 

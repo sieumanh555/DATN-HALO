@@ -49,14 +49,15 @@ export default function CheckOut() {
             }
         }
         total = subTotal + shipping - discountValue;
+        if (total <= 0) {
+            return total = 0;
+        }
         return total;
     };
 
     const subTotal = useMemo(() => calSubTotal(), [cart]);
     const total = useMemo(() => calTotal(), [cart, shipping, discount]);
     const percent = Math.abs(Math.ceil((total - subTotal + shipping) * 100 / (total + shipping)));
-
-    ;
 
     useEffect(() => {
         const fetchDiscounts = async () => {
@@ -70,7 +71,6 @@ export default function CheckOut() {
         };
         fetchDiscounts();
     }, []);
-
     return (
         <section className="container grid grid-cols-1 md:grid-cols-2 gap-8 px-[100px] py-10 tracking-wide">
             {/* customer info */}
