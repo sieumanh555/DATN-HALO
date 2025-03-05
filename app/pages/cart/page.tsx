@@ -7,7 +7,6 @@ import {ArrowLeft, Plus, ShoppingCart} from 'lucide-react';
 
 import Product from "../../models/Product";
 import CartState from "../../models/CartState";
-// import Discount from "../../models/Discount";
 import {removeAll} from "@/redux/slices/cartSlice";
 import ProBox from "../../components/cart/proBox";
 import CartEmpty from "../../components/cart/cartEmpty";
@@ -16,18 +15,7 @@ import SubProBox from "../../components/cart/subProBox";
 export default function Cart() {
     const dispatch = useDispatch();
     const cart = useSelector((state: CartState) => state.cart.products || []);
-    const [popup, setPopup] = useState(false)
-    const [shipping, setShipping] = useState(40000);
-
-    // const [discount, setDiscount] = useState<Discount>({
-    //     id: "",
-    //     name: "",
-    //     minus: 0,
-    //     percent: 0,
-    //     condition: 0,
-    //     description: "",
-    //     expire: 0,
-    // });
+    const [popup, setPopup] = useState(false);
 
     const calSubTotal = () => {
         return cart.reduce(
@@ -35,24 +23,7 @@ export default function Cart() {
             0
         );
     }
-    const calTotal = () => {
-        let total = 0;
-        // let discountValue = 0;
-        // if (subTotal >= discount.condition) {
-        //     if (discount.minus > 0) {
-        //         discountValue = discount.minus;
-        //     } else {
-        //         discountValue = (subTotal * discount.percent) / 100;
-        //     }
-        // }
-        total = subTotal + shipping;
-        return total;
-    };
     const subTotal = useMemo(() => calSubTotal(), [cart]);
-    const total = useMemo(() => calTotal(), [shipping, cart]);
-    // const percent = Math.floor(
-    //     ((total - (subTotal + shipping)) * 100) / (subTotal + shipping)
-    // );
 
     function handleClosePopup() {
         dispatch(removeAll());
@@ -69,9 +40,6 @@ export default function Cart() {
     );
     if (!data) return <div>Loading...</div>;
     if (error) return <div>Lỗi fetching data: {error.message}</div>;
-    // const newPro = () => {
-    //     return data.filter((product) => product.hot !== 0)
-    // }
     return (
         <section className="px-[100px] py-6 bg-[#F2F4F7] tracking-wide">
             {cart.length > 0 ? (
@@ -79,7 +47,7 @@ export default function Cart() {
                     <div className="w-full mt-6 flex justify-between">
                         {/*cart*/}
                         <div className="w-[60%]">
-                            <div className="w-full text-xl px-[20px] flex justify-between">
+                            <div className="w-full px-5 text-xl flex justify-between">
                                 <p className="w-[52%]">Sản phẩm</p>
                                 <p className="w-[14%] text-center">Số lượng</p>
                                 <p className="w-[14%] text-center">Giá</p>
@@ -117,56 +85,12 @@ export default function Cart() {
                                     {subTotal.toLocaleString("vi-VN")}đ
                                 </p>
                             </div>
-                            <div>
-                                <div className="w-full flex justify-between">
-                                    <p className="w-[40%] text-xl font-medium">
-                                        Chi phí vận chuyển
-                                    </p>
-                                    <p className="w-[40%] text-right">
-                                        {shipping.toLocaleString("vi-VN")}đ
-                                    </p>
-                                </div>
 
-                                <div className="my-2 ml-5 flex items-center">
-                                    <input
-                                        type="radio"
-                                        id="giaohangtietkiem"
-                                        name="shipping"
-                                        value={40000}
-                                        defaultChecked={true}
-                                        onClick={() => setShipping(40000)}
-                                        className="cursor-pointer"
-                                    />
-                                    <label
-                                        htmlFor="giaohangtietkiem"
-                                        className="ml-[6px] cursor-pointer"
-                                    >
-                                        Giao hàng tiết kiệm
-                                    </label>
-                                </div>
-
-                                <div className="my-2 ml-5 flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="shipping"
-                                        id="giaohangnhanh"
-                                        value={120000}
-                                        onClick={() => setShipping(120000)}
-                                        className="cursor-pointer"
-                                    />
-                                    <label
-                                        htmlFor="giaohangnhanh"
-                                        className="ml-[6px] cursor-pointer"
-                                    >
-                                        Giao hàng nhanh
-                                    </label>
-                                </div>
-                            </div>
                             <div className="w-full border-t-2 border-gray-300 pt-4 flex justify-between">
                                 <p className="w-[40%] text-xl font-medium">Tổng tiền</p>
 
                                 <div className="w-[40%] text-right">
-                                    <p>{total.toLocaleString("vi-VN")}đ</p>
+                                    <p>{subTotal.toLocaleString("vi-VN")}đ</p>
                                 </div>
                             </div>
 

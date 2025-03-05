@@ -1,17 +1,22 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import {Heart, Search, ShoppingBag, User} from "lucide-react";
 import {useSelector} from "react-redux";
+import {usePathname} from "next/navigation";
+import {Heart, Search, ShoppingBag, User} from "lucide-react";
 
 export default function Navbar() {
+    const pathname = usePathname();
+    const hiddenOnPaths = ["/pages/login", "/pages/register"];
+    const isHidden = hiddenOnPaths.includes(pathname);
+
     const cart = useSelector((state) => state.cart.products || []);
     const cartQuantity = cart.length;
     return (
-        <header className="text-xl text-gray-800 font-medium mx-12 py-4">
+        <header className={`${isHidden ? "hidden" : "block"} text-xl text-gray-800 font-medium mx-12 py-4`}>
             <div className="container">
                 <div
-                    className="w-[90%] text-center mx-auto uppercase mx-auto pb-2 border-b-[3px] flex justify-between items-center">
+                    className="w-[90%] text-center mx-auto uppercase pb-2 border-b-[3px] flex justify-between items-center">
                     <Link href="/" className="w-[20%] hover:text-gray-400">
                         trang chủ
                     </Link>

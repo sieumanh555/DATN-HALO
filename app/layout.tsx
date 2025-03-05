@@ -2,10 +2,16 @@ import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 
+import {GoogleOAuthProvider} from '@react-oauth/google';
 import ReduxProviders from "../redux/Provider";
 import Header from "./components/header";
 import Marquee from "./components/marquee";
+import Breadcrumbs from "./components/breadcrumbs";
 import Footer from "./components/footer";
+
+
+// client side
+const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -32,12 +38,15 @@ export default function RootLayout({
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F2F4F7] `}
         >
-        <ReduxProviders>
-            <Header/>
-            <Marquee/>
-            {children}
-            <Footer/>
-        </ReduxProviders>
+        <GoogleOAuthProvider clientId={googleClientId}>
+            <ReduxProviders>
+                <Header/>
+                <Marquee/>
+                <Breadcrumbs/>
+                {children}
+                <Footer/>
+            </ReduxProviders>
+        </GoogleOAuthProvider>
         </body>
         </html>
     );
