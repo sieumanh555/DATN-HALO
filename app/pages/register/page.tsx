@@ -1,12 +1,11 @@
 "use client";
 import * as Yup from "yup";
 import Link from "next/link";
-import Image from "next/image";
 import {useState} from "react";
 import {Field, Form, Formik} from "formik";
 import {Eye, EyeClosed} from 'lucide-react';
 
-import GoogleLoginButton from "../../components/login/googleBtnLogin"
+import ButtonLogin from "../../components/socialLogin/btnLogin"
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -184,18 +183,8 @@ export default function Login() {
                     </div>
 
                     {/*facebook && google account*/}
-                    <div className={`w-full flex justify-between`}>
-                        <button className={`w-[48%] h-10 border-[2px] rounded flex justify-center items-center gap-2`}>
-                            <Image
-                                src={`/assets/images/facebook-icon.webp`}
-                                alt={``}
-                                width={22}
-                                height={22}
-                            />
-                            <p className={`text-sm`}>Facebook</p>
-                        </button>
-                        <GoogleLoginButton />
-                    </div>
+                    <ButtonLogin/>
+
                 </div>
                 <div className={`flex gap-1`}>
                     Bạn đã có tài khoản ? <Link href={`/pages/login`} className={`text-[#034292] hover:underline`}>Đăng

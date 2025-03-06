@@ -101,7 +101,7 @@ export default function Footer() {
                         title="Facebook"
                     >
                         <img
-                            src="../facebook-icon.png"
+                            src="/assets/images/facebook-icon.png"
                             alt="Facebook"
                             width={32}
                             height={32}
@@ -109,12 +109,12 @@ export default function Footer() {
                     </Link>
 
                     <Link
-                        href="https://www.instagram.com/"
+                        href={`https://www.instagram.com/`}
                         target="_blank"
                         title="Instagram"
                     >
                         <img
-                            src="/instagram-icon.png"
+                            src={`/assets/images/instagram-icon.png`}
                             alt="Instagram"
                             width={32}
                             height={32}
@@ -123,7 +123,7 @@ export default function Footer() {
 
                     <Link href="https://www.tiktok.com/" target="_blank" title="TikTok">
                         <Image
-                            src="/tiktok-icon.png"
+                            src={`/assets/images/tiktok-icon.png`}
                             alt="TikTok"
                             width={32}
                             height={32}

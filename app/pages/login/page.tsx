@@ -1,12 +1,11 @@
 "use client";
 import * as Yup from "yup";
 import Link from "next/link";
-import Image from "next/image";
 import {useState} from "react";
 import {Field, Form, Formik} from "formik";
 import {Eye, EyeClosed} from 'lucide-react';
 
-import GoogleLoginButton from "../../components/login/googleBtnLogin"
+import ButtonLogin from "../../components/socialLogin/btnLogin";
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -94,13 +93,15 @@ export default function Login() {
                                                 onClick={() => setShowPassword(!showPassword)}
                                                 className={`absolute z-0 top-2 right-2 cursor-pointer`}
                                             >
-                                                {showPassword ? <Eye strokeWidth={1.5} className={`w-5 h-5`}/> : <EyeClosed strokeWidth={1.5} className={`w-5 h-5`}/>}
+                                                {showPassword ? <Eye strokeWidth={1.5} className={`w-5 h-5`}/> :
+                                                    <EyeClosed strokeWidth={1.5} className={`w-5 h-5`}/>}
                                             </div>
                                         </div>
                                     </div>
 
                                     {/*button submit*/}
-                                    <button className={`w-full h-10 bg-[#034292] hover:bg-[#5469d4] text-[#fff] mt-2 rounded`}>
+                                    <button
+                                        className={`w-full h-10 bg-[#034292] hover:bg-[#5469d4] text-[#fff] mt-2 rounded`}>
                                         Đăng nhập
                                     </button>
 
@@ -118,30 +119,11 @@ export default function Login() {
                         <div className={`w-[40%] h-[2px]`} style={{backgroundColor: 'rgb(219 219 219)'}}></div>
                     </div>
                     {/*facebook && google account*/}
-                    <div className={`w-full flex justify-between`}>
-                        <button className={`w-[48%] h-10 border-[2px] rounded flex justify-center items-center gap-2`}>
-                            <Image
-                                src={`/assets/images/facebook-icon.webp`}
-                                alt={``}
-                                width={22}
-                                height={22}
-                            />
-                            <p className={`text-sm`}>Facebook</p>
-                        </button>
-                        <GoogleLoginButton />
-                        {/*<button className={`w-[48%] h-10 border-[2px] rounded flex justify-center items-center gap-2`}>*/}
-                        {/*    <Image*/}
-                        {/*        src={`/assets/images/google-icon.webp`}*/}
-                        {/*        alt={``}*/}
-                        {/*        width={22}*/}
-                        {/*        height={22}*/}
-                        {/*    />*/}
-                        {/*    <p className={`text-sm`}>Google</p>*/}
-                        {/*</button>*/}
-                    </div>
+                    <ButtonLogin/>
                 </div>
                 <div className={`flex gap-1`}>
-                    Bạn chưa có tài khoản ? <Link href={`/pages/register`} className={`text-[#034292] hover:underline`}>Đăng ký</Link>
+                    Bạn chưa có tài khoản ? <Link href={`/pages/register`} className={`text-[#034292] hover:underline`}>Đăng
+                    ký</Link>
                 </div>
             </div>
         </div>

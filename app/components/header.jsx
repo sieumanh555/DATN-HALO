@@ -26,13 +26,13 @@ export default function Navbar() {
                     </Link>
 
                     <Link href="/" className="w-[16%]">
-                        <div className="w-full flex justify-center">
+                        <div className="w-full">
                             <Image
                                 src="/assets/images/logo.jpg"
                                 alt="Logo"
                                 width={120}
                                 height={120}
-                                style={{mixBlendMode: "darken"}}
+                                className={`mix-blend-darken`}
                             />
                         </div>
                     </Link>
@@ -45,7 +45,9 @@ export default function Navbar() {
                         <div className="flex justify-center space-x-5 text-gray-600">
                             <Search className="w-6 h-6 cursor-pointer"/>
                             <Heart className="w-6 h-6 cursor-pointer"/>
-                            <User className="w-6 h-6 cursor-pointer"/>
+                            <Link href={`/pages/login`}>
+                                <User className="w-6 h-6 cursor-pointer"/>
+                            </Link>
                             <Link href="/pages/cart">
                                 <div className="relative">
                                     <ShoppingBag className="w-6 h-6 cursor-pointer"/>

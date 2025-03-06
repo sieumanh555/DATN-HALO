@@ -12,7 +12,7 @@ export default function Breadcrumbs() {
 
     // ['', 'pages', 'product', 'product-detail', '1'] -> ['product', 'product-detail', '1']
     const filterPaths = pathname.split("/").filter((path) => path !== "" && path !== "pages");
-    const hiddenOnPaths = ["/", "/login", "/register"];
+    const hiddenOnPaths = ["/", "/pages/login", "/pages/register"];
     const isHidden = hiddenOnPaths.includes(pathname);
 
     function handlePath(path: string) {
