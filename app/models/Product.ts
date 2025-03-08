@@ -1,4 +1,5 @@
 interface Product {
+    quantity: number;
     _id: string;
     brand: string;
     category: {

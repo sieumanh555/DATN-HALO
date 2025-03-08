@@ -13,29 +13,12 @@
   const colors = ["yellow", "blue", "green", "red"];
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [quantity, setQuantity] = useState(1);
+    const [likedComments, setLikedComments] = useState({});
 
 
     const sizes = ["X", "M", "L", "XL"];
     const [selectedSize, setSelectedSize] = useState(sizes[0]);
 
-    const handleColorSelect = (color) => {
-      setSelectedColor(color);
-    };
-    const handleSizeSelect = (size) => {
-      setSelectedSize(size);
-    }
-
-    // Hàm tăng số lượng
-    const increaseQuantity = () => {
-      setQuantity((prev) => prev + 1);
-    };
-
-    // Hàm giảm số lượng (tối thiểu là 1)
-    const decreaseQuantity = () => {
-      setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
-    };
-
-   
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState("");
     const [replyingTo, setReplyingTo] = useState(null);
@@ -70,19 +53,30 @@
       });
       setReplyingTo(null);
     };
-  
+    const handleSubmitComment = () => {
+      if (comment.trim() !== "") {
+        handleAddComment();
+      }
+    };
+    
     const toggleLike = (commentId) => {
+      setLikedComments((prevLiked) => ({
+        ...prevLiked,
+        [commentId]: !prevLiked[commentId], // Đảo trạng thái like
+      }));
+    
       setLikes((prevLikes) => ({
         ...prevLikes,
-        [commentId]: prevLikes[commentId] ? prevLikes[commentId] + 1 : 1,
+        [commentId]: (prevLikes[commentId] || 0) + (likedComments[commentId] ? -1 : 1),
       }));
     };
+    
     
     
 
     
     const thumbnails = [
-            "/assets/images/Nike-Air-Force-1-ID-Gucci(1).png",
+            "/assets/images/Giày Rollers Halo Hồng Twinkle BREEZY ROLLERS 2186860.webp",
             "/assets/images/Nike-Air-Force-1-ID-Gucci(2).png",
             "/assets/images/Nike-Air-Force-1-ID-Gucci(3).png",
             "/assets/images/Nike-Air-Force-1-ID-Gucci(4).png",
@@ -127,47 +121,47 @@
 
     return (
       <div className="px-4 md:px-8 lg:px-16 mt-6">
-<div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md">
-      {/* Hình ảnh sản phẩm */}
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex md:flex-col gap-3">
-          {thumbnails.map((image, index) => (
-            <div
-              key={index}
-              className={`w-16 h-16 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 shadow-sm ${
-    selectedImage === image ? "border-blue-500 scale-110" : "border-gray-300"
-              }`}
-              onClick={() => setSelectedImage(image)}
-            >
-              <Image
-                src={image}
-                alt="Thumbnail"
-                width={64}
-                height={64}
-                className="object-cover w-full h-full rounded-lg"
-              />
-            </div>
-          ))}
-        </div>
-        <div className="w-full aspect-square rounded-xl overflow-hidden shadow-lg border">
+<div className="grid grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md">
+  {/* Hình ảnh sản phẩm */}
+  <div className="col-span-6 flex flex-col md:flex-row gap-6">
+    <div className="flex md:flex-col gap-3">
+      {thumbnails.map((image, index) => (
+        <div
+          key={index}
+          className={`w-16 h-16 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 shadow-sm ${
+            selectedImage === image ? "border-blue-500 scale-110" : "border-gray-300"
+          }`}
+          onClick={() => setSelectedImage(image)}
+        >
           <Image
-            src={selectedImage}
-            alt="Product"
-            width={500}
-            height={500}
-            className="object-cover w-full h-full"
+            src={image}
+            alt="Thumbnail"
+            width={64}
+            height={64}
+            className="object-cover w-full h-full rounded-lg"
           />
         </div>
-      </div>
+      ))}
+    </div>
+    <div className="w-full aspect-square rounded-xl overflow-hidden shadow-lg border">
+      <Image
+        src={selectedImage}
+        alt="Product"
+        width={500}
+        height={500}
+        className="object-cover w-full h-full"
+      />
+    </div>
+  </div>
 
       {/* Thông tin sản phẩm */}
-      <div>
-        <h2 className="text-3xl font-semibold">Áo Hoodie Siêu Cấp M1024</h2>
+      <div className="col-span-4">
+    <h2 className="text-3xl font-semibold">Giày Rollers Halo Hồng Twinkle BREEZY ROLLERS 2186860</h2>
          {/* Mô tả sản phẩm */}
           <div className="mt-4">
             <h3 className="text-lg font-medium text-gray-700">Mô tả sản phẩm</h3>
             <p className="mt-2 text-gray-600">
-              Áo hoodie siêu cấp M1024 được làm từ chất liệu cotton cao cấp, mang đến sự thoải mái và giữ ấm tốt. 
+              Giày Rollers Halo Hồng Twinkle BREEZY ROLLERS 2186860 được làm từ chất liệu cotton cao cấp, mang đến sự thoải mái và giữ ấm tốt. 
               Thiết kế hiện đại phù hợp với nhiều phong cách thời trang khác nhau.
             </p>
           </div>
@@ -234,9 +228,9 @@
 
         {/* Nút hành động */}
         <div className="mt-8 flex flex-col md:flex-row gap-4">
-          <button className="flex-1 px-6 py-3 border rounded-md text-gray-900 hover:bg-gray-100 transition-all">
-            Thêm vào giỏ hàng
-          </button>
+        <button className="flex-1 px-6 py-3 border  border-blue-500 rounded-md text-gray-900 hover:bg-blue-500 hover:text-white transition-all">
+          Thêm vào giỏ hàng
+        </button>
           <button className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">
             Mua ngay
           </button>
@@ -287,12 +281,15 @@
                 <p className="text-gray-800">{cmt.content}</p>
                 <span className="text-gray-500 text-sm">{cmt.time}</span>
                 <div className="flex gap-4 mt-1">
-                  <button
-                    className="text-gray-600 hover:text-gray-800 flex items-center gap-1"
-                    onClick={() => toggleLike(cmt.id)}
-                  >
-                    <FontAwesomeIcon icon={faThumbsUp} className="text-lg" /> {likes[cmt.id] || 0}
-                  </button>
+                <button
+                  className={`text-lg flex items-center gap-1 ${
+                    likedComments[cmt.id] ? "text-blue-600" : "text-gray-600 hover:text-gray-800"
+                  }`}
+                  onClick={() => toggleLike(cmt.id)}
+                >
+                  <FontAwesomeIcon icon={faThumbsUp} /> {likes[cmt.id] || 0}
+                </button>
+
                   <button
                     className="text-gray-600 hover:text-gray-800"
                     onClick={() => setReplyingTo(cmt.id)}
@@ -306,21 +303,19 @@
               <div className="ml-12 mt-2 flex items-center">
                 <input
                   type="text"
-                  placeholder="Nhập phản hồi..."
-                  className="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleReplyComment(cmt.id, e.target.value);
-                  }}
+                  placeholder="Viết bình luận..."
+                  className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmitComment()} // Xử lý khi nhấn Enter
                 />
                 <button
-                  className="ml-2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                  onClick={() => {
-                    const replyText = prompt("Nhập phản hồi của bạn:");
-                    if (replyText) handleReplyComment(cmt.id, replyText);
-                  }}
+                  className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  onClick={handleSubmitComment} // Xử lý khi nhấn nút "Gửi"
                 >
                   Gửi
                 </button>
+
               </div>
             )}
             {replies[cmt.id] && (
