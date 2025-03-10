@@ -54,23 +54,23 @@ export default function Navbar() {
       </div>
       <div className="container mt-4">
         <div className="w-[90%] mx-auto flex justify-between">
-          <Link href="/" className="hover:text-gray-400">
-            Tất cả sản phẩm
+          <Link href="/pages/product" className="hover:text-gray-400">
+            TẤT CẢ SẢN PHẨM
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            Danh mục
+          SẢN PHẨM ƯU ĐÃI
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            Sản phẩm mới
+            SẢN PHẨM BÁN CHẠY
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            Giày nam
+            GIÀY NAM
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            Giày nữ
+            GIÀY NỮ
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            Phụ kiện
+            PHỤ KIỆN
           </Link>
         </div>
       </div>

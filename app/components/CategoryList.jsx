@@ -30,7 +30,7 @@ const CategoryList = () => {
         {categories.map((category, index) => (
           <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
             <img src={category.image} alt={category.name} className="w-20 mx-auto" />
-            <h3 className="text-red-600 font-bold text-lg mt-3">{category.name.toUpperCase()}</h3>
+            <h3 className="text-blue-600 font-bold text-lg mt-3">{category.name.toUpperCase()}</h3>
             <p className="text-gray-600 mt-1">{category.products} sản phẩm</p>
           </div>
         ))}

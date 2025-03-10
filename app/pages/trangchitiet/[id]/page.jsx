@@ -8,21 +8,50 @@
 
   export default function Trangchitiet() {
 
+    const colorImageMap = {
+      yellow: "/assets/images/haloyellow.jpg",
+      blue: "/assets/images/haloblue.jpg",
+      red: "/assets/images/haloered.webp",
+      pink: "/assets/images/halohong.webp",
+    };
 
+    // Hàm cập nhật màu sắc và thay đổi hình ảnh tương ứng
+    const handleColorChange = (color) => {
+      setSelectedColor(color);
+      setSelectedImage(colorImageMap[color]);
+    };
+    
+    const sizeColorOptions = {
+      X: ["yellow", "blue"],
+      M: ["red", "pink"],
+      L: ["blue", "red", "yellow"],
+      XL: ["pink", "yellow"]
+    };
+    // Trạng thái size và màu sắc
+    const sizes = Object.keys(sizeColorOptions);
+    const [selectedSize, setSelectedSize] = useState(sizes[0]);
+    const [availableColors, setAvailableColors] = useState(sizeColorOptions[selectedSize]);
+    const [selectedColor, setSelectedColor] = useState(availableColors[0]);
+    const [selectedImage, setSelectedImage] = useState(colorImageMap[selectedColor]);
 
-  const colors = ["yellow", "blue", "green", "red"];
-    const [selectedColor, setSelectedColor] = useState(colors[0]);
+  // Cập nhật màu khi chọn size mới
+  const handleSizeChange = (size) => {
+    const newColors = sizeColorOptions[size];
+    setSelectedSize(size);
+    setAvailableColors(newColors);
+    setSelectedColor(newColors[0]);
+    setSelectedImage(colorImageMap[newColors[0]]);
+  };
+  
+
     const [quantity, setQuantity] = useState(1);
     const [likedComments, setLikedComments] = useState({});
 
 
-    const sizes = ["X", "M", "L", "XL"];
-    const [selectedSize, setSelectedSize] = useState(sizes[0]);
-
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState("");
     const [replyingTo, setReplyingTo] = useState(null);
-    const [replies, setReplies] = useState({});
+    const [replies] = useState({});
     const [likes, setLikes] = useState({});
   
     const handleAddComment = () => {
@@ -38,21 +67,6 @@
       setComment("");
     };
   
-    const handleReplyComment = (commentId, replyText) => {
-      if (!replyText.trim()) return;
-      const newReply = {
-        id: Date.now(),
-        username: "User123",
-        content: replyText,
-        time: new Date().toLocaleString(),
-        avatar: "/assets/images/avatar-default.png",
-      };
-      setReplies({
-        ...replies,
-        [commentId]: [...(replies[commentId] || []), newReply],
-      });
-      setReplyingTo(null);
-    };
     const handleSubmitComment = () => {
       if (comment.trim() !== "") {
         handleAddComment();
@@ -75,15 +89,6 @@
     
 
     
-    const thumbnails = [
-            "/assets/images/Giày Rollers Halo Hồng Twinkle BREEZY ROLLERS 2186860.webp",
-            "/assets/images/Nike-Air-Force-1-ID-Gucci(2).png",
-            "/assets/images/Nike-Air-Force-1-ID-Gucci(3).png",
-            "/assets/images/Nike-Air-Force-1-ID-Gucci(4).png",
-    ];
-
-    // State để lưu ảnh sản phẩm chính
-    const [selectedImage, setSelectedImage] = useState(thumbnails[0]);
     const products = [
       {
         id: 1,
@@ -124,33 +129,11 @@
 <div className="grid grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md">
   {/* Hình ảnh sản phẩm */}
   <div className="col-span-6 flex flex-col md:flex-row gap-6">
-    <div className="flex md:flex-col gap-3">
-      {thumbnails.map((image, index) => (
-        <div
-          key={index}
-          className={`w-16 h-16 border-2 rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 shadow-sm ${
-            selectedImage === image ? "border-blue-500 scale-110" : "border-gray-300"
-          }`}
-          onClick={() => setSelectedImage(image)}
-        >
-          <Image
-            src={image}
-            alt="Thumbnail"
-            width={64}
-            height={64}
-            className="object-cover w-full h-full rounded-lg"
-          />
-        </div>
-      ))}
-    </div>
     <div className="w-full aspect-square rounded-xl overflow-hidden shadow-lg border">
-      <Image
-        src={selectedImage}
-        alt="Product"
-        width={500}
-        height={500}
-        className="object-cover w-full h-full"
-      />
+    <Image src={selectedImage} 
+    alt="Product" width={500} 
+    height={500} 
+    className="object-cover w-full h-full" />
     </div>
   </div>
 
@@ -170,41 +153,45 @@
           <span className="text-gray-400 line-through">230.000đ</span>
         </div>
 
-        {/* Chọn màu */}
-        <div className="mt-6 flex justify-between items-center">
-          <h3 className="text-lg font-medium">Chọn màu</h3>
-          <div className="flex gap-3">
-            {colors.map((color) => (
-              <div
-                key={color}
-                className={`w-10 h-10 rounded-full border-2 cursor-pointer transition-all duration-300 hover:scale-110 shadow ${
-                  selectedColor === color ? "border-black" : "border-gray-300"
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => setSelectedColor(color)}
-              ></div>
-            ))}
-          </div>
-        </div>
+        
 
 
-        {/* Chọn size */}
-        <div className="mt-6">
+                {/* Chọn size */}
+                <div className="mt-6">
           <h3 className="text-lg font-medium">Size</h3>
           <div className="flex gap-3 mt-2">
             {sizes.map((size) => (
               <div
                 key={size}
                 className={`px-5 py-2 border rounded-md cursor-pointer transition-all duration-300 hover:shadow-md ${
-    selectedSize === size ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"
+                  selectedSize === size ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"
                 }`}
-                onClick={() => setSelectedSize(size)}
+                onClick={() => handleSizeChange(size)}
               >
                 {size}
               </div>
             ))}
           </div>
         </div>
+
+        {/* Chọn màu dựa trên size */}
+        <div className="mt-6 flex justify-between items-center">
+          <h3 className="text-lg font-medium">Chọn màu</h3>
+          <div className="flex gap-3">
+            {availableColors.map((color) => (
+              <div
+                key={color}
+                className={`w-10 h-10 rounded-full border-2 cursor-pointer transition-all duration-300 hover:scale-110 shadow ${
+                  selectedColor === color ? "border-black" : "border-gray-300"
+                }`}
+                style={{ backgroundColor: color }}
+                onClick={() => handleColorChange(color)}
+              ></div>
+            ))}
+          </div>
+
+        </div>
+
 <br/>
        {/* Số lượng */}
           <div className="mt-6 flex justify-between items-center">

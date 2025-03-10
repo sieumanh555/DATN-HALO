@@ -26,11 +26,11 @@ const VoucherList = () => {
       <div className="grid grid-cols-4 gap-4">
         {vouchers.map((voucher, index) => (
           <div key={index} className="bg-white shadow-md rounded-lg p-4 border border-gray-200 text-center">
-            <p className="text-red-600 font-semibold">NHẬP MÃ: {voucher.code}</p>
+            <p className="text-blue-600 font-semibold">NHẬP MÃ: {voucher.code}</p>
             <p className="text-gray-600 text-sm">Giảm {voucher.discount} cho đơn hàng từ {voucher.condition}</p>
 
             <div className="flex justify-center my-2">
-              <div className="bg-red-500 text-white w-16 h-16 flex flex-col items-center justify-center rounded-md">
+              <div className="bg-blue-500 text-white w-16 h-16 flex flex-col items-center justify-center rounded-md">
                 <span className="text-xs">VOUCHER</span>
                 <span className="text-lg font-bold">{voucher.discount}</span>
               </div>
@@ -42,7 +42,7 @@ const VoucherList = () => {
             <button
               onClick={() => copyToClipboard(voucher.code)}
               className={`mt-2 px-4 py-1 rounded-md transition ${
-                copiedVoucher === voucher.code ? "bg-red-300 text-white" : "bg-red-500 text-white hover:bg-red-600"
+                copiedVoucher === voucher.code ? "bg-blue-300 text-white" : "bg-blue-500 text-white hover:bg-blue-600"
               }`}
             >
               {copiedVoucher === voucher.code ? "Đã sao chép" : "Sao chép"}

@@ -1,0 +1,330 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Áo thun Regular 360GSM",
+      "price": 320,
+      "image": "https://cavathanquoc.com/wp-content/uploads/2024/06/Ao-thun-tron-cotton-mau-nau-dam-1-700x933.jpg",
+      "hot": 1,
+      "idcate": 1,
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Red",
+          "image": "https://cavathanquoc.com/wp-content/uploads/2024/06/Ao-thun-tron-cotton-mau-nau-dam-1-700x933.jpg"
+        },
+        {
+          "name": "Blue",
+          "image": "https://example.com/blue-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "name": "Áo thun nữ Alva rộng",
+      "price": 312,
+      "image": "https://product.hstatic.net/1000292277/product/9_a535507a490a4f1392ca80def69937fb.jpg",
+      "hot": 1,
+      "idcate": 2,
+      "sizes": [
+        "M",
+        "L"
+      ],
+      "colors": [
+        {
+          "name": "Pink",
+          "image": "https://example.com/pink-image.jpg"
+        },
+        {
+          "name": "White",
+          "image": "https://example.com/white-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Áo thun Cotton trắng",
+      "price": 95,
+      "image": "https://product.hstatic.net/200000054310/product/icon0025.jpg_ad0a2e5c75d1407babbcf9821d1c2094_1024x1024.jpg",
+      "hot": 0,
+      "idcate": 1,
+      "sizes": [
+        "S",
+        "M"
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "image": "https://example.com/white-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "name": "Áo thun nữ Croptop nâu",
+      "price": 189,
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwPUaR6Kzf4yGAmNv_Hf9-gIOixgBCXnIxTU5xN9eyMtXdkxxG",
+      "hot": 0,
+      "idcate": 2,
+      "sizes": [
+        "S",
+        "M"
+      ],
+      "colors": [
+        {
+          "name": "Brown",
+          "image": "https://example.com/brown-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Áo thun basic Old Sailor",
+      "price": 280,
+      "image": "https://product.hstatic.net/200000642007/product/45gnp_3atsv0243_2_9d6adbf1c5554af99e9c62d4385af29a_9b67e4239f454fc5a0858d30b13eae07_master.jpg",
+      "hot": 0,
+      "idcate": 1,
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Gray",
+          "image": "https://example.com/grey-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Áo thun basic unisex cotton",
+      "price": 149,
+      "image": "https://product.hstatic.net/200000642007/product/50d_31tsc5031_2_d55fb520c33846a6a31b26934008bbaa_f1442d2c218c46ecad67b70f29854477_master.jpg",
+      "hot": 1,
+      "idcate": 1,
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "image": "https://example.com/black-image.jpg"
+        },
+        {
+          "name": "White",
+          "image": "https://example.com/white-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "name": "Áo thun nữ tay dài",
+      "price": 330,
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGtkYSYHTwmOT5UtOxuK-A5yeTpxIVj4diJg&s",
+      "hot": 0,
+      "idcate": 2,
+      "sizes": [
+        "M",
+        "L"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "image": "https://example.com/black-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Áo thun trơn tay lỡ đỏ",
+      "price": 100,
+      "image": "https://levents.asia/cdn/shop/files/DarkRed_LTSBOCLA141UR0300FW23_2.jpg?v=1714985110&width=713",
+      "hot": 0,
+      "idcate": 1,
+      "sizes": [
+        "S",
+        "M"
+      ],
+      "colors": [
+        {
+          "name": "Red",
+          "image": "https://example.com/red-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "Áo thun cotton màu đỏ mận",
+      "price": 190,
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8eqjnAa-M1oFycEhe_SYw9t8Kg__Mo3tzsw&s",
+      "hot": 0,
+      "idcate": 1,
+      "sizes": [
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Maroon",
+          "image": "https://example.com/maroon-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "name": "Áo thun nữ form rộng",
+      "price": 119,
+      "image": "https://product.hstatic.net/1000292277/product/1_323302f11ac148c09554a44328905fd5.jpg",
+      "hot": 0,
+      "idcate": 2,
+      "sizes": [
+        "M",
+        "L"
+      ],
+      "colors": [
+        {
+          "name": "Pink",
+          "image": "https://example.com/pink-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "name": "Áo thun màu xanh dương",
+      "price": 199,
+      "image": "https://product.hstatic.net/200000642007/product/07u_31ts01031_6_34804b7268814bffa2aa573eb59fbcfe_cac45eb20a1b44b7bcf5630cd238fc3a_master.jpg",
+      "hot": 0,
+      "idcate": 1,
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Blue",
+          "image": "https://example.com/blue-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "name": "Áo thun nữ Hàn Quốc",
+      "price": 880,
+      "image": "https://bizweb.dktcdn.net/thumb/1024x1024/100/119/564/products/ao-thun-nu-han-quoc-s5910.jpg?v=1684924782500",
+      "hot": 1,
+      "idcate": 2,
+      "sizes": [
+        "S",
+        "M"
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "image": "https://example.com/white-image.jpg"
+        },
+        {
+          "name": "Black",
+          "image": "https://example.com/black-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Áo thun Standard đen",
+      "price": 95,
+      "image": "https://img.muji.net/img/item/4550583117788_05_1260.jpg",
+      "hot": 0,
+      "idcate": 1,
+      "sizes": [
+        "M",
+        "L"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "image": "https://example.com/black-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "name": "Áo thun nữ Croptop đen",
+      "price": 219,
+      "image": "https://inspireclo.com.vn/wp-content/uploads/2024/08/ao-thun-nu-croptop-mau-den-asm15-02-683x1024.webp",
+      "hot": 0,
+      "idcate": 2,
+      "sizes": [
+        "S",
+        "M",
+        "L"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "image": "https://example.com/black-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "name": "Áo thun nữ tay lửng",
+      "price": 130,
+      "image": "https://cdn.kkfashion.vn/9878-large_default/ao-thun-nu-tay-lung-ke-soc-ngang-asm08-04.jpg",
+      "hot": 0,
+      "idcate": 2,
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Yellow",
+          "image": "https://example.com/yellow-image.jpg"
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "name": "Áo thun nữ cổ tròn xanh",
+      "price": 209,
+      "image": "https://bizweb.dktcdn.net/100/441/136/products/20220103-rhino-w-0179-46-recovered-min-3.jpg?v=1687935194087",
+      "hot": 0,
+      "idcate": 2,
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Green",
+          "image": "https://example.com/green-image.jpg"
+        }
+      ]
+    }
+  ],
+  "user": [
+    {
+      "id": "6ec1",
+      "email": "tranthuong5286@gmail.com",
+      "password": "$2a$10$WCJt/0EqPkfhOFIg/taGyOS/Ui4P3qLnQDmmSKZ2IYeN1J.yQjlm."
+    },
+    {
+      "id": "0854",
+      "email": "tranthuong52866@gmail.com",
+      "password": "$2a$10$ybFe7A9ApB8Lvg6ClGujSeEu7FxOkdEnJa6zIC88o.4Mik3yOxxYG"
+    }
+  ]
+}
