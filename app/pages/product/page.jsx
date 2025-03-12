@@ -1,21 +1,50 @@
 "use client";
+
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faListCheck,
-  faSignal,
-  faFire,
-  faMoneyBill,
-} from "@fortawesome/free-solid-svg-icons";
+import { faListCheck, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 import SearchComponent from "@/app/components/search";
-import DropDown from "@/app/components/arrange";
-import CategoryPro from "@/app/components/categoryPro";
+import DropDown from "@/app/components/dropown";
 import Product from "@/app/components/product";
 import Pagination from "@/app/components/pagination";
 import Sidebar from "@/app/components/sidebar";
-import Checkbox from "@/app/components/checkbox";
 import Processbar from "@/app/components/processBar";
 
 export default function Products() {
+  const [products, setProducts] = useState([]); // Danh sách sản phẩm sau lọc/sắp xếp
+  const [searchedProducts, setSearchedProducts] = useState([]); // Danh sách sản phẩm sau tìm kiếm
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 9; // 3 sản phẩm mỗi hàng, 3 hàng mỗi trang
+
+  // Xử lý thay đổi từ DropDown (lọc và sắp xếp)
+  const handleProductsChange = (updatedProducts) => {
+    setProducts(updatedProducts);
+    setSearchedProducts(updatedProducts); // Đồng bộ với tìm kiếm
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Xử lý tìm kiếm từ SearchComponent
+  const handleSearch = (filteredProducts) => {
+    setSearchedProducts(filteredProducts);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Xử lý thay đổi trang
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Tính toán sản phẩm hiển thị trên trang hiện tại
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = searchedProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
   return (
     <div className="flex justify-center bg-gray-100">
       <div className="min-h-[100vh] max-w-[1440px] flex gap-6 my-20 px-6">
@@ -28,26 +57,18 @@ export default function Products() {
             ].map((item, index) => (
               <div key={index} className="bg-white rounded-xl shadow-md">
                 <div className="flex items-center gap-4 text-gray-900 bg-gradient-to-r from-blue-400 to-blue-600 py-4 px-4 rounded-t-xl">
-                  <FontAwesomeIcon icon={item.icon} className="text-[24px] text-white" />
-                  <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+                  <FontAwesomeIcon
+                    icon={item.icon}
+                    className="text-[24px] text-white"
+                  />
+                  <h2 className="text-lg font-semibold text-white">
+                    {item.title}
+                  </h2>
                 </div>
                 <div className="p-4">{item.content}</div>
               </div>
             ))}
           </div>
-
-          {/* Image Banner */}
-          {/* <div className="mt-5 rounded-lg overflow-hidden shadow-md">
-            <Image
-              src="https://i.pinimg.com/736x/05/cb/ec/05cbecedd26fd8812e31d93855f59e1d.jpg"
-              alt="Hình ảnh mô tả"
-              layout="responsive"
-              width={450}
-              height={200}
-              quality={100}
-              className="border border-gray-300"
-            />
-          </div> */}
         </div>
 
         {/* Main Content */}
@@ -55,30 +76,32 @@ export default function Products() {
           {/* Top Filter Bar */}
           <div className="flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-blue-400 to-blue-600 text-white py-4 px-5 rounded-lg shadow-md">
             <div className="flex gap-x-4">
-              <DropDown/>
-              <CategoryPro/>
+              <DropDown onChange={handleProductsChange} />
             </div>
             <div className="mt-3 md:mt-0">
-              <SearchComponent />
+              <SearchComponent
+                onSearch={handleSearch}
+                products={products} // Truyền danh sách từ DropDown vào Search
+              />
             </div>
-          </div>
-
-          {/* Result Count */}
-          <div className="my-5 text-gray-900 text-lg font-medium">
-            Kết quả tìm kiếm: <span className="text-blue-600">80 sản phẩm</span>
           </div>
 
           {/* Products Grid */}
-            <div className="grid grid-cols-3 gap-6 py-6  rounded-lg shadow-md p-4">
-              {Array.from({ length: 15 }).map((_, i) => (
-                <Product key={i} />
-              ))}
-            </div>
+          <div className="my-5 text-gray-900 text-lg font-medium">
+            Kết quả tìm kiếm: <span className="text-blue-600">Sản phẩm có sẵn</span>
+          </div>
 
+          {/* Hiển thị danh sách sản phẩm */}
+          <Product products={currentProducts} limit={productsPerPage} />
 
           {/* Pagination */}
           <div className="mt-6 flex justify-center">
-            <Pagination />
+            <Pagination
+              currentPage={currentPage}
+              setCurrentPage={handlePageChange}
+              totalProducts={searchedProducts.length}
+              productsPerPage={productsPerPage}
+            />
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@ export default function Sidebar({ }) {
           <li>
             <a
               href="#"
-              className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
+              className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-blue-200 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
             >
               <span className="ms-3">Nổi bật</span>
             </a>
@@ -31,7 +31,7 @@ export default function Sidebar({ }) {
           <li>
             <a
               href="#"
-              className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
+              className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-blue-200 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
             >
               <span className="ms-3">Bán chạy</span>
             </a>
@@ -39,7 +39,7 @@ export default function Sidebar({ }) {
           <li>
             <a
               href="#"
-              className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
+              className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-blue-200 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
             >
               <span className="ms-3">Ưu đãi</span>
             </a>
