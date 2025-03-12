@@ -100,7 +100,7 @@ export default function Footer() {
                         target="_blank"
                         title="Facebook"
                     >
-                        <img
+                        <Image
                             src="/assets/images/facebook-icon.png"
                             alt="Facebook"
                             width={32}
@@ -113,7 +113,7 @@ export default function Footer() {
                         target="_blank"
                         title="Instagram"
                     >
-                        <img
+                        <Image
                             src={`/assets/images/instagram-icon.png`}
                             alt="Instagram"
                             width={32}

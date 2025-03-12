@@ -1,9 +1,11 @@
 interface User {
-    _id: string;
+    _id: string,
     name: string,
-    phone: string
+    phone: string,
+    password: string,
     email: string,
-    zipcode: number,
     address: string,
+    zipcode: number,
+    role: number
 }
 export default User;

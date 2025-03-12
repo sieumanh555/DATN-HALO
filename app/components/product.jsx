@@ -1,63 +1,49 @@
 import Image from "next/image";
-import {faLocationDot, faStar} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { faStar, faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Product() {
     return (
-        <div
-            className="w-[321px] min-h-[456] bg-white flex flex-col gap-5  text-gray-900 py-2 cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105">
-            <div className="overflow-hidden w-[321] h-[290]">
-                <Image
-                    src="https://i.pinimg.com/736x/a0/34/5f/a0345fdbcf2697e90a1b1241437870ad.jpg"
-                    width={321}
-                    height={205}
-                    alt="Hình ảnh mô tả"
-                />
-            </div>
-            <div className="flex flex-row gap-2 h-[50] px-2">
-                <Image
-                    src="https://i.pinimg.com/736x/a0/34/5f/a0345fdbcf2697e90a1b1241437870ad.jpg"
-                    width={50}
-                    height={20}
-                    alt="Hình ảnh mô tả"
-                    className="border-4 border-gray-500/40"
-                />
-                <Image
-                    src="https://i.pinimg.com/736x/a0/34/5f/a0345fdbcf2697e90a1b1241437870ad.jpg"
-                    width={50}
-                    height={50}
-                    alt="Hình ảnh mô tả"
-                    className="border-4 border-gray-500/40"
-                />
-            </div>
-            <div
-                className="text-lg antialiased md:subpixel-antialiased px-2"
-                style={{
-                    wordWrap: "break-word",
-                    overflowWrap: "break-word",
-                    width: "321px",
-                }}
-            >
-                <h1>Áo Thun Local Brand Unisex Teelab Seasonal Tshirt TS295 </h1>
+        <div className="relative bg-white shadow-md rounded-lg p-4 transition-all duration-300 hover:shadow-lg hover:scale-105">
+            {/* Nhãn HOT */}
+            <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                HOT
             </div>
 
-            <div>
-                <span className="text-red-500 px-2">10.000VNĐ</span>
-                <span className="px-2 line-through">20.000VNĐ</span>
+            {/* Hình ảnh chính của sản phẩm */}
+            <div className="w-full h-60 overflow-hidden rounded-md">
+                <Image
+                    src="/assets/images/haloered.webp"
+                    width={321}
+                    height={240}
+                    className="w-full h-full object-cover cursor-pointer transition duration-300 ease-in-out "
+                    alt="Hình ảnh mô tả"
+                />
             </div>
-            <div>
-        <span className="text-yellow-300 px-2">
-          <FontAwesomeIcon icon={faStar}/>
-          <FontAwesomeIcon icon={faStar}/>
-          <FontAwesomeIcon icon={faStar}/>
-          <FontAwesomeIcon icon={faStar}/>
-          <FontAwesomeIcon icon={faStar}/>
-        </span>
-                <span className="px-2 text-gray-400">Đã bán hơn 2,4k</span>
+
+            {/* Thông tin sản phẩm */}
+            <div className="mt-3">
+                <h3 className="text-base font-semibold text-gray-800">
+                    Áo Thun Local Brand Unisex Teelab Seasonal Tshirt TS295
+                </h3>
+                <div className="flex items-center mt-2">
+                    <span className="text-red-500 text-lg font-bold">10.000VNĐ</span>
+                    <span className="text-gray-400 line-through ml-2">20.000VNĐ</span>
+                </div>
             </div>
-            <div className="flex flex-row gap-2 items-center px-2">
-                <FontAwesomeIcon icon={faLocationDot} className="text-lg"/>
-                <span className="text-lg relative top-0.5">Hồ Chí Minh</span>
+
+            {/* Đánh giá sản phẩm */}
+            <div className="flex items-center mt-2 text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                    <FontAwesomeIcon key={i} icon={faStar} className="mr-1" />
+                ))}
+                <span className="ml-2 text-gray-500 text-sm">Đã bán hơn 2,4k</span>
+            </div>
+
+            {/* Địa điểm bán */}
+            <div className="flex items-center mt-2 text-gray-700">
+                <FontAwesomeIcon icon={faLocationDot} className="text-lg" />
+                <span className="ml-2">Hồ Chí Minh</span>
             </div>
         </div>
     );

@@ -1,82 +1,51 @@
 "use client";
-import Image from "next/image";
-import {useEffect, useMemo, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {ChevronLeft, Package, Ticket, Truck} from 'lucide-react';
+// import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { ChevronLeft, Package, Ticket, Truck } from "lucide-react";
 
 import CartState from "../../models/CartState";
-import Product from "../../models/Product";
+// import Product from "../../models/Product";
 import Discount from "../../models/Discount";
 
-
-const userInfo = {
-    "userName": "Võ Tấn Đạt",
-    "phoneNumber": "0797373333",
-    "email": "vtdat0720@gmail.com",
-    "zip": 90250,
-    "address": "58 Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Thành phố Hà Nội",
-    "commune": "Quan Hoa",
-    "district": "Cầu Giấy",
-    "province": "Hà Nội",
-}
 export default function CheckOut() {
-    const dispatch = useDispatch();
     const cart = useSelector((state: CartState) => state.cart.products || []);
-    const [shipping, setShipping] = useState(40000);
-    const [user, setUser] = useState(userInfo);
-    const [popup, setPopup] = useState(false);
-    const [discounts, setDiscounts] = useState<Discount[]>([])
+    const [shipping, setShipping] = useState<number>(40000);
+    const [discounts, setDiscounts] = useState<Discount[]>([]);
     const [discount, setDiscount] = useState<Discount>({
         _id: "",
         name: "",
+        description: "",
+        condition: 0,
         minus: 0,
         percent: 0,
-        condition: 0,
-        description: "",
         stock: 0,
     });
-    const calSubTotal = () => {
-        return cart.reduce((total: number, item: Product) => total + item.price * item.quantity, 0)
-    };
-    const calTotal = () => {
-        let total = 0;
-        let discountValue = 0;
-        if (subTotal >= discount.condition) {
-            if (discount.minus > 0) {
-                discountValue = discount.minus
-            } else {
-                discountValue = (subTotal * discount.percent) / 100
-            }
-        }
-        total = subTotal + shipping - discountValue;
-        if (total <= 0) {
-            return total = 0;
-        }
-        return total;
-    };
-
-    const subTotal = useMemo(() => calSubTotal(), [cart]);
-    const total = useMemo(() => calTotal(), [cart, shipping, discount]);
-    const percent = Math.abs(Math.ceil((total - subTotal + shipping) * 100 / (total + shipping)));
-
+    const [popup, setPopup] = useState(false);
     useEffect(() => {
-        const fetchDiscounts = async () => {
-            try {
-                const response = await fetch("http://localhost:3000/discounts");
-                const data = await response.json();
-                setDiscounts(data);
-            } catch (err) {
-                console.error("Lỗi fetching http://localhost:3000/discounts", err);
-            }
-        };
-        fetchDiscounts();
+        fetch("http://localhost:3000/discounts")
+            .then((res) => res.json())
+            .then((data) => setDiscounts(data))
+            .catch((err) =>
+                console.error("Lỗi fetching http://localhost:3000/discounts", err)
+            );
     }, []);
+    const subTotal = useMemo(() => {
+        return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    }, [cart]);
+    const total = useMemo(() => {
+        if (!discount) return subTotal + shipping;
+        const discountValue =
+            discount.minus > 0 ? discount.minus : (subTotal * discount.percent) / 100;
+        const finalTotal = subTotal + shipping - discountValue;
+        return finalTotal > 0 ? finalTotal : 0;
+    }, [subTotal, shipping, discount]);
+    const percent = Math.abs(Math.ceil(((total - subTotal + shipping) * 100) / (total + shipping)));
     return (
         <section className="container grid grid-cols-1 md:grid-cols-2 gap-8 px-[100px] py-10 tracking-wide">
             {/* customer info */}
             <div className="grid-cols-1">
                 <p className="text-3xl font-semibold">Thông tin giao hàng</p>
-
                 <form
                     action=""
                     className="bg-[#fff] rounded-lg mt-6 px-8 py-6 flex flex-wrap gap-x-[14px] gap-y-4"
@@ -89,7 +58,7 @@ export default function CheckOut() {
                             type="text"
                             id="name"
                             placeholder="Oách Xà Lách"
-                            value={user.userName}
+                            value="Võ Tấn Đạt"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -103,7 +72,7 @@ export default function CheckOut() {
                             type="text"
                             id="phone"
                             placeholder="079xxxxxxx"
-                            value={user.phoneNumber}
+                            value="0797373333"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -117,7 +86,7 @@ export default function CheckOut() {
                             type="text"
                             id="email"
                             placeholder="OachXaLach123@gmail.com"
-                            value={user.email}
+                            value="vtandat0720@gmail.com"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -131,7 +100,7 @@ export default function CheckOut() {
                             type="text"
                             id="zipcode"
                             placeholder="90250"
-                            value={user.zip}
+                            value="90250"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -145,7 +114,7 @@ export default function CheckOut() {
                             type="text"
                             id="address"
                             placeholder="58 Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Thành phố Hà Nội"
-                            value={user.address}
+                            value="58 Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Thành phố Hà Nội"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -159,7 +128,7 @@ export default function CheckOut() {
                             type="text"
                             id="province"
                             placeholder="Hà Nội"
-                            value={user.province}
+                            value="Hà Nội"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -173,7 +142,7 @@ export default function CheckOut() {
                             type="text"
                             id="district"
                             placeholder="Cầu Giấy"
-                            value={user.district}
+                            value="Cầu Giấy"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -187,7 +156,7 @@ export default function CheckOut() {
                             type="text"
                             id="commune"
                             placeholder="Quan Hoa"
-                            value={user.commune}
+                            value="Quan Hoa"
                             readOnly
                             className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
                         />
@@ -247,82 +216,14 @@ export default function CheckOut() {
                         </label>
                     </div>
                 </div>
-                {/*credit payment*/}
-                <div className="bg-[#fff] mt-4 rounded-lg px-8 py-6">
-                    <p className="text-xl font-semibold uppercase">Thông tin thẻ ngân hàng</p>
 
-                    <div className="w-full flex flex-wrap items-center gap-x-[18px] gap-y-[18px] mt-[18px]">
-                        <div className="w-[300px] flex flex-col">
-                            <label htmlFor="bankNumber" className="font-semibold">
-                                Số thẻ*
-                            </label>
-                            <input
-                                type="text"
-                                id="bankNumber"
-                                placeholder="1234 1234 1234 1234"
-                                className="h-[40px] text-[14px] mt-[8px] px-[12px] py-[10px] border-[2px] rounded focus:outline-none"
-                            />
-                        </div>
-
-                        <div className=" mt-7 flex gap-2">
-                            <div className={`w-[60px] h-9 flex justify-center items-center`}>
-                                <Image
-                                    src="/assets/images/payment-mastercard-icon.png"
-                                    alt=""
-                                    width={32}
-                                    height={32}
-                                />
-                            </div>
-                            <div className={`w-[60px] h-9 flex justify-center items-center`}>
-                                <Image
-                                    src="/assets/images/payment-paypal-icon.png"
-                                    alt=""
-                                    width={32}
-                                    height={32}
-                                />
-                            </div>
-                            <div className={`w-[60px] h-9 flex justify-center items-center`}>
-                                <Image
-                                    src="/assets/images/payment-visa-icon.png"
-                                    alt=""
-                                    width={32}
-                                    height={32}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="w-[200px] flex flex-col">
-                            <label htmlFor="dateExpire" className="font-semibold">
-                                Ngày hết hạn*
-                            </label>
-                            <input
-                                type="text"
-                                id="dateExpire"
-                                placeholder="MM / YY"
-                                className="h-[40px] text-[14px] mt-[8px] px-[12px] py-[10px] border-[2px] rounded focus:outline-none"
-                            />
-                        </div>
-
-                        <div className="w-[200px] flex flex-col">
-                            <label htmlFor="cvc" className="font-semibold">
-                                CVC*
-                            </label>
-                            <input
-                                type="text"
-                                id="cvc"
-                                placeholder="012"
-                                className="h-[40px] text-[14px] mt-[8px] px-[12px] py-[10px] border-[2px] rounded focus:outline-none"
-                            />
-                        </div>
-                    </div>
-                </div>
                 {/*order info*/}
                 <div className="bg-[#fff] mt-4 rounded-lg px-8 py-6 space-y-4">
                     <p className="text-xl font-semibold uppercase">đơn hàng</p>
 
                     <div className="w-full mt-[18px] flex justify-between items-center">
                         <div className="h-19 flex items-center gap-2">
-                            <Package strokeWidth={1} className={`w-9 h-9`}/>
+                            <Package strokeWidth={1} className={`w-9 h-9`} />
                             <p>{cart.length} sản phẩm</p>
                         </div>
                         <p>{subTotal.toLocaleString("vi-VN")}đ</p>
@@ -331,7 +232,7 @@ export default function CheckOut() {
                     <div className={`w-full mt-[18px]`}>
                         <div className="w-full mt-[18px] flex justify-between items-center">
                             <div className="h-10 flex items-center gap-2">
-                                <Truck strokeWidth={1} className={`w-9 h-9`}/>
+                                <Truck strokeWidth={1} className={`w-9 h-9`} />
                                 <p>Chi phí vận chuyển</p>
                             </div>
                             <p>{shipping.toLocaleString("vi-VN")}đ</p>
@@ -371,31 +272,41 @@ export default function CheckOut() {
                         </div>
                     </div>
 
-                    <div className="w-full mt-[18px] flex justify-between items-center">
-                        <div className="h-10 flex items-center gap-2">
-                            <Ticket strokeWidth={1} className={`w-9 h-9`}/>
-                            <p>Mã giảm giá</p>
-                        </div>
-                        {discount.condition <= 0 && discount.stock <= 0 ? (
-                            <button
-                                onClick={() => setPopup(true)}
-                                title={`Chọn mã`}>
-                                <p className={`text-[#034292]`}>Chưa áp dụng</p>
-                            </button>
-                        ) : (
-                            <div>
-                                <button
-                                    onClick={() => setPopup(true)}
-                                    className={`w-full flex justify-end`}
-                                    title={`Chọn mã`}>
-                                    <p className={`text-[#034292]`}>{discount.name}</p>
-                                </button>
-                                <p className={`text-sm`}>{discount.description}</p>
+                    <div className="w-full mt-[18px] flex flex-col">
+                        <div className={`w-full flex justify-between items-center`}>
+                            <div className="flex items-center gap-2">
+                                <Ticket strokeWidth={1} className={`w-9 h-9`} />
+                                <p>Mã giảm giá</p>
                             </div>
-                        )}
 
+                            {discount.condition <= subTotal && discount.stock <= 0 ? (
+                                <button onClick={() => setPopup(true)} title={`Chọn mã`}>
+                                    <p className={`text-[#034292]`}>Chưa áp dụng</p>
+                                </button>
+                            ) : (
+                                <div>
+                                    <button
+                                        onClick={() => setPopup(true)}
+                                        className={`w-full flex justify-end`}
+                                        title={`Chọn mã`}
+                                    >
+                                        <p className={`text-[#034292] flex justify-end`}>
+                                            {discount.name}
+                                        </p>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <div
+                            className={`${
+                                discount.condition > subTotal && discount.stock <= 0
+                                    ? `hidden`
+                                    : `block`
+                            } text-sm flex justify-end`}
+                        >
+                            {discount.description}
+                        </div>
                     </div>
-
 
                     <div className="w-full pt-4 border-t-2 border-gray-300 flex justify-between items-center">
                         <div>
@@ -403,17 +314,21 @@ export default function CheckOut() {
                         </div>
                         {discount.condition > 0 && subTotal >= discount.condition ? (
                             <div className="flex gap-4">
-                                <p className="text-[#D92D20]">{total.toLocaleString("vi-VN")}đ (-{percent}%)</p>
-                                <p className="line-through">{subTotal.toLocaleString("vi-VN")}đ</p>
+                                <p className="text-[#D92D20]">
+                                    {total.toLocaleString("vi-VN")}đ (-{percent}%)
+                                </p>
+                                <p className="line-through">
+                                    {subTotal.toLocaleString("vi-VN")}đ
+                                </p>
                             </div>
                         ) : (
                             <div>
-                                <p className="text-[#D92D20]">{total.toLocaleString("vi-VN")}đ
+                                <p className="text-[#D92D20]">
+                                    {total.toLocaleString("vi-VN")}đ
                                 </p>
                             </div>
                         )}
                     </div>
-
 
                     <button className="w-full h-10 bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
                         Thanh toán
@@ -421,33 +336,47 @@ export default function CheckOut() {
                 </div>
             </div>
 
-
-            {/* Popup */
-            }
+            {/* Popup */}
             <div>
                 <div
                     onClick={() => setPopup(false)}
-                    className={`${popup === false ? `hidden` : `fixed top-0 right-0 z-10`} w-full h-full bg-[#00000066]`}>
-                </div>
+                    className={`${
+                        popup === false ? `hidden` : `fixed top-0 right-0 z-10`
+                    } w-full h-full bg-[#00000066]`}
+                ></div>
                 <div
-                    className={`${popup === false ? `hidden` : `fixed top-0 right-0 z-10`} w-[320px] h-full bg-[#fff] flex flex-col justify-between`}>
+                    className={`${
+                        popup === false ? `hidden` : `fixed top-0 right-0 z-10`
+                    } w-[320px] h-full bg-[#fff] flex flex-col justify-between`}
+                >
                     <div className={`w-full h-12 border-b-[2px] flex items-center`}>
-                        <ChevronLeft onClick={() => setPopup(false)} strokeWidth={1.5}
-                                     className={`w-[10%] cursor-pointer`}/>
-                        <div className={`w-[90%] font-medium flex justify-center`}>Mã giảm giá</div>
+                        <ChevronLeft
+                            onClick={() => setPopup(false)}
+                            strokeWidth={1.5}
+                            className={`w-[10%] cursor-pointer`}
+                        />
+                        <div className={`w-[90%] font-medium flex justify-center`}>
+                            Mã giảm giá
+                        </div>
                     </div>
                     <div className={`w-full px-4 flex flex-col gap-2`}>
                         {discounts.map((discount: Discount) => (
                             <div
                                 key={discount._id}
-                                className={`${discount.stock <= 0 ? `hidden` : `block`} w-full h-[100px] text-sm py-2 border-2 border-dashed flex justify-between items-center`}>
-                                <Ticket strokeWidth={0.5} className={`w-[100px] h-[100px]`}/>
+                                className={`${
+                                    discount.stock <= 0 ? `hidden` : `block`
+                                } w-full h-[100px] text-sm py-2 border-2 border-dashed flex justify-between items-center`}
+                            >
+                                <Ticket strokeWidth={0.5} className={`w-[120px] h-[80px]`} />
                                 <div className={`w-[160px] flex flex-col gap-y-1`}>
                                     <p className={`text-[#124062] uppercase`}>{discount.name}</p>
-                                    <p className={`text-xs text-gray-600`}>{discount.description}</p>
+                                    <p className={`text-xs text-gray-600`}>
+                                        {discount.description}
+                                    </p>
                                     <button
-                                        onClick={() => setDiscount(discount)}
-                                        className={`w-[100px] h-6 text-xs text-[#fff] bg-[#165b8d] rounded-xl`}>
+                                        onClick={() => {setDiscount(discount); setPopup(false)}}
+                                        className={`w-[100px] h-6 text-xs text-[#fff] bg-[#165b8d] rounded-xl`}
+                                    >
                                         Áp dụng
                                     </button>
                                 </div>
@@ -456,12 +385,12 @@ export default function CheckOut() {
                     </div>
                     <button
                         onClick={() => setPopup(false)}
-                        className={`w-[90%] h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}>
+                        className={`w-[90%] h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}
+                    >
                         Quay lại trang thanh toán
                     </button>
                 </div>
             </div>
         </section>
-    )
-        ;
+    );
 }
