@@ -61,16 +61,16 @@ export default function Navbar() {
           SẢN PHẨM ƯU ĐÃI
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            SẢN PHẨM BÁN CHẠY
+          GIÀY NAM
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            GIÀY NAM
+          GIÀY NỮ
           </Link>
           <Link href="/" className="hover:text-gray-400">
-            GIÀY NỮ
+          PHỤ KIỆN
           </Link>
-          <Link href="/" className="hover:text-gray-400">
-            PHỤ KIỆN
+          <Link href="/pages/tintuc" className="hover:text-gray-400">
+            TIN TỨC
           </Link>
         </div>
       </div>

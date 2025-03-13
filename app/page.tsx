@@ -8,19 +8,7 @@ import Product from "./components/product";
 import CategoryList from "./components/CategoryList";
 import VoucherList from "./components/VoucherList";
 
-const banners = [
-  { image: "/assets/images/banner1.jpg", alt: "Giày chạy bộ khuyến mãi" },
-  { image: "/assets/images/banner2.webp", alt: "Giày bóng rổ mới" },
-  { image: "/assets/images/banner3.webp", alt: "Giày sneaker hot trend" },
-];
-
-const productsSections = [
-  { banner: "/assets/images/banner2.webp", category: "Giày Nam" },
-  { banner: "/assets/images/banner2.webp", category: "Giày Nữ" },
-  { banner: "/assets/images/banner2.webp", category: "Phụ kiện" },
-];
-
-const BannerSlider = () => {
+const BannerSlider = ({ banners }) => {
   const settings = {
     dots: false,
     infinite: true,
@@ -35,8 +23,8 @@ const BannerSlider = () => {
   return (
     <div className="w-screen relative">
       <Slider {...settings}>
-        {banners.map((banner, index) => (
-          <div key={index} className="w-screen">
+        {banners.map((banner) => (
+          <div key={banner.id} className="w-screen">
             <img
               src={banner.image}
               alt={banner.alt}
@@ -51,9 +39,12 @@ const BannerSlider = () => {
 
 const StorePage = () => {
   const [products, setProducts] = useState([]);
+  const [banners, setBanners] = useState([]);
+  const [productsSections, setProductsSections] = useState([]);
 
-  // Fetch dữ liệu sản phẩm từ API
+  // Fetch dữ liệu từ API
   useEffect(() => {
+    // Fetch products
     fetch("http://localhost:3000/products")
       .then((response) => response.json())
       .then((data) => {
@@ -63,7 +54,31 @@ const StorePage = () => {
           setProducts([]);
         }
       })
-      .catch((error) => console.error("Lỗi khi fetch API:", error));
+      .catch((error) => console.error("Lỗi khi fetch products:", error));
+
+    // Fetch banners
+    fetch("http://localhost:3000/banners")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setBanners(data);
+        } else {
+          setBanners([]);
+        }
+      })
+      .catch((error) => console.error("Lỗi khi fetch banners:", error));
+
+    // Fetch productsSections
+    fetch("http://localhost:3000/productsSections")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProductsSections(data);
+        } else {
+          setProductsSections([]);
+        }
+      })
+      .catch((error) => console.error("Lỗi khi fetch productsSections:", error));
   }, []);
 
   return (
@@ -87,8 +102,8 @@ const StorePage = () => {
       <div className="max-w-6xl mx-auto p-6">
         <CategoryList />
         <VoucherList />
-        {productsSections.map((section, index) => (
-          <div key={index} className="mt-12">
+        {productsSections.map((section) => (
+          <div key={section.id} className="mt-12">
             <div className="relative mb-6">
               <img
                 src={section.banner}
@@ -162,7 +177,7 @@ const StorePage = () => {
           </div>
         </div>
       </div>
-      <BannerSlider />
+      <BannerSlider banners={banners} />
     </>
   );
 };

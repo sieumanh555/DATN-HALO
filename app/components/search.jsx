@@ -1,46 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-export default function SearchComponent({ onSearch, products }) {
+export default function SearchComponent({ onSearch }) {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Hàm xử lý tìm kiếm
-  const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      onSearch(products); // Nếu không có query, trả về toàn bộ danh sách
-      return;
-    }
-
-    const filteredProducts = products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    onSearch(filteredProducts); // Truyền danh sách đã lọc ra ngoài
-  };
-
-  // Xử lý khi nhấn Enter hoặc nút tìm kiếm
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleSearch();
+    onSearch(searchQuery);
   };
 
-  // Tự động tìm kiếm khi searchQuery thay đổi
-  useEffect(() => {
-    handleSearch();
-  }, [searchQuery, products]);
-
   return (
-    <form
-      className="flex items-center max-w-lg mx-auto"
-      onSubmit={handleSubmit}
-    >
+    <form className="flex items-center max-w-lg mx-auto" onSubmit={handleSubmit}>
       <div className="relative w-full">
         <input
           type="text"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full ps-10 p-2.5"
           placeholder="Tìm sản phẩm"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            onSearch(e.target.value);
+          }}
         />
         <button
           type="submit"

@@ -1,12 +1,10 @@
 // components/Layout.js
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle } from "@fortawesome/free-solid-svg-icons";
 
 
 export default function Sidebar({ }) {
   const [isSidebarOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown
+  const [] = useState(false); // State for dropdown
 
   return (
     <div>
@@ -42,6 +40,14 @@ export default function Sidebar({ }) {
               className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-blue-200 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
             >
               <span className="ms-3">Ưu đãi</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              className="flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-blue-200 dark:hover:bg-gradient-to-r from-cyan-500 via-gray-800/50 to-blue-400 group"
+            >
+              <span className="ms-3">Sản phẩm mới</span>
             </a>
           </li>
         </ul>
