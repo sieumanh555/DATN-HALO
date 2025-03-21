@@ -2,10 +2,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+// import { faThumbsUp } from "@fortawesome/free-solid-icons";
 import { useParams } from "next/navigation";
 import Product from "../../../components/product";
-
 
 export default function Trangchitiet() {
   const { id } = useParams();
@@ -22,7 +21,7 @@ export default function Trangchitiet() {
           price: 2800000,
           pricePromo: 2500000,
           hot: true,
-          mota: "Giày Nike Air Max 270 hiện đại, trẻ trung, đệm khí êm ái.",
+          mota: "Giày Nike Air Max 270 mang đến phong cách hiện đại, trẻ trung với thiết kế năng động, phù hợp cho mọi hoạt động hằng ngày. Được trang bị công nghệ đệm khí 270 độ, đôi giày này mang lại cảm giác êm ái, thoải mái vượt trội, giúp giảm áp lực lên bàn chân khi di chuyển.",
           hinhanh: "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
           isNew: false,
           rating: 4,
@@ -38,7 +37,6 @@ export default function Trangchitiet() {
               status: "Còn hàng",
               images: [
                 "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
-                
               ],
             },
             {
@@ -91,24 +89,22 @@ export default function Trangchitiet() {
   const [comment, setComment] = useState("");
   const [likes, setLikes] = useState({});
 
-  // Lấy danh sách size duy nhất
   const sizes = [...new Set(product?.variants.map((v) => v.size))];
-  // Lấy danh sách màu theo size đã chọn
   const colors = selectedSize
     ? product?.variants.filter((v) => v.size === selectedSize).map((v) => v)
     : [];
 
   useEffect(() => {
     if (product && product.variants && product.variants.length > 0) {
-      setSelectedSize(sizes[0]); // Mặc định chọn size đầu tiên
-      setSelectedColor(product.variants[0]); // Mặc định chọn variant đầu tiên
+      setSelectedSize(sizes[0]);
+      setSelectedColor(product.variants[0]);
     }
   }, [product]);
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
     const firstVariant = product.variants.find((v) => v.size === size);
-    setSelectedColor(firstVariant); // Chọn màu đầu tiên của size đó
+    setSelectedColor(firstVariant);
   };
 
   const handleColorChange = (variant) => {
@@ -144,24 +140,33 @@ export default function Trangchitiet() {
   if (!product || !product.variants) return <p>Không tìm thấy sản phẩm hoặc dữ liệu không hợp lệ.</p>;
 
   return (
-    <div className="px-4 md:px-8 lg:px-16 mt-6">
-      <div className="grid grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md min-h-[500px]">
-      <div className="col-span-6 flex items-center justify-center">
-        <div className="w-full h-full rounded-xl overflow-hidden shadow-lg border">
-          <Image
-            src={selectedColor?.images[0] || product.hinhanh}
-            alt={product.name}
-            width={0}  
-            height={0}
-            sizes="100vw" 
-            className="object-cover w-full h-full rounded-xl"
-          />
+    <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md min-h-[500px]">
+        {/* Hình ảnh chính */}
+        <div className="md:col-span-6 flex items-center justify-center">
+          <div className="w-full h-full rounded-xl overflow-hidden shadow-lg border">
+            <Image
+              src={selectedColor?.images[0] || product.hinhanh}
+              alt={product.name}
+              width={0}
+              height={0}
+              sizes="100vw"
+              className="object-cover w-full h-full rounded-xl"
+            />
+          </div>
         </div>
-      </div>
 
-        <div className="col-span-4 flex flex-col justify-between min-h-[500px]">
+        {/* Thông tin sản phẩm */}
+        <div className="md:col-span-4 flex flex-col justify-between min-h-[500px]">
           <div>
-            <h2 className="text-3xl font-semibold">{product.name}</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-semibold">{product.name}</h2>
+              {product.pricePromo < product.price && (
+                <span className="bg-red-500 text-white text-sm font-semibold px-2 py-1 rounded-md">
+                  Giảm {Math.round(((product.price - product.pricePromo) / product.price) * 100)}%
+                </span>
+              )}
+            </div>
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-700">Mô tả sản phẩm</h3>
               <p className="mt-2 text-gray-600">{product.mota}</p>
@@ -242,7 +247,7 @@ export default function Trangchitiet() {
         </div>
       </div>
 
-      {/* Phần bình luận giữ nguyên */}
+      {/* Phần bình luận */}
       <div className="mt-6 flex flex-col items-start">
         <div className="w-full max-w-3/4">
           <h3 className="text-lg font-medium text-gray-700">Bình luận</h3>
@@ -295,7 +300,7 @@ export default function Trangchitiet() {
         </div>
       </div>
 
-      <div className="container mx-auto mt-10">
+      <div className="mt-10">
         <h2 className="text-2xl font-bold text-center">Sản phẩm khác</h2>
         <Product products={product} limit={3} />
       </div>

@@ -33,7 +33,7 @@ const BannerSlider = ({ banners }) => {
   };
 
   return (
-    <div className="w-screen relative">
+    <div className="w-screen h-full relative">
       <Slider {...settings}>
         {banners.map((banner: { id: Key | null | undefined; image: string | undefined; alt: string | undefined; }) => (
           <div key={banner.id} className="w-screen">

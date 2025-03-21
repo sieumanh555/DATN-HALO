@@ -2,19 +2,19 @@ import React from "react";
 
 const categories = [
   {
-    name: "Giày Thể Thao",
-    image: "/assets/images/giaythethao.webp",
+    name: "Giày Jordan",
+    image: "https://i.ebayimg.com/images/g/97oAAOSweLFalc-f/s-l1200.jpg",
   },
   {
     name: "Giày Sneaker",
-    image: "/assets/images/depthethao.webp",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0_M28FaIiWvIvvFCqu0ZqYm3-gAIzs6OaxA&s",
   },
   {
-    name: "Giày trẻ em",
-    image: "/assets/images/quanao.webp",
+    name: "Giày Adidas",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwBJOtyZGcC-5b0xtu4SHUb4-iXz2ApiIsG4gW04yxm6sbAPShYWzHeEQN7zN7d9IhFG4&usqp=CAU",
   },
   {
-    name: "Phụ Kiện",
+    name: "Giày Nike",
     image: "/assets/images/phukien.webp",
   },
 ];

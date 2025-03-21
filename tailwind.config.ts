@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        "2xl": "1920px", // Định nghĩa màn hình 2xl là 1920px
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

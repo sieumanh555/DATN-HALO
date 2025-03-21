@@ -43,7 +43,7 @@ export default function Product({ products = [], limit = Infinity }) {
     </span>
   )}
 </div>
-              {/* <div className="flex items-center mt-2 text-yellow-400">
+              <div className="flex items-center mt-2 text-yellow-400">
                 {[...Array(5)].map((_, i) => (
                   <FontAwesomeIcon
                     key={i}
@@ -51,11 +51,11 @@ export default function Product({ products = [], limit = Infinity }) {
                     className={i < (product?.rating || 0) ? "mr-1 text-yellow-400" : "mr-1 text-gray-300"}
                   />
                 ))}
-                <span className="ml-2 text-gray-500 text-sm">
+                {/* <span className="ml-2 text-gray-500 text-sm">
                   Đã bán{" "}
                   {typeof product?.sold === "number" ? product.sold : "0"}
-                </span>
-              </div> */}
+                </span> */}
+              </div>
               <div className="flex items-center mt-2 text-gray-700">
                 <FontAwesomeIcon icon={faLocationDot} className="text-lg" />
                 <span className="ml-2 line-clamp-1">{product?.location || "Không xác định"}</span>
