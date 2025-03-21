@@ -1,12 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Key } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Product from "./components/product";
 import CategoryList from "./components/CategoryList";
-import VoucherList from "./components/VoucherList";
+
+const staticData = {
+  "banners": [
+    { "id": 1, "image": "/assets/images/banner1.jpg", "alt": "Giày chạy bộ khuyến mãi" },
+    { "id": 2, "image": "/assets/images/banner2.webp", "alt": "Giày bóng rổ mới" },
+    { "id": 3, "image": "/assets/images/banner3.webp", "alt": "Giày sneaker hot trend" }
+  ],
+  "productsSections": [
+    { "id": 1, "banner": "/assets/images/banner2.webp", "category": "Giày Nam" },
+    { "id": 2, "banner": "/assets/images/banner2.webp", "category": "Giày Nữ" },
+    { "id": 3, "banner": "/assets/images/banner2.webp", "category": "Phụ kiện" }
+  ]
+};
 
 const BannerSlider = ({ banners }) => {
   const settings = {
@@ -23,7 +35,7 @@ const BannerSlider = ({ banners }) => {
   return (
     <div className="w-screen relative">
       <Slider {...settings}>
-        {banners.map((banner) => (
+        {banners.map((banner: { id: Key | null | undefined; image: string | undefined; alt: string | undefined; }) => (
           <div key={banner.id} className="w-screen">
             <img
               src={banner.image}
@@ -39,46 +51,25 @@ const BannerSlider = ({ banners }) => {
 
 const StorePage = () => {
   const [products, setProducts] = useState([]);
-  const [banners, setBanners] = useState([]);
-  const [productsSections, setProductsSections] = useState([]);
+  const [banners] = useState(staticData.banners);
+  const [productsSections] = useState(staticData.productsSections);
 
-  // Fetch dữ liệu từ API
+
   useEffect(() => {
-    // Fetch products
-    fetch("http://localhost:3000/products")
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProducts(data);
+    const fetchData = async () => {
+      try {
+        const productsResponse = await fetch("http://localhost:3000/products");
+        if (productsResponse.ok) {
+          const productsData = await productsResponse.json();
+          setProducts(productsData);
         } else {
-          setProducts([]);
+          console.error("Failed to fetch products");
         }
-      })
-      .catch((error) => console.error("Lỗi khi fetch products:", error));
-
-    // Fetch banners
-    fetch("http://localhost:3000/banners")
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setBanners(data);
-        } else {
-          setBanners([]);
-        }
-      })
-      .catch((error) => console.error("Lỗi khi fetch banners:", error));
-
-    // Fetch productsSections
-    fetch("http://localhost:3000/productsSections")
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProductsSections(data);
-        } else {
-          setProductsSections([]);
-        }
-      })
-      .catch((error) => console.error("Lỗi khi fetch productsSections:", error));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
   }, []);
 
   return (
@@ -98,10 +89,10 @@ const StorePage = () => {
         </div>
       </div>
 
-      {/* Nội dung chính */}
+      {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <CategoryList />
-        <VoucherList />
+        {/* <VoucherList /> */}
         {productsSections.map((section) => (
           <div key={section.id} className="mt-12">
             <div className="relative mb-6">
@@ -121,7 +112,7 @@ const StorePage = () => {
         ))}
       </div>
 
-      {/* Các section khác */}
+      {/* Other Sections */}
       <div className="max-w-6xl mx-auto p-6">
         <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-12">
           <div className="w-full flex flex-col lg:flex-row items-center gap-6">
@@ -164,7 +155,7 @@ const StorePage = () => {
             </div>
             <div className="text-gray-900 w-full lg:w-1/2 px-6 flex justify-center flex-col gap-4">
               <h1 className="text-2xl md:text-4xl lg:text-[48px] font-bold leading-tight">
-                Bộ sưu tập nam
+                Bộ sưu tập nữ
               </h1>
               <p className="text-lg text-gray-600">
                 This collection brings together dreamy spirit with Hello Kitty’s

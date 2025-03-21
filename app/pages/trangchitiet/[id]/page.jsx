@@ -1,369 +1,304 @@
-
-  "use client";
-  import { useState } from "react";
-  import Image from "next/image";
-  import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-  import { faThumbsUp, faStar  } from "@fortawesome/free-solid-svg-icons";
-
-
-  export default function Trangchitiet() {
-
-    const colorImageMap = {
-      yellow: "/assets/images/haloyellow.jpg",
-      blue: "/assets/images/haloblue.jpg",
-      red: "/assets/images/haloered.webp",
-      pink: "/assets/images/halohong.webp",
-    };
-
-    // Hàm cập nhật màu sắc và thay đổi hình ảnh tương ứng
-    const handleColorChange = (color) => {
-      setSelectedColor(color);
-      setSelectedImage(colorImageMap[color]);
-    };
-    
-    const sizeColorOptions = {
-      X: ["yellow", "blue"],
-      M: ["red", "pink"],
-      L: ["blue", "red", "yellow"],
-      XL: ["pink", "yellow"]
-    };
-    // Trạng thái size và màu sắc
-    const sizes = Object.keys(sizeColorOptions);
-    const [selectedSize, setSelectedSize] = useState(sizes[0]);
-    const [availableColors, setAvailableColors] = useState(sizeColorOptions[selectedSize]);
-    const [selectedColor, setSelectedColor] = useState(availableColors[0]);
-    const [selectedImage, setSelectedImage] = useState(colorImageMap[selectedColor]);
-
-  // Cập nhật màu khi chọn size mới
-  const handleSizeChange = (size) => {
-    const newColors = sizeColorOptions[size];
-    setSelectedSize(size);
-    setAvailableColors(newColors);
-    setSelectedColor(newColors[0]);
-    setSelectedImage(colorImageMap[newColors[0]]);
-  };
-  
-
-    const [quantity, setQuantity] = useState(1);
-    const [likedComments, setLikedComments] = useState({});
+"use client";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { useParams } from "next/navigation";
+import Product from "../../../components/product";
 
 
-    const [comments, setComments] = useState([]);
-    const [comment, setComment] = useState("");
-    const [replyingTo, setReplyingTo] = useState(null);
-    const [replies] = useState({});
-    const [likes, setLikes] = useState({});
-  
-    const handleAddComment = () => {
-      if (comment.trim() === "") return;
-      const newComment = {
-        id: Date.now(),
-        username: "User123",
-        content: comment,
-        time: new Date().toLocaleString(),
-        avatar: "/assets/images/avatar-default.png",
-      };
-      setComments([newComment, ...comments]);
-      setComment("");
-    };
-  
-    const handleSubmitComment = () => {
-      if (comment.trim() !== "") {
-        handleAddComment();
+export default function Trangchitiet() {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const data = {
+          name: "Giày của HALO Cao Cấp",
+          price: 2800000,
+          pricePromo: 2500000,
+          hot: true,
+          mota: "Giày Nike Air Max 270 hiện đại, trẻ trung, đệm khí êm ái.",
+          hinhanh: "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
+          isNew: false,
+          rating: 4,
+          quantity: 40,
+          location: "Cần Thơ",
+          category: "67d303b0726ba39139b4610f",
+          variants: [
+            {
+              size: "40",
+              color: "Đỏ",
+              price: 2800000,
+              stock: 20,
+              status: "Còn hàng",
+              images: [
+                "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
+                
+              ],
+            },
+            {
+              size: "41",
+              color: "Xanh",
+              status: "Còn hàng",
+              price: 2800000,
+              stock: 15,
+              images: [
+                "https://i.pinimg.com/736x/70/4e/c8/704ec873531b79a613271505c0663f78.jpg",
+              ],
+            },
+            {
+              size: "41",
+              color: "Trắng",
+              status: "Còn hàng",
+              price: 2800000,
+              stock: 25,
+              images: [
+                "https://i.pinimg.com/736x/70/4e/c8/704ec873531b79a613271505c0663f78.jpg",
+              ],
+            },
+            {
+              size: "40",
+              color: "Xám",
+              price: 2800000,
+              stock: 10,
+              status: "Còn hàng",
+              images: [
+                "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
+              ],
+            },
+          ],
+        };
+        setProduct(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-    
-    const toggleLike = (commentId) => {
-      setLikedComments((prevLiked) => ({
-        ...prevLiked,
-        [commentId]: !prevLiked[commentId], // Đảo trạng thái like
-      }));
-    
-      setLikes((prevLikes) => ({
-        ...prevLikes,
-        [commentId]: (prevLikes[commentId] || 0) + (likedComments[commentId] ? -1 : 1),
-      }));
+    fetchProduct();
+  }, []);
+
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [likedComments, setLikedComments] = useState({});
+  const [comments, setComments] = useState([]);
+  const [comment, setComment] = useState("");
+  const [likes, setLikes] = useState({});
+
+  // Lấy danh sách size duy nhất
+  const sizes = [...new Set(product?.variants.map((v) => v.size))];
+  // Lấy danh sách màu theo size đã chọn
+  const colors = selectedSize
+    ? product?.variants.filter((v) => v.size === selectedSize).map((v) => v)
+    : [];
+
+  useEffect(() => {
+    if (product && product.variants && product.variants.length > 0) {
+      setSelectedSize(sizes[0]); // Mặc định chọn size đầu tiên
+      setSelectedColor(product.variants[0]); // Mặc định chọn variant đầu tiên
+    }
+  }, [product]);
+
+  const handleSizeChange = (size) => {
+    setSelectedSize(size);
+    const firstVariant = product.variants.find((v) => v.size === size);
+    setSelectedColor(firstVariant); // Chọn màu đầu tiên của size đó
+  };
+
+  const handleColorChange = (variant) => {
+    setSelectedColor(variant);
+  };
+
+  const handleAddComment = () => {
+    if (comment.trim() === "") return;
+    const newComment = {
+      id: Date.now(),
+      username: "User123",
+      content: comment,
+      time: new Date().toLocaleString(),
+      avatar: "/assets/images/avatar-default.png",
     };
-    
-    
-    const products = [
-      {
-        id: 1,
-        name: "Giày Sneaker Nam Thể Thao Cao Cấp",
-        price: "10.000 VND",
-        oldPrice: "20.000 VND",
-        sold: "Đã bán hơn 0",
-        image: "/assets/images/MLB-Chunky-Runner-NY-Black-White(2).png",
-      },
-      {
-        id: 2,
-        name: "Giày Sneaker Nam Thể Thao Cao Cấp",
-        price: "10.000 VND",
-        oldPrice: "20.000 VND",
-        sold: "Đã bán hơn 0",
-        image: "/assets/images/MLB-Chunky-Runner-NY-Black-White(2).png",
-      },
-      {
-        id: 3,
-        name: "Giày Sneaker Nam Thể Thao Cao Cấp",
-        price: "10.000 VND",
-        oldPrice: "20.000 VND",
-        sold: "Đã bán hơn 0",
-        image: "/assets/images/MLB-Chunky-Runner-NY-Black-White(2).png",
-      },
-      {
-        id: 4,
-        name: "Giày Sneaker Nam Thể Thao Cao Cấp",
-        price: "10.000 VND",
-        oldPrice: "20.000 VND",
-        sold: "Đã bán hơn 0",
-        image: "/assets/images/MLB-Chunky-Runner-NY-Black-White(2).png",
-      },
-    ];
+    setComments([newComment, ...comments]);
+    setComment("");
+  };
 
-    return (
-      <div className="px-4 md:px-8 lg:px-16 mt-6">
-<div className="grid grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md">
-  {/* Hình ảnh sản phẩm */}
-  <div className="col-span-6 flex flex-col md:flex-row gap-6">
-    <div className="w-full aspect-square rounded-xl overflow-hidden shadow-lg border">
-    <Image src={selectedImage} 
-    alt="Product" width={500} 
-    height={500} 
-    className="object-cover w-full h-full" />
-    </div>
-  </div>
+  const toggleLike = (commentId) => {
+    setLikedComments((prev) => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+    setLikes((prev) => ({
+      ...prev,
+      [commentId]: (prev[commentId] || 0) + (likedComments[commentId] ? -1 : 1),
+    }));
+  };
 
-      {/* Thông tin sản phẩm */}
-      <div className="col-span-4">
-    <h2 className="text-3xl font-semibold">Giày Rollers Halo Hồng Twinkle BREEZY ROLLERS 2186860</h2>
-         {/* Mô tả sản phẩm */}
-          <div className="mt-4">
-            <h3 className="text-lg font-medium text-gray-700">Mô tả sản phẩm</h3>
-            <p className="mt-2 text-gray-600">
-              Giày Rollers Halo Hồng Twinkle BREEZY ROLLERS 2186860 được làm từ chất liệu cotton cao cấp, mang đến sự thoải mái và giữ ấm tốt. 
-              Thiết kế hiện đại phù hợp với nhiều phong cách thời trang khác nhau.
-            </p>
-          </div>
-        <div className="mt-3 flex items-center gap-4">
-          <span className="text-2xl font-bold text-red-500">108.000đ</span>
-          <span className="text-gray-400 line-through">230.000đ</span>
+  if (loading) return <p>Đang tải...</p>;
+  if (error) return <p>Lỗi: {error}</p>;
+  if (!product || !product.variants) return <p>Không tìm thấy sản phẩm hoặc dữ liệu không hợp lệ.</p>;
+
+  return (
+    <div className="px-4 md:px-8 lg:px-16 mt-6">
+      <div className="grid grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md min-h-[500px]">
+      <div className="col-span-6 flex items-center justify-center">
+        <div className="w-full h-full rounded-xl overflow-hidden shadow-lg border">
+          <Image
+            src={selectedColor?.images[0] || product.hinhanh}
+            alt={product.name}
+            width={0}  
+            height={0}
+            sizes="100vw" 
+            className="object-cover w-full h-full rounded-xl"
+          />
         </div>
+      </div>
 
-        
+        <div className="col-span-4 flex flex-col justify-between min-h-[500px]">
+          <div>
+            <h2 className="text-3xl font-semibold">{product.name}</h2>
+            <div className="mt-4">
+              <h3 className="text-lg font-medium text-gray-700">Mô tả sản phẩm</h3>
+              <p className="mt-2 text-gray-600">{product.mota}</p>
+            </div>
+            <div className="mt-3 flex items-center gap-4">
+              <span className="text-2xl font-bold text-red-500">
+                {product.pricePromo.toLocaleString()}đ
+              </span>
+              <span className="text-gray-400 line-through">
+                {product.price.toLocaleString()}đ
+              </span>
+            </div>
 
-
-                {/* Chọn size */}
-                <div className="mt-6">
-          <h3 className="text-lg font-medium">Size</h3>
-          <div className="flex gap-3 mt-2">
-            {sizes.map((size) => (
-              <div
-                key={size}
-                className={`px-5 py-2 border rounded-md cursor-pointer transition-all duration-300 hover:shadow-md ${
-                  selectedSize === size ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"
-                }`}
-                onClick={() => handleSizeChange(size)}
-              >
-                {size}
+            <div className="mt-6">
+              <h3 className="text-lg font-medium">Size</h3>
+              <div className="flex gap-3 mt-2">
+                {sizes.map((size) => (
+                  <div
+                    key={size}
+                    className={`px-5 py-2 border rounded-md cursor-pointer transition-all duration-300 hover:shadow-md ${
+                      selectedSize === size ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                    onClick={() => handleSizeChange(size)}
+                  >
+                    {size}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Chọn màu dựa trên size */}
-        <div className="mt-6 flex justify-between items-center">
-          <h3 className="text-lg font-medium">Chọn màu</h3>
-          <div className="flex gap-3">
-            {availableColors.map((color) => (
-              <div
-                key={color}
-                className={`w-10 h-10 rounded-full border-2 cursor-pointer transition-all duration-300 hover:scale-110 shadow ${
-                  selectedColor === color ? "border-black" : "border-gray-300"
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => handleColorChange(color)}
-              ></div>
-            ))}
-          </div>
+              {selectedSize && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-medium">Màu sắc</h3>
+                  <div className="flex flex-col gap-3 mt-2">
+                    {colors.map((variant, index) => (
+                      <div
+                        key={`${variant.size}-${variant.color}-${index}`}
+                        className={`px-5 py-2 border rounded-md cursor-pointer transition-all duration-300 hover:shadow-md ${
+                          selectedColor === variant ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                        onClick={() => handleColorChange(variant)}
+                      >
+                        {`${variant.color} (${variant.stock} còn hàng)`}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
-        </div>
-
-<br/>
-       {/* Số lượng */}
-          <div className="mt-6 flex justify-between items-center">
-            <h3 className="text-lg font-medium">Số lượng</h3>
-            <div className="flex items-center gap-5">
-              <button
-                onClick={() => setQuantity((q) => Math.max(q - 1, 1))}
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
-              >
-                -
-              </button>
-              <span className="text-lg font-semibold">{quantity}</span>
-              <button
-                onClick={() => setQuantity((q) => q + 1)}
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
-              >
-                +
-              </button>
+            <div className="mt-6 flex justify-between items-center">
+              <h3 className="text-lg font-medium">Số lượng</h3>
+              <div className="flex items-center gap-5">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(q - 1, 1))}
+                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  -
+                </button>
+                <span className="text-lg font-semibold">{quantity}</span>
+                <button
+                  onClick={() => setQuantity((q) => Math.min(q + 1, selectedColor?.stock || 1))}
+                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
 
-        {/* Nút hành động */}
-        <div className="mt-8 flex flex-col md:flex-row gap-4">
-        <button className="flex-1 px-6 py-3 border  border-blue-500 rounded-md text-gray-900 hover:bg-blue-500 hover:text-white transition-all">
-          Thêm vào giỏ hàng
-        </button>
-          <button className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">
-            Mua ngay
+          <div className="mt-8 flex flex-col md:flex-row gap-4">
+            <button className="flex-1 px-6 py-3 border border-blue-500 rounded-md text-gray-900 hover:bg-blue-500 hover:text-white transition-all">
+              Thêm vào giỏ hàng
+            </button>
+            <button className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">
+              Mua ngay
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Phần bình luận giữ nguyên */}
+      <div className="mt-6 flex flex-col items-start">
+        <div className="w-full max-w-3/4">
+          <h3 className="text-lg font-medium text-gray-700">Bình luận</h3>
+        </div>
+        <div className="w-full max-w-3/4 flex items-center">
+          <input
+            type="text"
+            placeholder="Viết bình luận..."
+            className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
+          />
+          <button
+            className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            onClick={handleAddComment}
+          >
+            Gửi
           </button>
         </div>
-        </div>
-        </div>
-
-
-{/*------------------------------------------ */}
-
-
-
-<div className="mt-6 flex flex-col items-start">
-  <div className="w-full max-w-3/4">
-    <h3 className="text-lg font-medium text-gray-700">Bình luận</h3>
-  </div>
-  <div className="w-full max-w-3/4 flex items-center">
-    <input
-      type="text"
-      placeholder="Viết bình luận..."
-      className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      value={comment}
-      onChange={(e) => setComment(e.target.value)}
-      onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
-    />
-    <button
-      className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-      onClick={handleAddComment}
-    >
-      Gửi
-    </button>
-  </div>
-  <div className="w-full max-w-3/4 mt-4">
-    {comments.length === 0 ? (
-      <p className="text-gray-500">Không có bình luận.</p>
-    ) : (
-      <ul className="space-y-2">
-        {comments.map((cmt) => (
-          <li key={cmt.id} className="p-3 border rounded-lg bg-gray-100 flex flex-col gap-2">
-            <div className="flex items-start gap-3">
-              <img
-                src={cmt.avatar}
-                alt="Avatar"
-                className="w-10 h-10 rounded-full border"
-              />
-              <div>
-                <span className="font-bold text-blue-600">{cmt.username}</span>
-                <p className="text-gray-800">{cmt.content}</p>
-                <span className="text-gray-500 text-sm">{cmt.time}</span>
-                <div className="flex gap-4 mt-1">
-                <button
-                  className={`text-lg flex items-center gap-1 ${
-                    likedComments[cmt.id] ? "text-blue-600" : "text-gray-600 hover:text-gray-800"
-                  }`}
-                  onClick={() => toggleLike(cmt.id)}
-                >
-                  <FontAwesomeIcon icon={faThumbsUp} /> {likes[cmt.id] || 0}
-                </button>
-
-                  <button
-                    className="text-gray-600 hover:text-gray-800"
-                    onClick={() => setReplyingTo(cmt.id)}
-                  >
-                    Phản hồi
-                  </button>
-                </div>
-              </div>
-            </div>
-            {replyingTo === cmt.id && (
-              <div className="ml-12 mt-2 flex items-center">
-                <input
-                  type="text"
-                  placeholder="Viết bình luận..."
-                  className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSubmitComment()} // Xử lý khi nhấn Enter
-                />
-                <button
-                  className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                  onClick={handleSubmitComment} // Xử lý khi nhấn nút "Gửi"
-                >
-                  Gửi
-                </button>
-
-              </div>
-            )}
-            {replies[cmt.id] && (
-              <ul className="ml-12 mt-2 space-y-1">
-                {replies[cmt.id].map((reply) => (
-                  <li key={reply.id} className="p-2 border rounded-lg bg-gray-200 flex gap-3">
-                    <img
-                      src={reply.avatar}
-                      alt="Avatar"
-                      className="w-8 h-8 rounded-full border"
-                    />
+        <div className="w-full max-w-3/4 mt-4">
+          {comments.length === 0 ? (
+            <p className="text-gray-500">Không có bình luận.</p>
+          ) : (
+            <ul className="space-y-2">
+              {comments.map((cmt) => (
+                <li key={cmt.id} className="p-3 border rounded-lg bg-gray-100 flex flex-col gap-2">
+                  <div className="flex items-start gap-3">
+                    <img src={cmt.avatar} alt="Avatar" className="w-10 h-10 rounded-full border" />
                     <div>
-                      <span className="font-bold text-blue-600">{reply.username}</span>
-                      <p className="text-gray-800">{reply.content}</p>
-                      <span className="text-gray-500 text-sm">{reply.time}</span>
+                      <span className="font-bold text-blue-600">{cmt.username}</span>
+                      <p className="text-gray-800">{cmt.content}</p>
+                      <span className="text-gray-500 text-sm">{cmt.time}</span>
+                      <div className="flex gap-4 mt-1">
+                        <button
+                          className={`text-lg flex items-center gap-1 ${
+                            likedComments[cmt.id] ? "text-blue-600" : "text-gray-600 hover:text-gray-800"
+                          }`}
+                          onClick={() => toggleLike(cmt.id)}
+                        >
+                          <FontAwesomeIcon icon={faThumbsUp} /> {likes[cmt.id] || 0}
+                        </button>
+                      </div>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-</div>
-
-
-          
-
-
-          <div className="container mx-auto mt-10">
-        <h2 className="text-2xl font-bold text-center">Sản phẩm khác</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          {products.map((product) => (
-            <div key={product.id} className="border bg-white rounded-lg p-4 shadow-sm">
-              {/* Hình ảnh sản phẩm */}
-              <div className="w-full h-40 bg-gray-200 rounded-lg overflow-hidden">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-              </div>
-
-              {/* Thông tin sản phẩm */}
-              <h3 className="text-sm font-medium mt-3">{product.name}</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-red-500 font-bold">{product.price}</span>
-                <span className="text-gray-400 line-through">{product.oldPrice}</span>
-              </div>
-
-              {/* Đánh giá & số lượng bán */}
-              <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
-                <span>
-                <FontAwesomeIcon icon={faStar} className="text-yellow-500 text-lg" />
-                <FontAwesomeIcon icon={faStar} className="text-yellow-500 text-lg" />
-                <FontAwesomeIcon icon={faStar} className="text-yellow-500 text-lg" />
-                <FontAwesomeIcon icon={faStar} className="text-yellow-500 text-lg" />
-                <FontAwesomeIcon icon={faStar} className="text-yellow-500 text-lg" />
-                </span>
-                <span>{product.sold}</span>
-              </div>
-            </div>
-          ))}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
+
+      <div className="container mx-auto mt-10">
+        <h2 className="text-2xl font-bold text-center">Sản phẩm khác</h2>
+        <Product products={product} limit={3} />
       </div>
-      
-    );
-  }
+    </div>
+  );
+}

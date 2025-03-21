@@ -18,7 +18,7 @@ export default function Products() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 5000000 });
-  const [dropDownFiltered, setDropDownFiltered] = useState([]); // Lưu kết quả từ DropDown
+  const [categoryFiltered, setCategoryFiltered] = useState([]);
   const productsPerPage = 9;
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function Products() {
         if (Array.isArray(data)) {
           setInitialProducts(data);
           setFilteredProducts(data);
-          setDropDownFiltered(data); // Khởi tạo từ dữ liệu gốc
+          setCategoryFiltered(data);
         } else {
           throw new Error("Dữ liệu không phải mảng");
         }
@@ -44,34 +44,35 @@ export default function Products() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  // Tổng hợp các bộ lọc
   const applyAdditionalFilters = useCallback(
     (baseProducts) => {
       let result = [...baseProducts];
-
-      // Lọc theo giá
       result = result.filter(
         (product) =>
           (product.price || 0) >= priceRange.min && (product.price || 0) <= priceRange.max
       );
-
-      // Lọc theo tìm kiếm
       if (searchQuery.trim()) {
         result = result.filter((product) =>
           (product?.name || "").toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
-
-      console.log("Final filtered:", result); // Debug
       return result;
     },
     [priceRange, searchQuery]
   );
 
-  // Xử lý từ DropDown
-  const handleDropDownChange = useCallback(
+  const handleCategoryChange = useCallback(
+    (filteredFromSidebar) => {
+      setCategoryFiltered(filteredFromSidebar);
+      const finalFiltered = applyAdditionalFilters(filteredFromSidebar);
+      setFilteredProducts(finalFiltered);
+      setCurrentPage(1);
+    },
+    [applyAdditionalFilters]
+  );
+
+  const handleSortChange = useCallback(
     (filteredFromDropDown) => {
-      setDropDownFiltered(filteredFromDropDown); // Lưu kết quả từ DropDown
       const finalFiltered = applyAdditionalFilters(filteredFromDropDown);
       setFilteredProducts(finalFiltered);
       setCurrentPage(1);
@@ -79,26 +80,24 @@ export default function Products() {
     [applyAdditionalFilters]
   );
 
-  // Xử lý tìm kiếm
   const handleSearch = useCallback(
     (query) => {
       setSearchQuery(query);
-      const finalFiltered = applyAdditionalFilters(dropDownFiltered); // Dùng kết quả từ DropDown
+      const finalFiltered = applyAdditionalFilters(categoryFiltered);
       setFilteredProducts(finalFiltered);
       setCurrentPage(1);
     },
-    [dropDownFiltered, applyAdditionalFilters]
+    [categoryFiltered, applyAdditionalFilters]
   );
 
-  // Xử lý lọc giá
   const handlePriceChange = useCallback(
     ({ min, max }) => {
       setPriceRange({ min, max });
-      const finalFiltered = applyAdditionalFilters(dropDownFiltered); // Dùng kết quả từ DropDown
+      const finalFiltered = applyAdditionalFilters(categoryFiltered);
       setFilteredProducts(finalFiltered);
       setCurrentPage(1);
     },
-    [dropDownFiltered, applyAdditionalFilters]
+    [categoryFiltered, applyAdditionalFilters]
   );
 
   const handlePageChange = useCallback((page) => {
@@ -115,12 +114,22 @@ export default function Products() {
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
 
   return (
-    <div className="flex justify-center bg-gray-100">
-      <div className="min-h-[100vh] max-w-[1440px] flex gap-6 my-20 px-6">
-        <div className="w-[25%] hidden lg:block">
+    <div className="flex justify-center bg-gray-100 min-h-screen">
+      <div className="w-full max-w-[1440px] flex flex-col lg:flex-row gap-6 my-6 px-4 sm:px-6 lg:px-[100px] lg:my-20">
+        {/* Sidebar */}
+        <div className="w-full lg:w-[25%]">
           <div className="space-y-5">
             {[
-              { icon: faListCheck, title: "Danh mục", content: <Sidebar /> },
+              {
+                icon: faListCheck,
+                title: "Danh mục",
+                content: (
+                  <Sidebar
+                    products={initialProducts}
+                    onCategoryChange={handleCategoryChange}
+                  />
+                ),
+              },
               {
                 icon: faMoneyBill,
                 title: "Theo giá",
@@ -132,6 +141,7 @@ export default function Products() {
                   />
                 ),
               },
+              
             ].map((item, index) => (
               <div key={index} className="bg-white rounded-xl shadow-md">
                 <div className="flex items-center gap-4 text-gray-900 bg-gradient-to-r from-blue-400 to-blue-600 py-4 px-4 rounded-t-xl">
@@ -144,22 +154,25 @@ export default function Products() {
           </div>
         </div>
 
-        <div className="w-full lg:w-[70%]">
-          <div className="flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-blue-400 to-blue-600 text-white py-4 px-5 rounded-lg shadow-md">
-            <div className="flex gap-x-4">
-              <DropDown products={initialProducts} onChange={handleDropDownChange} />
+        {/* Main Content */}
+        <div className="w-full lg:w-[75%]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-400 to-blue-600 text-white py-4 px-5 rounded-lg shadow-md gap-4 sm:gap-0">
+            <div className="w-full sm:w-auto">
+              <DropDown products={initialProducts} onChange={handleSortChange} />
             </div>
-            <div className="mt-3 md:mt-0">
+            <div className="w-full sm:w-auto">
               <SearchComponent onSearch={handleSearch} />
             </div>
           </div>
 
-          <div className="my-5 text-gray-900 text-lg font-medium">
+          <div className="my-5 text-gray-900 text-base sm:text-lg font-medium text-center sm:text-left">
             Kết quả tìm kiếm:{" "}
             <span className="text-blue-600">{filteredProducts.length} sản phẩm</span>
           </div>
 
-          <Product products={currentProducts} limit={productsPerPage} />
+          <div className="grid grid-cols-1 gap-6">
+            <Product products={currentProducts} limit={productsPerPage} />
+          </div>
 
           {filteredProducts.length > 0 && (
             <div className="mt-6 flex justify-center">

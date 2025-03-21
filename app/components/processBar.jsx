@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
+import debounce from "lodash/debounce";
 
 export default function PriceRange({ onPriceChange, initialMin = 0, initialMax = 5000000 }) {
   const MIN_LIMIT = 0;
@@ -11,70 +13,78 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
   const [formattedMinPrice, setFormattedMinPrice] = useState("");
   const [formattedMaxPrice, setFormattedMaxPrice] = useState("");
 
-  // Cập nhật định dạng giá
+  // Định dạng giá trị tiền tệ
+  const formatPrice = (value) =>
+    value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+
+  // Cập nhật giá trị định dạng
   useEffect(() => {
-    setFormattedMinPrice(minPrice.toLocaleString("vi-VN"));
-    setFormattedMaxPrice(maxPrice.toLocaleString("vi-VN"));
+    setFormattedMinPrice(formatPrice(minPrice));
+    setFormattedMaxPrice(formatPrice(maxPrice));
   }, [minPrice, maxPrice]);
 
-  // Gọi onPriceChange khi giá thay đổi từ người dùng
-  const handleMinChange = (e) => {
-    const value = Math.max(MIN_LIMIT, Math.min(Number(e.target.value), maxPrice));
-    setMinPrice(value);
-    onPriceChange({ min: value, max: maxPrice });
+  // Xử lý thay đổi giá trị nhưng không gọi onPriceChange ngay
+  const handleMinChange = (value) => {
+    const newMin = Math.max(MIN_LIMIT, Math.min(Number(value), maxPrice - STEP));
+    setMinPrice(newMin);
   };
 
-  const handleMaxChange = (e) => {
-    const value = Math.min(MAX_LIMIT, Math.max(Number(e.target.value), minPrice));
-    setMaxPrice(value);
-    onPriceChange({ min: minPrice, max: value });
+  const handleMaxChange = (value) => {
+    const newMax = Math.min(MAX_LIMIT, Math.max(Number(value), minPrice + STEP));
+    setMaxPrice(newMax);
   };
 
-  const handleReset = () => {
-    setMinPrice(MIN_LIMIT);
-    setMaxPrice(MAX_LIMIT);
-    onPriceChange({ min: MIN_LIMIT, max: MAX_LIMIT });
+  // Hàm xử lý tìm kiếm
+  const handleSearch = () => {
+    onPriceChange({ min: minPrice, max: maxPrice });
+  };
+
+  // Xử lý khi nhấn Enter
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
     <div className="bg-white w-full p-4 rounded-lg shadow-md">
-      <p className="text-sm font-semibold text-gray-700">Chọn khoảng giá:</p>
-      <div className="flex flex-col gap-4 mt-2">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <div className="flex-1">
           <label className="text-sm text-gray-700">Giá thấp nhất:</label>
           <input
             type="number"
             min={MIN_LIMIT}
-            max={MAX_LIMIT}
+            max={maxPrice - STEP}
             step={STEP}
-            value={minPrice}
-            onChange={handleMinChange}
-            className="w-32 p-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            onChange={(e) => handleMinChange(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="w-full p-2 mt-1 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex-1">
           <label className="text-sm text-gray-700">Giá cao nhất:</label>
           <input
             type="number"
-            min={MIN_LIMIT}
+            min={minPrice + STEP}
             max={MAX_LIMIT}
             step={STEP}
-            value={maxPrice}
-            onChange={handleMaxChange}
-            className="w-32 p-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+
+            onChange={(e) => handleMaxChange(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="w-full p-2 mt-1 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
       </div>
-      <p className="mt-2 text-sm text-gray-700">
+      <p className="text-sm text-gray-700">
         Khoảng giá:
-        <span className="font-semibold text-blue-600"> {formattedMinPrice}đ</span> -
-        <span className="font-semibold text-blue-600"> {formattedMaxPrice}đ</span>
+        <span className="font-semibold text-blue-600"> {formattedMinPrice}</span> - 
+        <span className="font-semibold text-blue-600"> {formattedMaxPrice}</span>
       </p>
       <button
-        className="mt-4 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
-        onClick={handleReset}
+        className="mt-4 w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
+        onClick={handleSearch}
       >
-        Đặt lại
+        Tìm kiếm
       </button>
     </div>
   );

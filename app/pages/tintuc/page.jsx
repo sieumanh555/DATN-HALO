@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
@@ -10,104 +10,109 @@ const Tintuc = () => {
   }, []);
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen py-8">
-      {/* Desktop: 1440px, 12 cols, 75px/col, gutter 24px */}
-      {/* Tablet: auto width, margin 60px, gutter 35px, 8 cols */}
-      {/* Mobile: auto width, margin 12px, gutter 10px, 2 cols */}
-      <div className="mx-auto 
-        md:max-w-[1164px] md:px-[138px] md:grid md:grid-cols-12 md:gap-6 
-        sm:max-w-full sm:mx-[60px] sm:grid sm:grid-cols-8 sm:gap-[35px]
-        max-w-full mx-3 grid grid-cols-2 gap-[10px]"
-      >
-        {/* Left Sidebar */}
-        <aside className="md:col-span-3 sm:col-span-2 col-span-2 space-y-4">
-          {[...Array(6)].map((_, i) => (
-            <div 
-              key={i} 
-              className="flex items-center bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
-            >
-              <div className="relative w-16 h-16 flex-shrink-0">
-                <Image 
-                  src="/assets/images/Adidas-Rivalry-Low-Dark-Grey-Red(3).png" 
-                  alt="Thumbnail" 
-                  width={64}
-                  height={64}
-                  className="rounded-lg"
-                />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">Tin tức sản phẩm</h3>
-                <p className="text-xs text-gray-500 mt-1">1 phút trước</p>
-              </div>
-            </div>
-          ))}
-        </aside>
+    <div className=" min-h-screen py-12">
+      <div className="w-full px-[100px]">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Left Sidebar - Trending News */}
+          <aside className="md:col-span-1 space-y-6">
+  {/* <h3 className="text-lg font-bold text-gray-900 mb-4">Tin Hot</h3> */}
+  {[...Array(5)].map((_, i) => (
+    <div
+      key={i}
+      className="group bg-white rounded-lg p-4 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 cursor-pointer"
+    >
+      <div className="flex items-start space-x-3">
+        <div className="relative w-16 h-16 flex-shrink-0">
+          <Image
+            src="/assets/images/Adidas-Rivalry-Low-Dark-Grey-Red(3).png"
+            alt="Thumbnail"
+            width={64}
+            height={64}
+            className="rounded-md object-cover"
+          />
+        </div>
+        <div>
+          <h4 className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2">
+            Tin tức sản phẩm nổi bật
+          </h4>
+          <p className="text-xs text-gray-500 mt-1">{i + 1} giờ trước</p>
+        </div>
+      </div>
+    </div>
+  ))}
+</aside>
 
-        {/* Main Content */}
-        <main className="md:col-span-6 sm:col-span-4 col-span-2">
-          <div className="relative w-full h-72 rounded-xl overflow-hidden shadow-lg group">
-            <Image 
-              src="/assets/images/Adidas-Rivalry-Low-Dark-Grey-Red(3).png" 
-              alt="Game Banner"
-              width={800}
-              height={288}
-              className="w-full h-full transition-transform duration-300 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <h2 className="absolute bottom-4 left-4 right-4 text-white text-xl font-bold drop-shadow-lg">
-              Xuất hiện thêm một game MMO mới mẻ đầy tiềm năng trên Steam, chưa ra mắt đã có 100.000 người "mong ước"
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-4 mt-6">
-            {[...Array(2)].map((_, i) => (
-              <div 
-                key={i} 
-                className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300"
-              >
-                <div className="relative w-full h-32">
-                  <Image 
-                    src="/assets/images/Adidas-Rivalry-Low-Dark-Grey-Red(3).png" 
-                    alt="Sản phẩm" 
-                    width={300}
-                    height={128}
-                    className="w-full h-full"
-                  />
-                </div>
-                <p className="p-3 text-sm font-semibold text-gray-800 text-center">Tin tức sản phẩm</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div 
-                key={i} 
-                className="bg-white h-24 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-4"
-              >
-                {/* Có thể thêm nội dung cụ thể ở đây */}
-              </div>
-            ))}
-          </div>
-        </main>
-
-        {/* Right Sidebar */}
-        <aside className="md:col-span-3 sm:col-span-2 col-span-2 space-y-6">
-          {[...Array(2)].map((_, i) => (
-            <div 
-              key={i}
-              className="relative h-[30rem] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
-            >
-              <Image 
-                src="/assets/images/quangcao.png" 
-                alt="Quảng cáo" 
-                width={300}
-                height={480}
-                className="w-full h-full"
+          {/* Main Content */}
+          <main className="md:col-span-2 space-y-6">
+            {/* Featured News */}
+            <div className="relative w-full h-96 rounded-xl overflow-hidden shadow-xl group cursor-pointer">
+              <Image
+                src="/assets/images/Adidas-Rivalry-Low-Dark-Grey-Red(3).png"
+                alt="Featured News"
+                width={800}
+                height={384}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 via-gray-900/20 to-transparent" />
+              <div className="absolute bottom-0 p-6">
+                <span className="inline-block bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full mb-2">
+                  Mới nhất
+                </span>
+                <h2 className="text-2xl font-bold text-white drop-shadow-md leading-tight">
+                  Giày HALO cao cấp mới xuất hiện
+                </h2>
+                <p className="text-sm text-gray-200 mt-2">100.000 người đang chờ đón</p>
+              </div>
             </div>
-          ))}
-        </aside>
+
+            {/* News Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group"
+                >
+                  <div className="relative w-full h-40">
+                    <Image
+                      src="/assets/images/Adidas-Rivalry-Low-Dark-Grey-Red(3).png"
+                      alt="News"
+                      width={300}
+                      height={160}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 line-clamp-2">
+                      Tin tức sản phẩm
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-1">{i + 1} phút trước</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+
+          {/* Right Sidebar - Ads & Highlights */}
+          <aside className="md:col-span-1 space-y-6">
+            {[...Array(2)].map((_, i) => (
+              <div
+                key={i}
+                className="relative h-100 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+              >
+                <Image
+                  src="/assets/images/quangcao.png"
+                  alt="Advertisement"
+                  width={300}
+                  height={288}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 p-4 bg-gradient-to-t from-gray-900/80 to-transparent w-full">
+                  <p className="text-sm font-medium text-white">Quảng cáo nổi bật</p>
+                </div>
+              </div>
+            ))}
+          </aside>
+        </div>
       </div>
     </div>
   );

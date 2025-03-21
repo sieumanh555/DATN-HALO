@@ -1,238 +1,60 @@
 {
-  "banners": [
-    { "id": 1, "image": "/assets/images/banner1.jpg", "alt": "Giày chạy bộ khuyến mãi" },
-    { "id": 2, "image": "/assets/images/banner2.webp", "alt": "Giày bóng rổ mới" },
-    { "id": 3, "image": "/assets/images/banner3.webp", "alt": "Giày sneaker hot trend" }
-  ],
-  "productsSections": [
-    { "id": 1, "banner": "/assets/images/banner2.webp", "category": "Giày Nam" },
-    { "id": 2, "banner": "/assets/images/banner2.webp", "category": "Giày Nữ" },
-    { "id": 3, "banner": "/assets/images/banner2.webp", "category": "Phụ kiện" }
-  ],
+  
   "products": [
     {
-      "id": 1,
-      "name": "Giày HALO cao cấp Red",
-      "image": "/assets/images/haloered.webp",
-      "price": 15000,
-      "oldPrice": 20000,
+      "name": "Giày của HALO Cao Cấp",
+      "price": 2800000,
+      "pricePromo": 2500000,
+      "hot":true,
+      "mota": "Giày Nike Air Max 270 hiện đại, trẻ trung, đệm khí êm ái.",
+      "hinhanh": "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
+      "quantity": 70,
+      "isNew": false,
       "rating": 4,
-      "sold": 24,
-      "location": "Hồ Chí Minh",
-      "hot": false,
-      "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Đỏ", "Xanh", "Vàng", "Hồng"],
-      "description": "Áo thun local brand unisex phong cách trẻ trung, thoải mái. Chất liệu cotton 100% mềm mại, thấm hút mồ hôi.",
-      "stock": 50,
-      "category": "Giày Nam"
-    },
-    {
-      "id": 2,
-      "name": "Giày HALO cao cấp Blue",
-      "image": "/assets/images/haloblue.jpg",
-      "price": 12500,
-      "oldPrice": 20000,
-      "rating": 5,
-      "sold": 24,
-      "location": "Hồ Chí Minh",
-      "hot": true,
-      "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Xanh", "Đỏ", "Vàng", "Hồng"],
-      "description": "Áo thun thiết kế đơn giản, dễ phối đồ, phù hợp với mọi giới tính.",
-      "stock": 30,
-      "category": "Giày Nam"
-    },
-    {
-      "id": 3,
-      "name": "Giày HALO cao cấp Red",
-      "image": "/assets/images/haloered.webp",
-      "price": 14000,
-      "oldPrice": 20000,
-      "rating": 3,
-      "sold": 24,
-      "location": "Hồ Chí Minh",
-      "hot": false,
-      "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Đỏ", "Xanh", "Vàng", "Hồng"],
-      "description": "Sản phẩm chất lượng cao, đường may chắc chắn, phù hợp cho cả nam và nữ.",
-      "stock": 40,
-      "category": "Giày Nữ"
-    },
-    {
-      "id": 4,
-      "name": "Giày HALO cao cấp Yellow",
-      "image": "/assets/images/haloyellow.jpg",
-      "price": 16000,
-      "oldPrice": 20000,
-      "rating": 5,
-      "sold": 24,
-      "location": "Hồ Chí Minh",
-      "hot": true,
-      "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Vàng", "Đỏ", "Xanh", "Hồng"],
-      "description": "Áo thun phong cách Hàn Quốc, năng động, trẻ trung, phù hợp với mọi lứa tuổi.",
-      "stock": 60,
-      "category": "Giày Nữ"
-    },
-    {
-      "id": 5,
-      "name": "Áo Thun Local Brand Unisex Teelab Seasonal Tshirt TS295",
-      "image": "/assets/images/haloered.webp",
-      "price": 13500,
-      "oldPrice": 20000,
-      "rating": 5,
-      "sold": 24,
-      "location": "Hồ Chí Minh",
-      "hot": true,
-      "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Đỏ", "Xanh", "Vàng", "Hồng"],
-      "description": "Thiết kế basic dễ mặc, phù hợp với mọi phong cách thời trang.",
-      "stock": 35,
-      "category": "Phụ kiện"
-    },
-    {
-      "id": 6,
-      "name": "Áo Thun Local Brand Unisex Teelab Seasonal Tshirt TS295",
-      "image": "/assets/images/halohong.webp",
-      "price": 11000,
-      "oldPrice": 20000,
-      "rating": 4,
-      "sold": 24,
-      "location": "Hồ Chí Minh",
-      "hot": true,
-      "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Hồng", "Đỏ", "Xanh", "Vàng"],
-      "description": "Chất vải mềm, thoáng mát, co giãn tốt, giúp bạn thoải mái cả ngày.",
-      "stock": 20,
-      "category": "Phụ kiện"
-    },
-    {
-      "id": 7,
-      "name": "Giày Sneakers Street Style Black",
-      "image": "/assets/images/haloered.webp",
-      "price": 18000,
-      "oldPrice": 25000,
-      "rating": 4,
-      "sold": 30,
-      "location": "Hà Nội",
-      "hot": true,
-      "sizes": ["38", "39", "40", "41", "42"],
-      "colors": ["Đen", "Trắng", "Xám"],
-      "description": "Giày sneakers phong cách đường phố, chất liệu cao cấp, đế êm ái.",
-      "stock": 45,
-      "category": "Giày Nam"
-    },
-    {
-      "id": 8,
-      "name": "Giày Sneakers Street Style White",
-      "image": "/assets/images/haloyellow.jpg",
-      "price": 17500,
-      "oldPrice": 25000,
-      "rating": 4,
-      "sold": 28,
-      "location": "Hà Nội",
-      "hot": false,
-      "sizes": ["38", "39", "40", "41", "42"],
-      "colors": ["Trắng", "Đen", "Xanh Navy"],
-      "description": "Thiết kế trẻ trung, dễ phối đồ, phù hợp mọi phong cách.",
-      "stock": 40,
-      "category": "Phụ kiện"
-    },
-    {
-      "id": 9,
-      "name": "Áo Hoodie Local Brand Streetwear",
-      "image": "/assets/images/haloered.webp",
-      "price": 22000,
-      "oldPrice": 30000,
-      "rating": 5,
-      "sold": 50,
-      "location": "Đà Nẵng",
-      "hot": true,
-      "sizes": ["M", "L", "XL", "XXL"],
-      "colors": ["Đen", "Xám", "Xanh Navy"],
-      "description": "Áo hoodie unisex phong cách streetwear, vải nỉ dày dặn, ấm áp.",
-      "stock": 35,
-      "category": "Giày Nữ"
-    },
-    {
-      "id": 10,
-      "name": "Áo Hoodie Local Brand Classic",
-      "image": "/assets/images/haloered.webp",
-      "price": 21000,
-      "oldPrice": 28000,
-      "rating": 4,
-      "sold": 48,
-      "location": "Đà Nẵng",
-      "hot": false,
-      "sizes": ["M", "L", "XL", "XXL"],
-      "colors": ["Trắng", "Be", "Xanh Lá"],
-      "description": "Phong cách tối giản, phù hợp với mọi outfit mùa đông.",
-      "stock": 30,
-      "category": "Giày Nam"
-    },
-    {
-      "id": 11,
-      "name": "Quần Jean Slimfit Basic",
-      "image": "/assets/images/haloyellow.jpg",
-      "price": 25000,
-      "oldPrice": 32000,
-      "rating": 3,
-      "sold": 33,
-      "location": "Hồ Chí Minh",
-      "hot": true,
-      "sizes": ["28", "29", "30", "31", "32"],
-      "colors": ["Xanh Đậm", "Xanh Nhạt", "Đen"],
-      "description": "Chất liệu denim cao cấp, form slimfit trẻ trung.",
-      "stock": 25,
-      "category": "Phụ kiện"
-    },
-    {
-      "id": 12,
-      "name": "Quần Jogger Thể Thao",
-      "image": "/assets/images/haloblue.jpg",
-      "price": 19000,
-      "oldPrice": 27000,
-      "rating": 4,
-      "sold": 27,
-      "location": "Hà Nội",
-      "hot": true,
-      "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Đen", "Xám", "Xanh Rêu"],
-      "description": "Jogger thể thao năng động, co giãn tốt, thoáng mát.",
-      "stock": 30,
-      "category": "Giày Nam"
-    },
-    {
-      "id": 13,
-      "name": "Balo Laptop Chống Nước",
-      "image": "/assets/images/haloyellow.jpg",
-      "price": 30000,
-      "oldPrice": 40000,
-      "rating": 5,
-      "sold": 40,
-      "location": "Hồ Chí Minh",
-      "hot": true,
-      "sizes": ["Free Size"],
-      "colors": ["Đen", "Xám", "Xanh Navy"],
-      "description": "Balo đựng laptop 15.6 inch, chất liệu chống nước, bền bỉ.",
-      "stock": 20,
-      "category": "Phụ kiện"
-    },
-    {
-      "id": 14,
-      "name": "Mũ Lưỡi Trai Classic",
-      "image": "/assets/images/haloblue.jpg",
-      "price": 8000,
-      "oldPrice": 12000,
-      "rating": 2,
-      "sold": 35,
-      "location": "Hồ Chí Minh",
-      "hot": false,
-      "sizes": ["Free Size"],
-      "colors": ["Đen", "Trắng", "Xanh Navy"],
-      "description": "Mũ lưỡi trai classic, dễ phối với nhiều phong cách.",
-      "stock": 50,
-      "category": "Giày Nữ"
+      "location": "Cần Thơ",
+      "category": "67d303b0726ba39139b4610f",
+      "variants": [
+        {
+          "size": "40",
+          "color": "Đỏ",
+          "price": 2800000,
+          "stock": 20,
+          "status": "Còn hàng",
+          "images": [
+            "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg"
+          ]
+        },
+        {
+          "size": "41",
+          "color": "Xanh",
+          "price": 2800000,
+          "stock": 15,
+          "status": "Còn hàng",
+          "images": [
+            "https://i.pinimg.com/736x/70/4e/c8/704ec873531b79a613271505c0663f78.jpg"
+          ]
+        },
+        {
+          "size": "41",
+          "color": "Trắng",
+          "price": 2800000,
+          "stock": 25,
+          "status": "Còn hàng",
+          "images": [
+            "https://i.pinimg.com/736x/70/4e/c8/704ec873531b79a613271505c0663f78.jpg"
+          ]
+        },
+        {
+          "size": "40",
+          "color": "Xám",
+          "price": 2800000,
+          "stock": 10,
+          "status": "Còn hàng",
+          "images": [
+            "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg"
+          ]
+        }
+      ]
     }
   ]
 }
