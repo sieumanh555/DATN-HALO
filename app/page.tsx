@@ -14,9 +14,10 @@ const staticData = {
     { "id": 3, "image": "/assets/images/banner3.webp", "alt": "Giày sneaker hot trend" }
   ],
   "productsSections": [
-    { "id": 1, "banner": "/assets/images/banner2.webp", "category": "Giày Nam" },
-    { "id": 2, "banner": "/assets/images/banner2.webp", "category": "Giày Nữ" },
-    { "id": 3, "banner": "/assets/images/banner2.webp", "category": "Phụ kiện" }
+    { "id": 1, "banner": "/assets/images/banner2.webp", "category": "Sản phẩm nổi bật" },
+    { "id": 2, "banner": "/assets/images/banner2.webp", "category": "Giày Nam" },
+    { "id": 3, "banner": "/assets/images/banner2.webp", "category": "Giày Nữ" },
+    { "id": 4, "banner": "/assets/images/banner2.webp", "category": "Phụ kiện" }
   ]
 };
 
@@ -35,7 +36,7 @@ const BannerSlider = ({ banners }) => {
   return (
     <div className="w-screen h-full relative">
       <Slider {...settings}>
-        {banners.map((banner: { id: Key | null | undefined; image: string | undefined; alt: string | undefined; }) => (
+        {banners.map((banner) => (
           <div key={banner.id} className="w-screen">
             <img
               src={banner.image}
@@ -54,23 +55,29 @@ const StorePage = () => {
   const [banners] = useState(staticData.banners);
   const [productsSections] = useState(staticData.productsSections);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsResponse = await fetch("http://localhost:3000/products");
-        if (productsResponse.ok) {
-          const productsData = await productsResponse.json();
-          setProducts(productsData);
-        } else {
-          console.error("Failed to fetch products");
+        const productsResponse = await fetch("http://localhost:5000/product");
+        if (!productsResponse.ok) {
+          throw new Error("Failed to fetch products");
         }
+        const productsData = await productsResponse.json();
+        setProducts(productsData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
   }, []);
+
+  // Hàm lọc sản phẩm theo danh mục và hot
+  const filterProducts = (category) => {
+    if (category === "Sản phẩm nổi bật") {
+      return products.filter((product) => product.hot === 1);
+    }
+    return products;
+  };
 
   return (
     <>
@@ -92,7 +99,6 @@ const StorePage = () => {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-6">
         <CategoryList />
-        {/* <VoucherList /> */}
         {productsSections.map((section) => (
           <div key={section.id} className="mt-12">
             <div className="relative mb-6">
@@ -106,7 +112,7 @@ const StorePage = () => {
               </h2>
             </div>
             <div className="grid gap-6 mt-6">
-              <Product products={products} limit={6} />
+              <Product products={filterProducts(section.category)} limit={6} />
             </div>
           </div>
         ))}

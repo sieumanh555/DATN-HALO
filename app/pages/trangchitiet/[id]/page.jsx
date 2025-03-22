@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faThumbsUp } from "@fortawesome/free-solid-icons";
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "next/navigation";
 import Product from "../../../components/product";
 
@@ -11,66 +11,20 @@ export default function Trangchitiet() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageHeight, setImageHeight] = useState('auto');
+  const productInfoRef = useRef(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const data = {
-          name: "Giày của HALO Cao Cấp",
-          price: 2800000,
-          pricePromo: 2500000,
-          hot: true,
-          mota: "Giày Nike Air Max 270 mang đến phong cách hiện đại, trẻ trung với thiết kế năng động, phù hợp cho mọi hoạt động hằng ngày. Được trang bị công nghệ đệm khí 270 độ, đôi giày này mang lại cảm giác êm ái, thoải mái vượt trội, giúp giảm áp lực lên bàn chân khi di chuyển.",
-          hinhanh: "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
-          isNew: false,
-          rating: 4,
-          quantity: 40,
-          location: "Cần Thơ",
-          category: "Giày Nam",
-          variants: [
-            {
-              size: "40",
-              color: "Đỏ",
-              price: 2800000,
-              stock: 20,
-              status: "Còn hàng",
-              images: [
-                "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
-              ],
-            },
-            {
-              size: "41",
-              color: "Xanh",
-              status: "Còn hàng",
-              price: 2800000,
-              stock: 15,
-              images: [
-                "https://i.pinimg.com/736x/70/4e/c8/704ec873531b79a613271505c0663f78.jpg",
-              ],
-            },
-            {
-              size: "41",
-              color: "Trắng",
-              status: "Còn hàng",
-              price: 2800000,
-              stock: 25,
-              images: [
-                "https://i.pinimg.com/736x/70/4e/c8/704ec873531b79a613271505c0663f78.jpg",
-              ],
-            },
-            {
-              size: "40",
-              color: "Xám",
-              price: 2800000,
-              stock: 10,
-              status: "Còn hàng",
-              images: [
-                "https://i.pinimg.com/736x/f3/0b/14/f30b14128e01f1199fd240ccc9a6954f.jpg",
-              ],
-            },
-          ],
-        };
+        const response = await fetch(`http://localhost:5000/product/${id}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch product: ${response.status}`);
+        }
+        
+        const data = await response.json();
         setProduct(data);
       } catch (err) {
         setError(err.message);
@@ -78,8 +32,19 @@ export default function Trangchitiet() {
         setLoading(false);
       }
     };
-    fetchProduct();
-  }, []);
+
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+
+  // Effect để đo chiều cao của phần thông tin sản phẩm
+  useEffect(() => {
+    if (productInfoRef.current) {
+      const height = productInfoRef.current.offsetHeight;
+      setImageHeight(`${height}px`);
+    }
+  }, [product]);
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -89,13 +54,13 @@ export default function Trangchitiet() {
   const [comment, setComment] = useState("");
   const [likes, setLikes] = useState({});
 
-  const sizes = [...new Set(product?.variants.map((v) => v.size))];
+  const sizes = [...new Set(product?.variants?.map((v) => v.size) || [])];
   const colors = selectedSize
-    ? product?.variants.filter((v) => v.size === selectedSize).map((v) => v)
+    ? product?.variants?.filter((v) => v.size === selectedSize) || []
     : [];
 
   useEffect(() => {
-    if (product && product.variants && product.variants.length > 0) {
+    if (product?.variants?.length > 0) {
       setSelectedSize(sizes[0]);
       setSelectedColor(product.variants[0]);
     }
@@ -135,37 +100,38 @@ export default function Trangchitiet() {
     }));
   };
 
-  if (loading) return <p>Đang tải...</p>;
-  if (error) return <p>Lỗi: {error}</p>;
-  if (!product || !product.variants) return <p>Không tìm thấy sản phẩm hoặc dữ liệu không hợp lệ.</p>;
+  if (loading) return <p className="text-center">Đang tải...</p>;
+  if (error) return <p className="text-center text-red-500">Lỗi: {error}</p>;
+  if (!product) return <p className="text-center">Không tìm thấy sản phẩm.</p>;
 
   return (
-    <div className="max-w-[1920px]">
-      <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md min-h-[500px]">
-        {/* Hình ảnh chính */}
+    <div className="max-w-[1920px] px-[100px] py-[48px]">
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md">
+        {/* Product Image */}
         <div className="md:col-span-6 flex items-center justify-center">
-          <div className="w-full h-full rounded-xl overflow-hidden shadow-lg border">
+          <div 
+            className="w-full rounded-xl overflow-hidden shadow-lg border"
+            style={{ height: imageHeight }}
+          >
             <Image
-              src={selectedColor?.images[0] || product.hinhanh}
-              alt={product.name}
-              width={0}
-              height={0}
+              src={selectedColor?.images?.[0] || product.hinhanh || "/placeholder.jpg"}
+              alt={product.name || "Product"}
+              width={600}
+              height={520}
               sizes="100vw"
               className="object-cover w-full h-full rounded-xl"
             />
           </div>
         </div>
 
-        {/* Thông tin sản phẩm */}
-        <div className="md:col-span-4 flex flex-col justify-between min-h-[500px]">
+        {/* Product Info */}
+        <div 
+          ref={productInfoRef}
+          className="md:col-span-4 flex flex-col"
+        >
           <div>
             <div className="flex items-center gap-3">
               <h2 className="text-3xl font-semibold">{product.name}</h2>
-              {product.pricePromo < product.price && (
-                <span className="bg-red-500 text-white text-sm font-semibold px-2 py-1 rounded-md">
-                  Giảm {Math.round(((product.price - product.pricePromo) / product.price) * 100)}%
-                </span>
-              )}
             </div>
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-700">Mô tả sản phẩm</h3>
@@ -173,11 +139,18 @@ export default function Trangchitiet() {
             </div>
             <div className="mt-3 flex items-center gap-4">
               <span className="text-2xl font-bold text-red-500">
-                {product.pricePromo.toLocaleString()}đ
+                {product.pricePromo?.toLocaleString() || product.price?.toLocaleString()}đ
               </span>
-              <span className="text-gray-400 line-through">
-                {product.price.toLocaleString()}đ
-              </span>
+              {product.pricePromo && (
+                <span className="text-gray-400 line-through">
+                  {product.price.toLocaleString()}đ
+                </span>
+              )}
+              {product.pricePromo && product.price && (
+                <span className="bg-red-500 text-white text-sm font-semibold px-2 py-1 rounded-md">
+                  Giảm {Math.round(((product.price - product.pricePromo) / product.price) * 100)}%
+                </span>
+              )}
             </div>
 
             <div className="mt-6">
@@ -247,7 +220,7 @@ export default function Trangchitiet() {
         </div>
       </div>
 
-      {/* Phần bình luận */}
+      {/* Comments Section */}
       <div className="mt-6 flex flex-col items-start">
         <div className="w-full max-w-3/4">
           <h3 className="text-lg font-medium text-gray-700">Bình luận</h3>
@@ -302,7 +275,7 @@ export default function Trangchitiet() {
 
       <div className="mt-10">
         <h2 className="text-2xl font-bold text-center">Sản phẩm khác</h2>
-        <Product products={product} limit={3} />
+        <Product products={[product]} limit={3} />
       </div>
     </div>
   );

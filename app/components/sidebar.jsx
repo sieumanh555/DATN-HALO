@@ -2,23 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretRight } from "@fortawesome/free-solid-svg-icons"; // Import faCaretRight
+import { faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
 export default function Sidebar({ products = [], onCategoryChange }) {
   const [isSidebarOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Lấy danh sách danh mục từ products, thêm "Giày nam" nếu chưa có
+  // Lấy danh sách danh mục từ products, dùng categoryName thay vì toàn bộ object
   const categories = [
     "all",
-    ...new Set(products.map((p) => p.category).filter(Boolean)),
+    ...new Set(products.map((p) => p.category?.categoryName).filter(Boolean)),
   ].filter((value, index, self) => self.indexOf(value) === index);
 
   // Hàm lọc sản phẩm theo danh mục
   const filterProductsByCategory = (category) => {
     let filtered = [...products];
     if (category && category !== "all") {
-      filtered = filtered.filter((product) => product.category === category);
+      filtered = filtered.filter((product) => product.category?.categoryName === category);
     }
     return filtered;
   };
@@ -56,7 +56,6 @@ export default function Sidebar({ products = [], onCategoryChange }) {
                     selectedCategory === category ? "bg-blue-200 text-gray-900" : ""
                   }`}
                 >
-                  {/* Thêm mũi tên faCaretRight khi danh mục được chọn */}
                   <span className="mr-2">
                     {selectedCategory === category ? (
                       <FontAwesomeIcon icon={faCaretRight} />

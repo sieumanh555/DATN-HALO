@@ -23,13 +23,14 @@ export default function Products() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("http://localhost:3000/products")
+    fetch("http://localhost:5000/product")
       .then((response) => {
         if (!response.ok) throw new Error("API không phản hồi");
         return response.json();
       })
       .then((data) => {
         if (Array.isArray(data)) {
+          console.log("Fetched products:", data); // Debug log
           setInitialProducts(data);
           setFilteredProducts(data);
           setCategoryFiltered(data);
@@ -141,9 +142,8 @@ export default function Products() {
                   />
                 ),
               },
-              
-            ].map((item, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-md">
+            ].map((item) => (
+              <div key={item.title} className="bg-white rounded-xl shadow-md">
                 <div className="flex items-center gap-4 text-gray-900 bg-gradient-to-r from-blue-400 to-blue-600 py-4 px-4 rounded-t-xl">
                   <FontAwesomeIcon icon={item.icon} className="text-[24px] text-white" />
                   <h2 className="text-lg font-semibold text-white">{item.title}</h2>

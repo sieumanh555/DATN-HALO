@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useMemo } from "react";
 
-export default function DropDown({ products = [], onChange }) {
+export default function DropDown({ onChange }) {
+  const [products, setProducts] = useState([]);
   const [sortOption, setSortOption] = useState("");
   const [filterOption, setFilterOption] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Danh sách các tùy chọn lọc
   const filterOptions = [
@@ -14,6 +17,27 @@ export default function DropDown({ products = [], onChange }) {
     { value: "discount", label: "Sản phẩm được ưu đãi" },
   ];
 
+  // Fetch data từ API khi component mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:5000/product");
+        if (!response.ok) {
+          throw new Error("Không thể tải dữ liệu sản phẩm");
+        }
+        const data = await response.json();
+        setProducts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   // Hàm lọc và sắp xếp sản phẩm
   const filterAndSortProducts = (sort = sortOption, filter = filterOption) => {
     let filtered = [...products];
@@ -21,17 +45,22 @@ export default function DropDown({ products = [], onChange }) {
     // Lọc theo tùy chọn
     switch (filter) {
       case "hot":
-        filtered = filtered.filter((product) => product?.hot === true);
+        filtered = filtered.filter((product) => product?.hot === 1); // Sửa từ true thành 1
         break;
-      case "new": // Sửa từ "isNew" thành "new" để khớp với filterOptions
-        filtered = filtered.filter((product) => product?.isNew === true);
+      case "new":
+        // Giả định sản phẩm mới dựa trên createdAt (ví dụ: trong vòng 30 ngày)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 10);
+        filtered = filtered.filter(
+          (product) => new Date(product?.createdAt) >= thirtyDaysAgo
+        );
         break;
       case "discount":
         filtered = filtered.filter(
           (product) =>
-            product?.oldPrice &&
+            product?.pricePromo &&
             product?.price &&
-            product.oldPrice > product.price
+            product.pricePromo < product.price
         );
         break;
       case "all":
@@ -57,22 +86,21 @@ export default function DropDown({ products = [], onChange }) {
         break;
     }
 
-    console.log("DropDown filtered:", filtered); // Debug
     return filtered;
   };
 
-  // Sử dụng useMemo để tối ưu hiệu suất (tùy chọn)
+  // Sử dụng useMemo để tối ưu hiệu suất
   const processedProducts = useMemo(
     () => filterAndSortProducts(),
     [products, sortOption, filterOption]
   );
 
-  // Gửi danh sách ban đầu khi mount hoặc products thay đổi
+  // Gửi danh sách sản phẩm đã xử lý khi thay đổi
   useEffect(() => {
-    if (typeof onChange === "function") {
+    if (typeof onChange === "function" && !loading) {
       onChange(processedProducts);
     }
-  }, [processedProducts, onChange]);
+  }, [processedProducts, onChange, loading]);
 
   // Xử lý thay đổi sort
   const handleSortChange = (e) => {
@@ -91,6 +119,10 @@ export default function DropDown({ products = [], onChange }) {
       onChange(filterAndSortProducts(sortOption, newFilter));
     }
   };
+
+  // Hiển thị loading hoặc error nếu có
+  if (loading) return <div>Đang tải sản phẩm...</div>;
+  if (error) return <div>Lỗi: {error}</div>;
 
   return (
     <div className="flex gap-4">
