@@ -27,7 +27,7 @@ export default function Trangchitiet() {
           rating: 4,
           quantity: 40,
           location: "Cần Thơ",
-          category: "67d303b0726ba39139b4610f",
+          category: "Giày Nam",
           variants: [
             {
               size: "40",
