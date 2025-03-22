@@ -140,7 +140,7 @@ export default function Trangchitiet() {
   if (!product || !product.variants) return <p>Không tìm thấy sản phẩm hoặc dữ liệu không hợp lệ.</p>;
 
   return (
-    <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-16 mt-6">
+    <div className="max-w-[1920px] max-w-[1920px]">
       <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md min-h-[500px]">
         {/* Hình ảnh chính */}
         <div className="md:col-span-6 flex items-center justify-center">

@@ -75,7 +75,7 @@ const StorePage = () => {
   return (
     <>
       {/* Video Banner */}
-      <div className="flex flex-col">
+      <div className="max-w-[1920px] flex flex-col">
         <div className="relative flex h-screen w-full mb-12 overflow-hidden">
           <video
             autoPlay

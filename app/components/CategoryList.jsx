@@ -15,7 +15,7 @@ const categories = [
   },
   {
     name: "Giày Nike",
-    image: "/assets/images/phukien.webp",
+    image: "https://www.pngall.com/wp-content/uploads/2016/06/Nike-Logo.png",
   },
 ];
 
@@ -31,7 +31,7 @@ const CategoryList = () => {
             <img
               src={category.image}
               alt={category.name}
-              className="w-20 h-20 object-cover mx-auto"
+              className="w-20 h-20 object-contain mx-auto" // Thay object-cover thành object-contain
             />
             <h3 className="text-blue-600 font-bold text-lg mt-3">
               {category.name.toUpperCase()}
