@@ -31,7 +31,7 @@ export default function Home() {
     }
 
     return (
-        <div className={`w-full mt-[18px] px-[100px] flex justify-between`}>
+        <div className={`w-full mt-[18px] px-[100px] flex flex-wrap justify-between`}>
             {data.map((product) => (
                 <div
                     key={product._id}

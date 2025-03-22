@@ -1,6 +1,7 @@
 interface Variant {
     _id: string,
     productId: string,
+    image: string;
     color: string,
     hex: string,
     size: number,

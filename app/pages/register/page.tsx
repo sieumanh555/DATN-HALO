@@ -4,9 +4,11 @@ import Link from "next/link";
 import {useState} from "react";
 import {Field, Form, Formik} from "formik";
 import {Eye, EyeClosed} from "lucide-react";
+import {setCookie} from "../../libs/Cookie/clientSideCookie";
 
-import ButtonLogin from "../../components/socialLogin/btnLogin";
 import type User from "../../models/User";
+import ButtonLogin from "../../components/socialLogin/btnLogin";
+
 
 interface RegisterFormValues extends User {
     rePassword: string;
@@ -15,6 +17,8 @@ interface RegisterFormValues extends User {
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .trim()
@@ -23,10 +27,6 @@ export default function Register() {
             .trim()
             .email("* Email không hợp lệ")
             .required("* Vui lòng nhập email"),
-        phone: Yup.string()
-            .min(10, "* Số điện thoại phải từ 10 số trở lên")
-            .trim()
-            .required("* Vui lòng nhập số điện thoại"),
         password: Yup.string()
             .trim()
             .min(8, "* Mật khẩu tối thiểu 8 kí tự")
@@ -39,38 +39,42 @@ export default function Register() {
             .oneOf([Yup.ref("password")], "* Mật khẩu không khớp")
             .required("* Vui lòng nhập lại mật khẩu"),
     });
-    const handleSubmit = async (values: Omit<User, "rePassword">) => {
-        const {_id, name, phone, password, email, address, zipcode, role} = values;
-        const data = {_id, name, phone, password, email, address, zipcode, role};
-        await fetch("http://localhost:3000/users/register", {
-            method: "POST",
-            headers: {"content-type": "application/json"},
-            body: JSON.stringify(data),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(">>> Response: ", data);
-                if (data.status === 200) {
-                    // localStorage.setItem("access_token", data.accessToken);
-                    // localStorage.setItem("refresh_token", data.refreshToken);
 
-                    window.location.href = "/";
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch((error) => console.log("Lỗi đăng ký:" + error));
+    const handleSubmit = async (values: Omit<User, "rePassword">) => {
+        setIsSubmitting(true);
+        try {
+            const {_id, name, phone, password, email, address, zipcode, role} = values;
+            const data = {_id, name, phone, password, email, address, zipcode, role};
+            console.log(data);
+            const response = await fetch("http://localhost:3000/users/register", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data),
+            });
+            const responseData = await response.json();
+            if (responseData.status === 200) {
+                setCookie(`as_tn`, responseData.access_token, 3);
+                setCookie(`rh_tn`, responseData.refreshToken, 10);
+            } else {
+                alert(responseData.message);
+            }
+        } catch (error) {
+            console.log("Lỗi đăng ký:" + error);
+            alert("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
+
     return (
-        <div className={`bg-[#fbfcfd] tracking-wider py-4`}>
-            <div className={`w-[30%] mx-auto flex flex-col items-center gap-4`}>
-                {/*<p className={`text-3xl text-[#034292] font-bold uppercase`}>*/}
-                {/*    halo store*/}
-                {/*</p>*/}
-                <div
-                    className={`full-shadow w-full bg-[#fff] px-8 py-6 rounded-lg flex flex-col gap-2`}
-                >
-                    <p className={`text-3xl text-[#034292] text-center font-bold tracking-wider`}>HALO</p>
+        <section
+            className="min-h-screen bg-[#fbfcfd] tracking-wider py-4 px-4 md:px-0 flex flex-col items-center gap-4">
+            <div className="full-shadow w-full md:w-[600px] lg:w-[500px] mx-auto flex flex-col items-center gap-4">
+                <div className="w-full bg-white px-4 sm:px-6 md:px-8 py-6 rounded-lg shadow-md">
+                    <p className="text-2xl sm:text-3xl text-[#034292] text-center font-bold tracking-wider mb-6">
+                        HALO
+                    </p>
+
                     <Formik<RegisterFormValues>
                         initialValues={{
                             _id: "",
@@ -87,186 +91,156 @@ export default function Register() {
                         onSubmit={handleSubmit}
                     >
                         {({errors, touched}) => (
-                            <div className={`w-full`}>
-                                <Form className="flex flex-col items-center gap-2">
-                                    {/* name */}
-                                    <div className="w-full">
-                                        <label htmlFor="name" className={`block my-1`}>
-                                            Họ tên
-                                        </label>
+                            <Form className="flex flex-col gap-3">
+                                {/* name */}
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium mb-1">
+                                        Tên tài khoản
+                                    </label>
+                                    <Field
+                                        name="name"
+                                        id="name"
+                                        type="text"
+                                        className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#034292] transition-all duration-200"
+                                    />
+                                    {errors.name && touched.name && (
+                                        <div className="text-xs text-red-500 mt-1">{errors.name}</div>
+                                    )}
+                                </div>
+                                {/* email */}
+                                <div>
+                                    <label htmlFor="email" className="block text-sm font-medium mb-1">
+                                        Email
+                                    </label>
+                                    <Field
+                                        name="email"
+                                        id="email"
+                                        type="text"
+                                        className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#034292] transition-all duration-200"
+                                    />
+                                    {errors.email && touched.email && (
+                                        <div className="text-xs text-red-500 mt-1">{errors.email}</div>
+                                    )}
+                                </div>
+                                {/* password */}
+                                <div>
+                                    <label htmlFor="password" className="block text-sm font-medium mb-1">
+                                        Mật khẩu
+                                    </label>
+                                    <div className="relative">
                                         <Field
-                                            name="name"
-                                            id="name"
-                                            type="text"
-                                            placeholder=""
-                                            className="w-full text-sm px-3 py-2 border border-gray-300 focus:outline-none rounded"
+                                            name="password"
+                                            id="password"
+                                            type={showPassword ? "text" : "password"}
+                                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#034292] transition-all duration-200"
                                         />
-                                        {errors.name && touched.name ? (
-                                            <div className={`text-xs text-red-500 my-2`}>
-                                                {errors.name}
-                                            </div>
-                                        ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                        >
+                                            {showPassword ? (
+                                                <Eye size={20} strokeWidth={1.5}/>
+                                            ) : (
+                                                <EyeClosed size={20} strokeWidth={1.5}/>
+                                            )}
+                                        </button>
                                     </div>
-
-                                    {/* email */}
-                                    <div className="w-full">
-                                        <label htmlFor="email" className={`block my-1`}>
-                                            Email
-                                        </label>
+                                    {errors.password && touched.password && (
+                                        <div className="text-xs text-red-500 mt-1">{errors.password}</div>
+                                    )}
+                                </div>
+                                {/* rePassword */}
+                                <div>
+                                    <label htmlFor="rePassword" className="block text-sm font-medium mb-1">
+                                        Nhập lại mật khẩu
+                                    </label>
+                                    <div className="relative">
                                         <Field
-                                            name="email"
-                                            id="email"
-                                            type="text"
-                                            placeholder=""
-                                            className="w-full text-sm px-3 py-2 border border-gray-300 focus:outline-none rounded"
+                                            name="rePassword"
+                                            id="rePassword"
+                                            type={showRePassword ? "text" : "password"}
+                                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#034292] transition-all duration-200"
                                         />
-                                        {errors.email && touched.email ? (
-                                            <div className={`text-xs text-red-500 my-2`}>
-                                                {errors.email}
-                                            </div>
-                                        ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowRePassword(!showRePassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                        >
+                                            {showRePassword ? (
+                                                <Eye size={20} strokeWidth={1.5}/>
+                                            ) : (
+                                                <EyeClosed size={20} strokeWidth={1.5}/>
+                                            )}
+                                        </button>
                                     </div>
-                                    {/* phone */}
-                                    <div className="w-full">
-                                        <label htmlFor="phone" className={`block my-1`}>
-                                            Số điện thoại
-                                        </label>
-                                        <Field
-                                            name="phone"
-                                            id="phone"
-                                            type="text"
-                                            placeholder=""
-                                            className="w-full text-sm px-3 py-2 border border-gray-300 focus:outline-none rounded"
-                                        />
-                                        {errors.phone && touched.phone ? (
-                                            <div className={`text-xs text-red-500 my-2`}>
-                                                {errors.phone}
-                                            </div>
-                                        ) : null}
-                                    </div>
-                                    {/* password */}
-                                    <div className="w-full">
-                                        <label htmlFor="password" className={`block my-1`}>
-                                            Mật khẩu
-                                        </label>
-                                        <div className={`relative`}>
-                                            <Field
-                                                name="password"
-                                                id="password"
-                                                type={showPassword ? "text" : "password"}
-                                                placeholder=""
-                                                className="w-full text-sm px-3 py-2 border border-gray-300 focus:outline-none rounded"
-                                            />
-                                            {errors.password && touched.password ? (
-                                                <div className={`text-xs text-red-500 my-2`}>
-                                                    {errors.password}
-                                                </div>
-                                            ) : null}
-                                            <div
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className={`absolute z-0 top-2 right-2 cursor-pointer`}
-                                            >
-                                                {showPassword ? (
-                                                    <Eye strokeWidth={1.5} className={`w-5 h-5`}/>
-                                                ) : (
-                                                    <EyeClosed strokeWidth={1.5} className={`w-5 h-5`}/>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* rePassword */}
-                                    <div className="w-full">
-                                        <label htmlFor="rePassword" className={`block my-1`}>
-                                            Nhập lại mật khẩu
-                                        </label>
-                                        <div className={`relative`}>
-                                            <Field
-                                                name="rePassword"
-                                                id="rePassword"
-                                                type={showRePassword ? "text" : "password"}
-                                                placeholder=""
-                                                className="w-full text-sm px-3 py-2 border border-gray-300 focus:outline-none rounded"
-                                            />
-                                            {errors.rePassword && touched.rePassword ? (
-                                                <div className={`text-xs text-red-500 my-2`}>
-                                                    {errors.rePassword}
-                                                </div>
-                                            ) : null}
-                                            <div
-                                                onClick={() => setShowRePassword(!showRePassword)}
-                                                className={`absolute z-0 top-2 right-2 cursor-pointer`}
-                                            >
-                                                {showRePassword ? (
-                                                    <Eye strokeWidth={1.5} className={`w-5 h-5`}/>
-                                                ) : (
-                                                    <EyeClosed strokeWidth={1.5} className={`w-5 h-5`}/>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/*confirm terms*/}
-                                    <div className={`w-full mt-2`}>
-                                        <div className={`flex justify-between items-start`}>
-                                            <input
-                                                type="checkbox"
-                                                id={`confirmTerms`}
-                                                className={` w-3 h-3 mt-1 cursor-pointer`}
-                                            />
-                                            <label
-                                                htmlFor={`confirmTerms`}
-                                                className={`text-xs ml-2 cursor-pointer`}
-                                            >
-                                                Tôi đồng ý với{" "}
-                                                <Link
-                                                    href={`/pages/privacy`}
-                                                    className={`font-semibold hover:text-[#034292] underline`}
-                                                >
-                                                    Chính sách bảo mật và Điều khoản sử dụng
-                                                </Link>{" "}
-                                                của HALO.
-                                            </label>
-                                        </div>
-                                    </div>
-                                    {/*button submit*/}
-                                    <button
-                                        type={`submit`}
-                                        className={`w-full h-10 bg-[#034292] hover:bg-[#5469d4] text-[#fff] mt-2 rounded`}
+                                    {errors.rePassword && touched.rePassword && (
+                                        <div className="text-xs text-red-500 mt-1">{errors.rePassword}</div>
+                                    )}
+                                </div>
+                                {/* Terms */}
+                                <div className="flex items-start gap-2 mt-2">
+                                    <input
+                                        type="checkbox"
+                                        id="confirmTerms"
+                                        className="mt-1 w-4 h-4 rounded border-gray-300 text-[#034292] focus:ring-[#034292] transition duration-200 cursor-pointer"
+                                    />
+                                    <label
+                                        htmlFor="confirmTerms"
+                                        className="text-xs cursor-pointer"
                                     >
-                                        Đăng ký
-                                    </button>
-                                </Form>
-                            </div>
+                                        Tôi đồng ý với{" "}
+                                        <Link
+                                            href="/pages/privacy"
+                                            className="font-semibold text-[#034292] hover:underline"
+                                        >
+                                            Chính sách bảo mật và Điều khoản sử dụng
+                                        </Link>{" "}
+                                        của HALO.
+                                    </label>
+                                </div>
+                                {/* Submit button */}
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full h-11 bg-[#034292] hover:bg-[#023170] text-white rounded mt-2 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                                >
+                                    {isSubmitting ? (
+                                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg"
+                                             fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                    strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor"
+                                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    ) : (
+                                        "Đăng ký"
+                                    )}
+                                </button>
+                            </Form>
                         )}
                     </Formik>
 
-                    {/*gap*/}
-                    <div
-                        className={`w-full opacity-50 flex justify-between items-center`}
-                    >
-                        <div
-                            className={`w-[40%] h-[2px]`}
-                            style={{backgroundColor: "rgb(219 219 219)"}}
-                        ></div>
-                        <div className={`uppercase text-sm`}>hoặc</div>
-                        <div
-                            className={`w-[40%] h-[2px]`}
-                            style={{backgroundColor: "rgb(219 219 219)"}}
-                        ></div>
+                    {/* Divider */}
+                    <div className="flex items-center gap-3 my-6">
+                        <div className="flex-1 h-[1px] bg-gray-200"></div>
+                        <span className="text-xs text-gray-500 uppercase">hoặc</span>
+                        <div className="flex-1 h-[1px] bg-gray-200"></div>
                     </div>
-
-                    {/*facebook && google account*/}
+                    {/* Social login */}
                     <ButtonLogin/>
                 </div>
-                <div className={`flex gap-1`}>
-                    Bạn đã có tài khoản ?{" "}
-                    <Link
-                        href={`/pages/login`}
-                        className={`text-[#034292] hover:underline`}
-                    >
-                        Đăng nhập
-                    </Link>
-                </div>
             </div>
-        </div>
+            {/* Login link */}
+            <div className="flex gap-1 mb-8">
+                <span>Bạn đã có tài khoản?</span>
+                <Link
+                    href="/pages/login"
+                    className="text-[#034292] hover:underline"
+                >
+                    Đăng nhập
+                </Link>
+            </div>
+        </section>
     );
 }
