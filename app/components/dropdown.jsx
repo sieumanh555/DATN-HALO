@@ -38,6 +38,7 @@ export default function DropDown({ onChange }) {
     fetchProducts();
   }, []);
 
+  
   // Hàm lọc và sắp xếp sản phẩm
   const filterAndSortProducts = (sort = sortOption, filter = filterOption) => {
     let filtered = [...products];

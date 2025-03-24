@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Key } from "react";
+import { useState, useEffect } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -71,12 +71,13 @@ const StorePage = () => {
     fetchData();
   }, []);
 
-  // Hàm lọc sản phẩm theo danh mục và hot
+  // Hàm lọc sản phẩm theo danh mục
   const filterProducts = (category) => {
     if (category === "Sản phẩm nổi bật") {
-      return products.filter((product) => product.hot === 1);
+      return products.filter((product) => product.hot === 1); // Lọc sản phẩm nổi bật
     }
-    return products;
+    // Lọc sản phẩm theo category.categoryName
+    return products.filter((product) => product.category?.categoryName === category);
   };
 
   return (

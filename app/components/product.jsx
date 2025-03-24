@@ -33,14 +33,22 @@ export default function Product({ products = [], limit = Infinity }) {
                 {product?.name || "Tên sản phẩm không xác định"}
               </h3>
               <div className="flex items-center mt-2">
-                <span className="text-red-500 text-sm font-bold">
-                  {typeof product?.price === "number"
-                    ? product.price.toLocaleString() + " VNĐ"
-                    : "Đang cập nhật"}
-                </span>
-                {typeof product?.pricePromo === "number" && (
-                  <span className="text-gray-400 line-through ml-2 text-sm">
-                    {product.pricePromo.toLocaleString()} VNĐ
+                {typeof product?.pricePromo === "number" ? (
+                  <>
+                    <span className="text-red-500 text-sm font-bold">
+                      {product.pricePromo.toLocaleString()} VNĐ
+                    </span>
+                    {typeof product?.price === "number" && (
+                      <span className="text-gray-400 line-through ml-2 text-sm">
+                        {product.price.toLocaleString()} VNĐ
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-red-500 text-sm font-bold">
+                    {typeof product?.price === "number" 
+                      ? product.price.toLocaleString() + " VNĐ" 
+                      : "Đang cập nhật"}
                   </span>
                 )}
               </div>

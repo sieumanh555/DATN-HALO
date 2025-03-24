@@ -19,11 +19,9 @@ export default function Trangchitiet() {
       try {
         setLoading(true);
         const response = await fetch(`http://localhost:5000/product/${id}`);
-        
         if (!response.ok) {
           throw new Error(`Failed to fetch product: ${response.status}`);
         }
-        
         const data = await response.json();
         setProduct(data);
       } catch (err) {
@@ -38,7 +36,6 @@ export default function Trangchitiet() {
     }
   }, [id]);
 
-  // Effect để đo chiều cao của phần thông tin sản phẩm
   useEffect(() => {
     if (productInfoRef.current) {
       const height = productInfoRef.current.offsetHeight;
@@ -55,25 +52,32 @@ export default function Trangchitiet() {
   const [likes, setLikes] = useState({});
 
   const sizes = [...new Set(product?.variants?.map((v) => v.size) || [])];
-  const colors = selectedSize
-    ? product?.variants?.filter((v) => v.size === selectedSize) || []
+  const allColors = ["black", "white", "blue", "red", "yellow"]; 
+  const availableColors = selectedSize
+    ? product?.variants
+        ?.filter((v) => v.size === selectedSize)
+        .map((v) => ({ color: v.color.toLowerCase(), stock: v.stock, images: v.images })) || []
     : [];
 
   useEffect(() => {
-    if (product?.variants?.length > 0) {
+    if (product?.variants?.length > 0 && !selectedSize) {
       setSelectedSize(sizes[0]);
-      setSelectedColor(product.variants[0]);
+      const firstVariant = product.variants.find((v) => v.size === sizes[0]);
+      setSelectedColor(firstVariant);
     }
   }, [product]);
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
     const firstVariant = product.variants.find((v) => v.size === size);
-    setSelectedColor(firstVariant);
+    setSelectedColor(firstVariant || null);
   };
 
-  const handleColorChange = (variant) => {
-    setSelectedColor(variant);
+  const handleColorChange = (color) => {
+    const variant = availableColors.find((v) => v.color === color);
+    if (variant) {
+      setSelectedColor(variant); // Cập nhật selectedColor với toàn bộ variant
+    }
   };
 
   const handleAddComment = () => {
@@ -114,7 +118,7 @@ export default function Trangchitiet() {
             style={{ height: imageHeight }}
           >
             <Image
-              src={selectedColor?.images?.[0] || product.hinhanh || "/placeholder.jpg"}
+              src={selectedColor?.images?.[0] || product.image || "/placeholder.jpg"}
               alt={product.name || "Product"}
               width={600}
               height={520}
@@ -130,9 +134,7 @@ export default function Trangchitiet() {
           className="md:col-span-4 flex flex-col"
         >
           <div>
-            <div className="flex items-center gap-3">
-              <h2 className="text-3xl font-semibold">{product.name}</h2>
-            </div>
+            <h2 className="text-3xl font-semibold">{product.name}</h2>
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-700">Mô tả sản phẩm</h3>
               <p className="mt-2 text-gray-600">{product.mota}</p>
@@ -172,18 +174,34 @@ export default function Trangchitiet() {
               {selectedSize && (
                 <div className="mt-4">
                   <h3 className="text-lg font-medium">Màu sắc</h3>
-                  <div className="flex flex-col gap-3 mt-2">
-                    {colors.map((variant, index) => (
-                      <div
-                        key={`${variant.size}-${variant.color}-${index}`}
-                        className={`px-5 py-2 border rounded-md cursor-pointer transition-all duration-300 hover:shadow-md ${
-                          selectedColor === variant ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"
-                        }`}
-                        onClick={() => handleColorChange(variant)}
-                      >
-                        {`${variant.color} (${variant.stock} còn hàng)`}
-                      </div>
-                    ))}
+                  <div className="flex flex-row gap-4 mt-2">
+                    {allColors.map((color) => {
+                      const variant = availableColors.find((v) => v.color === color);
+                      const isAvailable = !!variant;
+                      return (
+                        <div
+                          key={color}
+                          className="flex flex-col items-center"
+                        >
+                          <div
+                            className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${
+                              isAvailable
+                                ? selectedColor?.color.toLowerCase() === color
+                                  ? "border-blue-500 scale-110"
+                                  : "border-gray-300 hover:border-gray-500 cursor-pointer"
+                                : "border-gray-300 opacity-50 cursor-not-allowed"
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => isAvailable && handleColorChange(color)}
+                          />
+                          {/* {selectedColor?.color.toLowerCase() === color && (
+                            <span className="text-sm mt-1 text-center text-gray-600">
+                              {isAvailable ? `${variant.stock} còn` : "Hết hàng"}
+                            </span>
+                          )} */}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

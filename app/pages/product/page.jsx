@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation"; // Use useSearchParams for App Router
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListCheck, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 import SearchComponent from "@/app/components/search";
@@ -21,29 +22,54 @@ export default function Products() {
   const [categoryFiltered, setCategoryFiltered] = useState([]);
   const productsPerPage = 9;
 
+  const searchParams = useSearchParams(); // Replace useRouter with useSearchParams
+
+  // Fetch products and apply initial filters based on URL query params
   useEffect(() => {
-    setIsLoading(true);
-    fetch("http://localhost:5000/product")
-      .then((response) => {
+    const fetchAndFilterProducts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("http://localhost:5000/product");
         if (!response.ok) throw new Error("API không phản hồi");
-        return response.json();
-      })
-      .then((data) => {
+        const data = await response.json();
+
         if (Array.isArray(data)) {
-          console.log("Fetched products:", data); // Debug log
+          console.log("Fetched products:", data);
           setInitialProducts(data);
-          setFilteredProducts(data);
-          setCategoryFiltered(data);
+
+          // Apply filters based on query parameters
+          const filter = searchParams.get("filter");
+          const category = searchParams.get("category");
+          let filtered = [...data];
+
+          if (filter === "discount") {
+            filtered = filtered.filter(
+              (product) =>
+                product?.pricePromo &&
+                product?.price &&
+                product.pricePromo < product.price
+            );
+          } else if (category) {
+            filtered = filtered.filter(
+              (product) => product.category?.categoryName === category
+            );
+          }
+
+          setFilteredProducts(filtered);
+          setCategoryFiltered(filtered);
         } else {
           throw new Error("Dữ liệu không phải mảng");
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Lỗi khi fetch products:", error);
         setError(error.message);
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAndFilterProducts();
+  }, [searchParams]); // Re-run when searchParams change
 
   const applyAdditionalFilters = useCallback(
     (baseProducts) => {
