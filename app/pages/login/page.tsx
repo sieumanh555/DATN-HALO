@@ -2,6 +2,7 @@
 import * as Yup from "yup";
 import Link from "next/link";
 import {useState} from "react";
+import {useRouter} from "next/navigation";
 import {Field, Form, Formik} from "formik";
 import {Eye, EyeClosed} from "lucide-react";
 import {setCookie} from "../../libs/Cookie/clientSideCookie";
@@ -10,6 +11,7 @@ import type User from "../../models/User";
 import ButtonLogin from "../../components/socialLogin/btnLogin";
 
 export default function Login() {
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -28,7 +30,7 @@ export default function Login() {
             .required("* Vui lòng nhập mật khẩu"),
     });
 
-    const handleSubmit = async (values: User) => {
+    const handleSubmit = async (values: Partial<User>) => {
         setIsSubmitting(true);
         try {
             const {email, password} = values;
@@ -39,9 +41,10 @@ export default function Login() {
                 body: JSON.stringify(data),
             });
             const responseData = await response.json();
-            if (responseData.status === 200) {
+            if (response.status === 200) {
                 setCookie(`as_tn`, responseData.access_token, 3);
-                setCookie(`rh_tn`, responseData.refresh_token, 10);
+                setCookie(`rh_tn`, responseData.refresh_token, 7);
+                router.push("/");
             } else {
                 alert(responseData.message);
             }
@@ -64,14 +67,8 @@ export default function Login() {
 
                     <Formik
                         initialValues={{
-                            _id: "",
-                            name: "",
-                            phone: "",
                             password: "",
                             email: "",
-                            address: "",
-                            zipcode: 0,
-                            role: 0
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSubmit}

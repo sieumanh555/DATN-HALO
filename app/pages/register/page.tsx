@@ -2,6 +2,7 @@
 import * as Yup from "yup";
 import Link from "next/link";
 import {useState} from "react";
+import {useRouter} from "next/navigation";
 import {Field, Form, Formik} from "formik";
 import {Eye, EyeClosed} from "lucide-react";
 import {setCookie} from "../../libs/Cookie/clientSideCookie";
@@ -10,13 +11,14 @@ import type User from "../../models/User";
 import ButtonLogin from "../../components/socialLogin/btnLogin";
 
 
-interface RegisterFormValues extends User {
-    rePassword: string;
-}
+// interface RegisterFormValues extends User {
+//     rePassword: string;
+// }
 
 export default function Register() {
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
-    const [showRePassword, setShowRePassword] = useState(false);
+    // const [showRePassword, setShowRePassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const validationSchema = Yup.object().shape({
@@ -35,16 +37,17 @@ export default function Register() {
                 "* Mật khẩu phải bắt đầu bằng chữ in hoa, chứa ít nhất một chữ số và một ký tự đặc biệt"
             )
             .required("* Vui lòng nhập mật khẩu"),
-        rePassword: Yup.string()
-            .oneOf([Yup.ref("password")], "* Mật khẩu không khớp")
-            .required("* Vui lòng nhập lại mật khẩu"),
+        // rePassword: Yup.string()
+        //     .oneOf([Yup.ref("password")], "* Mật khẩu không khớp")
+        //     .required("* Vui lòng nhập lại mật khẩu"),
     });
-
-    const handleSubmit = async (values: Omit<User, "rePassword">) => {
+    // o
+    // const handleSubmit = async (values: Omit<User, "rePassword">) => {
+    const handleSubmit = async (values: Partial<User>) => {
         setIsSubmitting(true);
         try {
-            const {_id, name, phone, password, email, address, zipcode, role} = values;
-            const data = {_id, name, phone, password, email, address, zipcode, role};
+            const {name, password, email} = values;
+            const data = {name, password, email};
             console.log(data);
             const response = await fetch("http://localhost:3000/users/register", {
                 method: "POST",
@@ -52,9 +55,10 @@ export default function Register() {
                 body: JSON.stringify(data),
             });
             const responseData = await response.json();
-            if (responseData.status === 200) {
+            if (response.ok) {
                 setCookie(`as_tn`, responseData.access_token, 3);
-                setCookie(`rh_tn`, responseData.refreshToken, 10);
+                setCookie(`rh_tn`, responseData.refreshToken, 7);
+                router.push("/");
             } else {
                 alert(responseData.message);
             }
@@ -68,24 +72,19 @@ export default function Register() {
 
     return (
         <section
-            className="min-h-screen bg-[#fbfcfd] tracking-wider py-4 px-4 md:px-0 flex flex-col items-center gap-4">
+            className="min-h-screen bg-[#fbfcfd] tracking-wider py-12 px-4 md:px-0 flex flex-col items-center gap-4">
             <div className="full-shadow w-full md:w-[600px] lg:w-[500px] mx-auto flex flex-col items-center gap-4">
                 <div className="w-full bg-white px-4 sm:px-6 md:px-8 py-6 rounded-lg shadow-md">
                     <p className="text-2xl sm:text-3xl text-[#034292] text-center font-bold tracking-wider mb-6">
                         HALO
                     </p>
 
-                    <Formik<RegisterFormValues>
+                    <Formik
                         initialValues={{
-                            _id: "",
                             name: "",
-                            phone: "",
                             password: "",
                             email: "",
-                            address: "",
-                            zipcode: 0,
-                            role: 0,
-                            rePassword: "",
+                            // rePassword: "",
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSubmit}
@@ -151,33 +150,33 @@ export default function Register() {
                                     )}
                                 </div>
                                 {/* rePassword */}
-                                <div>
-                                    <label htmlFor="rePassword" className="block text-sm font-medium mb-1">
-                                        Nhập lại mật khẩu
-                                    </label>
-                                    <div className="relative">
-                                        <Field
-                                            name="rePassword"
-                                            id="rePassword"
-                                            type={showRePassword ? "text" : "password"}
-                                            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#034292] transition-all duration-200"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowRePassword(!showRePassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-                                        >
-                                            {showRePassword ? (
-                                                <Eye size={20} strokeWidth={1.5}/>
-                                            ) : (
-                                                <EyeClosed size={20} strokeWidth={1.5}/>
-                                            )}
-                                        </button>
-                                    </div>
-                                    {errors.rePassword && touched.rePassword && (
-                                        <div className="text-xs text-red-500 mt-1">{errors.rePassword}</div>
-                                    )}
-                                </div>
+                                {/*<div>*/}
+                                {/*    <label htmlFor="rePassword" className="block text-sm font-medium mb-1">*/}
+                                {/*        Nhập lại mật khẩu*/}
+                                {/*    </label>*/}
+                                {/*    <div className="relative">*/}
+                                {/*        <Field*/}
+                                {/*            name="rePassword"*/}
+                                {/*            id="rePassword"*/}
+                                {/*            type={showRePassword ? "text" : "password"}*/}
+                                {/*            className="w-full text-sm px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#034292] transition-all duration-200"*/}
+                                {/*        />*/}
+                                {/*        <button*/}
+                                {/*            type="button"*/}
+                                {/*            onClick={() => setShowRePassword(!showRePassword)}*/}
+                                {/*            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"*/}
+                                {/*        >*/}
+                                {/*            {showRePassword ? (*/}
+                                {/*                <Eye size={20} strokeWidth={1.5}/>*/}
+                                {/*            ) : (*/}
+                                {/*                <EyeClosed size={20} strokeWidth={1.5}/>*/}
+                                {/*            )}*/}
+                                {/*        </button>*/}
+                                {/*    </div>*/}
+                                {/*    {errors.rePassword && touched.rePassword && (*/}
+                                {/*        <div className="text-xs text-red-500 mt-1">{errors.rePassword}</div>*/}
+                                {/*    )}*/}
+                                {/*</div>*/}
                                 {/* Terms */}
                                 <div className="flex items-start gap-2 mt-2">
                                     <input

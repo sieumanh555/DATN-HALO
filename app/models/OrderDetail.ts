@@ -1,15 +1,31 @@
 import Product from "@/app/models/Product";
 
-interface OrderDetail {
+export interface OrderDetailRequest {
     _id: string,
     items: [
-        productId: string | Product,
-        selectedColor: string,
-        selectedSize: number,
-        quantity: number,
-        price: number
+        {
+            productId: string,
+            selectedColor: string,
+            selectedSize: number,
+            quantity: number,
+            price: number
+        }
     ],
     createdAt: Date,
     updatedAt: Date
 }
-export default OrderDetail;
+
+export interface OrderDetailResponse {
+    _id: string,
+    items: [
+        {
+            productId: Product,
+            selectedColor: string,
+            selectedSize: number,
+            quantity: number,
+            price: number
+        }
+    ],
+    createdAt: Date,
+    updatedAt: Date
+}

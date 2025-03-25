@@ -1,17 +1,20 @@
-import type Order from "@/app/models/Order";
-import {Copy, Trash} from "lucide-react";
 import {useState} from "react";
+import {Copy, Trash} from "lucide-react";
 
-export default function OrderManagement({data}: { data: Order[] }) {
+import type {OrderResponse} from "@/app/models/Order";
+import {formatDate} from "@/app/libs/formatDate";
+
+export default function OrderManagement({data}: { data: OrderResponse[] }) {
     const [showCopyPopup, setShowCopyPopup] = useState(false);
     const [showCancelPopup, setShowCancelPopup] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState('');
 
-    const statusStyles = {
-        Processing: 'bg-yellow-100 text-yellow-800',
-        Shipped: 'bg-blue-100 text-blue-800',
-        Delivered: 'bg-green-100 text-green-800',
-        Cancelled: 'bg-gray-100 text-gray-800'
+    type OrderStatus = "Processing" | "Shipped" | "Delivered" | "Cancelled";
+    const statusStyles: Record<OrderStatus, string> = {
+        Processing: "bg-yellow-100 text-yellow-800",
+        Shipped: "bg-blue-100 text-blue-800",
+        Delivered: "bg-green-100 text-green-800",
+        Cancelled: "bg-gray-100 text-gray-800"
     };
 
     const handleCopy = (text: string) => {
@@ -47,7 +50,7 @@ export default function OrderManagement({data}: { data: Order[] }) {
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
                     ...order,
-                    status: "Cancel"
+                    status: "Cancelled"
                 })
             });
             if (!response.ok) {
@@ -86,7 +89,7 @@ export default function OrderManagement({data}: { data: Order[] }) {
                 </tr>
                 </thead>
                 <tbody>
-                {data.map((order: Order) => (
+                {data.map((order: OrderResponse) => (
                     <tr key={order._id} className="text-sm hover:bg-gray-50">
                         <td className="p-3 border-b">{order._id}</td>
                         <td className="p-3 border-b">
@@ -101,11 +104,11 @@ export default function OrderManagement({data}: { data: Order[] }) {
                                 </button>
                             </div>
                         </td>
-                        <td className="p-3 border-b">{order.createdAt.split("T")[0]}</td>
+                        <td className="p-3 border-b">{formatDate(order.createdAt)}</td>
                         <td className="p-3 border-b">{order.amount.toLocaleString("vn-VN")} VND</td>
                         <td className="p-3 border-b">
                                     <span
-                                        className={`px-2 py-1 rounded-lg text-sm ${statusStyles[order.status] || 'bg-gray-100 text-gray-800'}`}
+                                        className={`px-2 py-1 rounded-lg text-sm ${statusStyles[order.status as OrderStatus] || 'bg-gray-100 text-gray-800'}`}
                                     >
                                         {order.status}
                                     </span>

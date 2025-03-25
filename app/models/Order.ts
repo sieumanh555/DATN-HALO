@@ -1,13 +1,23 @@
 import type User from "./User";
-import type OrderDetail from "./OrderDetail";
+import type { OrderDetailResponse } from "./OrderDetail";
 
-interface Order {
+export interface OrderRequest {
     _id: string,
-    userId: string | User,
-    orderDetailId: string | OrderDetail,
+    userId: string,
+    orderDetailId: string,
     amount: number,
     status: string,
     createdAt: Date,
     updatedAt: Date
 }
-export default Order;
+
+export interface OrderResponse {
+    _id: string,
+    userId: User,
+    orderDetailId: OrderDetailResponse,
+    amount: number,
+    status: string,
+    createdAt: Date,
+    updatedAt: Date
+}
+
