@@ -1,40 +1,38 @@
 import Image from "next/image";
-import {useState} from "react";
-import {useRouter} from "next/navigation";
+import {useEffect, useState} from "react";
 import {Edit, Save, X} from "lucide-react";
 
 import type User from "@/app/models/User";
 import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSideCookie";
 
 export default function UserInformation() {
-    const router = useRouter();
-    const [user, setUser] = useState<User | null>(() => getPayload())
+    const token = getCookieCSide("as_tn");
     const [isEditing, setIsEditing] = useState(false);
-    const [name, setName] = useState(user.name);
-    const [gender, setGender] = useState(user.gender);
-    const [birthday, setBirthDay] = useState(
-        user.birthday ? new Date(user.birthday).toISOString().split("T")[0] : ""
-    );
-    const [phone, setPhone] = useState(user.phone);
-    const [address, setAddress] = useState(user.address);
-    const [zipcode, setZipCode] = useState(user.zipcode);
+    const [user, setUser] = useState<User | null>(null);
+    const [name, setName] = useState(user?.name);
+    const [gender, setGender] = useState(user?.gender);
+    const [birthday, setBirthDay] = useState(user?.birthday ? new Date(user.birthday).toISOString().split("T")[0] : "");
+    const [phone, setPhone] = useState(user?.phone);
+    const [address, setAddress] = useState(user?.address);
+    const [zipcode, setZipCode] = useState(user?.zipcode);
+
+    useEffect(() => {
+        const payload = getPayload();
+        setUser(payload);
+        if (payload) {
+            setName(payload.name || "");
+            setGender(payload.gender || "");
+            setBirthDay(payload.birthday ? new Date(payload.birthday).toISOString().split("T")[0] : "");
+            setPhone(payload.phone || "");
+            setAddress(payload.address || "");
+            setZipCode(payload.zipcode || "");
+        }
+    }, []);
 
     const userChange = async () => {
         try {
-            const token = getCookieCSide("as_tn");
-            if (token === null) {
-                alert("Vui lòng đăng nhập lại");
-                router.push("/pages/login");
-            }
-            const values = {
-                name: name,
-                gender: gender,
-                birthday: birthday,
-                phone: phone,
-                address: address,
-                zipcode: zipcode
-            };
-            const response = await fetch(`http://localhost:3000/users/${user._id}`, {
+            const values = {name, gender, birthday, phone, address, zipcode};
+            const response = await fetch(`http://localhost:3000/users/${user?._id}`, {
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -48,21 +46,14 @@ export default function UserInformation() {
                 console.log("Lỗi sửa thông tin user: ", data);
                 return;
             }
-            setCookie("as_tn", data.access_token,3);
-            setCookie("rh_tn", data.refresh_token,7);
+            setCookie("as_tn", data.access_token, 3);
+            setCookie("rh_tn", data.refresh_token, 7);
+            setUser(getPayload());
+            alert("Sửa thông tin thành công");
         } catch (error) {
             console.log(">>> Lỗi: ", error);
         }
     }
-    const resetFormData = () => {
-        setName(user.name);
-        setGender(user.gender);
-        setBirthDay(user.birthday ? new Date(user.birthday).toISOString().split("T")[0] : "");
-        setPhone(user.phone);
-        setAddress(user.address);
-        setZipCode(user.zipcode);
-    }
-
     return (
         <div className="w-full mx-auto py-4 sm:p-6 bg-white rounded-xl">
             <div className="flex flex-col gap-8">
@@ -81,8 +72,8 @@ export default function UserInformation() {
                         </div>
                     </div>
                     <div className="flex flex-col text-center sm:text-left">
-                        <h2 className="text-2xl font-bold text-gray-800 capitalize">{user.name}</h2>
-                        <p className="text-gray-500 mt-1">{user.email}</p>
+                        <h2 className="text-2xl font-bold text-gray-800 capitalize">{name}</h2>
+                        <p className="text-gray-500 mt-1">{user?.email}</p>
                     </div>
                 </div>
 
@@ -190,7 +181,7 @@ export default function UserInformation() {
                         {isEditing && (
                             <button
                                 onClick={() => {
-                                    resetFormData();
+                                    // resetFormData();
                                     setIsEditing(false);
                                 }}
                                 className="px-6 py-2.5 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-lg flex items-center gap-2 font-medium transition-all duration-200"

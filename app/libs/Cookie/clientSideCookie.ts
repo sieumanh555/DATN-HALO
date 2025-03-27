@@ -5,6 +5,7 @@ export const setCookie = (name: string, token: string, days: number) => {
 };
 
 export const getCookieCSide = (name: string) => {
+    if (typeof window === "undefined" || typeof document === "undefined") return null;
     const cookies = document.cookie.split("; ");
     for (const cookie of cookies) {
         const [key, value] = cookie.split("=");
@@ -26,6 +27,16 @@ export const getPayload = () => {
         const payload = token.split(".")[1];
         const decode = JSON.parse(decodeBase64URL(payload));
         return decode.userInfo;
+    }
+    return null;
+}
+
+export const getUserId = () => {
+    const token = getCookieCSide("as_tn");
+    if (token !== null) {
+        const payload = token.split(".")[1];
+        const decode = JSON.parse(decodeBase64URL(payload));
+        return decode.userId;
     }
     return null;
 }
