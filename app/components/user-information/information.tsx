@@ -1,6 +1,6 @@
 import Image from "next/image";
 import {useEffect, useState} from "react";
-import {Edit, Save, X} from "lucide-react";
+import {ChevronUp, Edit, Save, X} from "lucide-react";
 
 import type User from "@/app/models/User";
 import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSideCookie";
@@ -15,6 +15,7 @@ export default function UserInformation() {
     const [phone, setPhone] = useState(user?.phone);
     const [address, setAddress] = useState(user?.address);
     const [zipcode, setZipCode] = useState(user?.zipcode);
+    const [dropDown, setDropDown] = useState(false);
 
     useEffect(() => {
         const payload = getPayload();
@@ -95,14 +96,57 @@ export default function UserInformation() {
 
                             <div className="space-y-2">
                                 <label className="block font-semibold text-gray-700">Giới tính</label>
-                                <input
-                                    type="text"
-                                    value={gender}
-                                    readOnly={!isEditing}
-                                    onChange={(e) => setGender(e.target.value)}
-                                    className={`w-full px-4 py-2.5 rounded-lg text-sm text-gray-700 focus:outline-none border
-                                        ${!isEditing ? 'bg-gray-50  cursor-not-allowed' : 'bg-white'}`}
-                                />
+                                {isEditing ? (
+                                    <div
+                                        className={`relative w-full px-4 py-2.5 rounded-lg border flex justify-between items-center`}>
+                                        <input type="text" value={gender} readOnly={isEditing}
+                                               className={`text-sm focus:outline-none`}/>
+                                        <button
+                                            onClick={() => setDropDown(!dropDown)}
+                                            className={`transition-transform transform duration-300 ${dropDown ? `-rotate-180` : `rotate-0`}`}>
+                                            <ChevronUp size={20} strokeWidth={1.5}/>
+                                        </button>
+                                        <div
+                                            className={`${!dropDown ? `hidden` : `block`} absolute w-full top-10 left-0 border rounded-lg flex flex-col`}>
+                                            {["Nam", "Nữ", "Khác"].filter((genderValue: string) => genderValue !== gender).map((value: string) => (
+                                                <button
+                                                    key={value}
+                                                    onClick={() => {
+                                                        setGender(value);
+                                                        setDropDown(!dropDown);
+                                                    }}
+                                                    className={`group bg-gray-50 hover:bg-gray-100  py-2.5 px-4 flex justify-start`}
+                                                >
+                                                    <input
+                                                        type="text"
+                                                        value={value}
+                                                        readOnly={true}
+                                                        className={`bg-gray-50 text-sm group-hover:bg-gray-100 text-gray-700 focus:outline-none cursor-pointer`}
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={`w-full px-4 py-2 rounded-lg border bg-gray-50 cursor-not-allowed`}>
+                                        <input
+                                            type="text"
+                                            value={gender}
+                                            readOnly={true}
+                                            className={`bg-gray-50 text-sm text-gray-700 focus:outline-none cursor-not-allowed`}
+                                        />
+                                    </div>
+                                )}
+
+                                {/*<input*/}
+                                {/*    type="text"*/}
+                                {/*    value={gender}*/}
+                                {/*    readOnly={!isEditing}*/}
+                                {/*    onChange={(e) => setGender(e.target.value)}*/}
+                                {/*    className={`w-full px-4 py-2.5 rounded-lg text-sm text-gray-700 focus:outline-none border*/}
+                                {/*        ${!isEditing ? 'bg-gray-50  cursor-not-allowed' : 'bg-white'}`}*/}
+                                {/*/>*/}
                             </div>
 
                             <div className="space-y-2">

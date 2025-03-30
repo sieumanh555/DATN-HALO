@@ -1,25 +1,55 @@
 import { NextRequest } from "next/server";
 
 export const getCookieSSide = (req: NextRequest, name: string): string | null => {
+    console.log('Debugging getCookieSSide');
+    console.log('Request object:', req);
+
+    // Kiểm tra req và headers
+    if (!req || !req.headers) {
+        console.log('Invalid request or headers');
+        return null;
+    }
+
+    // Lấy header cookie
     const cookieHeader = req.headers.get("cookie");
-    console.log(">>>>> Cookies: ", cookieHeader);
+    console.log('Cookie header:', cookieHeader);
 
-    if (!cookieHeader) return null;
+    if (!cookieHeader) {
+        console.log('No cookie header found');
+        return null;
+    }
 
-    const cookies = cookieHeader.split("; ");
+    // Sử dụng regex để tách cookie an toàn hơn
+    const cookies = cookieHeader.split(/;\s*/);
+    console.log('Parsed cookies:', cookies);
 
     for (const cookie of cookies) {
-        console.log("Processing cookie:", cookie);
+        // Bỏ qua nếu cookie không hợp lệ
+        if (!cookie) continue;
 
-        const index = cookie.indexOf("=");
+        console.log('Processing cookie:', cookie);
 
-        if (index === -1) continue;
+        // Tách key và value an toàn
+        const [rawKey, rawValue] = cookie.split('=');
 
-        const key = cookie.substring(0, index).trim();
-        const value = cookie.substring(index + 1).trim();
+        // Trim và kiểm tra
+        const key = rawKey?.trim();
+        const value = rawValue?.trim();
+
+        console.log('Key:', key);
+        console.log('Value:', value);
+
+        if (!key || !value) continue;
 
         if (key === name) {
-            return decodeURIComponent(value);
+            try {
+                const decodedValue = decodeURIComponent(value);
+                console.log('Decoded value:', decodedValue);
+                return decodedValue;
+            } catch (error) {
+                console.error('Decoding error:', error);
+                return value;
+            }
         }
     }
 

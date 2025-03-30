@@ -108,25 +108,25 @@ export default function Cart() {
             {/* recently viewed product */}
             <div className="mt-12">
                 <p className="text-2xl font-medium">Sản phẩm vừa xem</p>
-                <div className="mt-[18px] flex flex-wrap justify-between">
-                    {data.map((product: Product, index: number) => (
-                        <Link key={index} href="#" className="w-[16%]">
-                            <SubProBox data={product} />
-                        </Link>
-                    ))}
-                </div>
+                {/*<div className="mt-[18px] flex flex-wrap justify-between">*/}
+                {/*    {data.map((product: Product, index: number) => (*/}
+                {/*        <Link key={index} href="#" className="w-[16%]">*/}
+                {/*            <SubProBox data={product} />*/}
+                {/*        </Link>*/}
+                {/*    ))}*/}
+                {/*</div>*/}
             </div>
 
             {/* new product */}
             <div className="mt-12">
                 <p className="text-2xl font-medium">Sản phẩm mới</p>
-                <div className="mt-[18px] flex flex-wrap justify-between">
-                    {data.map((product: Product, index: number) => (
-                        <Link key={index} href="#" className="w-[16%]">
-                            <SubProBox data={product} />
-                        </Link>
-                    ))}
-                </div>
+                {/*<div className="mt-[18px] flex flex-wrap justify-between">*/}
+                {/*    {data.map((product: Product, index: number) => (*/}
+                {/*        <Link key={index} href="#" className="w-[16%]">*/}
+                {/*            <SubProBox data={product} />*/}
+                {/*        </Link>*/}
+                {/*    ))}*/}
+                {/*</div>*/}
             </div>
 
             {/* Popup */}

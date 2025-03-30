@@ -1,11 +1,18 @@
 import {useState} from "react";
-import {Copy, Trash} from "lucide-react";
+import {FileText, Trash2} from 'lucide-react';
 
 import type {OrderResponse} from "@/app/models/Order";
 import {formatDate} from "@/app/libs/formatDate";
 
-export default function OrderManagement({data}: { data: OrderResponse[] }) {
-    const [showCopyPopup, setShowCopyPopup] = useState(false);
+export default function OrderManagement({
+                                            data,
+                                            setActiveTab,
+                                            setOrderDetailId
+                                        }: {
+    data: OrderResponse[];
+    setActiveTab: (tab: string) => void;
+    setOrderDetailId: (id: string) => void;
+}) {
     const [showCancelPopup, setShowCancelPopup] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState('');
 
@@ -15,12 +22,6 @@ export default function OrderManagement({data}: { data: OrderResponse[] }) {
         Shipped: "bg-blue-100 text-blue-800",
         Delivered: "bg-green-100 text-green-800",
         Cancelled: "bg-gray-100 text-gray-800"
-    };
-
-    const handleCopy = (text: string) => {
-        navigator.clipboard.writeText(text);
-        setShowCopyPopup(true);
-        setTimeout(() => setShowCopyPopup(false), 2000);
     };
 
     const handleCancelClick = (orderId: string) => {
@@ -35,132 +36,110 @@ export default function OrderManagement({data}: { data: OrderResponse[] }) {
 
     const cancelOrder = async (id: string) => {
         try {
-            // 🟢 Lấy thông tin đơn hàng
             const res = await fetch(`http://localhost:3000/orders/${id}`);
-            if (!res.ok) {
-                const errorData = await res.json();
-                console.error("Lỗi lấy dữ liệu order:", errorData);
-                return;
-            }
+            if (!res.ok) return;
             const {data: order} = await res.json();
-
-            // 🟢 Cập nhật trạng thái đơn hàng
-            const response = await fetch(`http://localhost:3000/orders/${id}`, {
+            await fetch(`http://localhost:3000/orders/${id}`, {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    ...order,
-                    status: "Cancelled"
-                })
+                body: JSON.stringify({...order, status: "Cancelled"})
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Lỗi cập nhật đơn hàng:", errorData);
-                return;
-            }
             alert("Hủy đơn hàng thành công");
         } catch (error) {
             console.error("Lỗi hệ thống:", error);
         }
     };
 
+    const handleStatus = (status: string) => {
+        switch (status) {
+            case "Processing":
+                return "Đang xử lí";
+            case "Shipped":
+                return "Đang vận chuyển";
+            case "Delivered":
+                return "Hoàn thành";
+            default:
+                return "Đơn hàng đã bị hủy";
+        }
+    }
+
+    const handleViewDetail = (orderId: string) => {
+        setOrderDetailId(orderId); // Lưu orderDetailId
+        setActiveTab("Chi tiết đơn hàng"); // Chuyển tab về "Chi tiết đơn hàng"
+    };
     return (
-        <div className={`min-h-[500px]`}>
-            <table className="w-full border-collapse min-w-[800px]">
+        <div className="overflow-x-auto">
+            <table className="w-full min-w-[800px] text-sm border border-gray-300 rounded-lg shadow-md">
                 <thead>
-                <tr className="bg-gray-100">
-                    <th className="p-3 text-left font-medium text-gray-700 border-b">Mã đơn
-                        hàng
-                    </th>
-                    <th className="p-3 text-left font-medium text-gray-700 border-b">Mã chi
-                        tiết đơn hàng
-                    </th>
-                    <th className="p-3 text-left font-medium text-gray-700 border-b">Ngày đặt hàng
-                    </th>
-                    <th className="p-3 text-left font-medium text-gray-700 border-b">Tổng
-                        tiền
-                    </th>
-                    <th className="p-3 text-left font-medium text-gray-700 border-b">Trạng
-                        thái
-                    </th>
-                    <th className="p-3 text-left font-medium text-gray-700 border-b">Hành
-                        động
-                    </th>
+                <tr className="bg-gray-100 text-gray-700">
+                    <th className="p-3 text-left">Mã đơn hàng</th>
+                    <th className="p-3 text-left">Ngày đặt hàng</th>
+                    <th className="p-3 text-left">Tổng tiền</th>
+                    <th className="p-3 text-left">Trạng thái</th>
+                    <th className="p-3 text-center">Xem chi tiết</th>
+                    <th className="p-3 text-center">Hủy đơn hàng</th>
                 </tr>
                 </thead>
                 <tbody>
-                {data.map((order: OrderResponse) => (
-                    <tr key={order._id} className="text-sm hover:bg-gray-50">
-                        <td className="p-3 border-b">{order._id}</td>
-                        <td className="p-3 border-b">
-                            <div className="flex items-center gap-4">
-                                <span>{order.orderDetailId._id}</span>
-                                <button
-                                    onClick={() => handleCopy(order.orderDetailId._id)}
-                                    title="Sao chép"
-                                    className="text-blue-500 hover:text-blue-600 p-1"
-                                >
-                                    <Copy size={16}/>
-                                </button>
-                            </div>
+                {data.map((order) => (
+                    <tr key={order._id} className="border-t border-gray-200 hover:bg-gray-50">
+                        <td className="p-3">{order._id}</td>
+                        <td className="p-3">{formatDate(order.createdAt)}</td>
+                        <td className="p-3">{order.amount.toLocaleString("vn-VN")} VND</td>
+                        <td className="p-3">
+                                <span
+                                    className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[order.status as OrderStatus] || 'bg-gray-100 text-gray-800'}`}>
+                                   {handleStatus(order.status)}
+                                </span>
                         </td>
-                        <td className="p-3 border-b">{formatDate(order.createdAt)}</td>
-                        <td className="p-3 border-b">{order.amount.toLocaleString("vn-VN")} VND</td>
-                        <td className="p-3 border-b">
-                                    <span
-                                        className={`px-2 py-1 rounded-lg text-sm ${statusStyles[order.status as OrderStatus] || 'bg-gray-100 text-gray-800'}`}
-                                    >
-                                        {order.status}
-                                    </span>
+                        <td className="p-3 flex justify-center items-center">
+                            <button
+                                onClick={() => handleViewDetail(order.orderDetailId._id)}
+                                className="text-blue-600 flex items-center gap-1"
+                            >
+                                <p>Chi tiết đơn hàng</p>
+                                <FileText size={20}/>
+                            </button>
                         </td>
-                        <td className="p-3 border-b">
-                            {order.status === "Processing" ? (
+                        <td className="p-3">
+                            {handleStatus(order.status) === "Đang xử lí" ? (
                                 <button
                                     onClick={() => handleCancelClick(order._id)}
-                                    className="text-red-500 hover:text-red-600 p-1"
-                                    title="Hủy đơn hàng"
+                                    className="text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
                                 >
-                                    <Trash size={16}/>
+                                    <p>Hủy</p>
+                                    <Trash2 size={20}/>
                                 </button>
                             ) : (
-                                <button
-                                    className="p-1 cursor-not-allowed opacity-50"
-                                    title="Không thể hủy đơn hàng"
-                                >
-                                    <Trash size={16}/>
-                                </button>
+                                <div title={`Hủy đơn hàng`} className={`flex items-center gap-1`}>
+                                    <p>Hủy</p>
+                                    <Trash2 size={20} className={`opacity-50 cursor-not-allowed`}/>
+                                </div>
+                                // <span className="text-gray-400 cursor-not-allowed" title={`Không thể hủy đơn hàng`}>Hủy đơn</span>
                             )}
+
                         </td>
                     </tr>
                 ))}
                 </tbody>
             </table>
 
-
-            {/* Copy Popup */}
-            {showCopyPopup && (
-                <div
-                    className="fixed top-[50%] right-[35%] bg-black bg-opacity-80 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
-                    Đã sao chép vào clipboard!
-                </div>
-            )}
-
-            {/* Cancel Confirmation Popup */}
+            {/* Popup xác nhận hủy đơn */}
             {showCancelPopup && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-[420px] w-full mx-4">
-                        <h3 className="text-lg text-center font-semibold mb-4">Xác nhận hủy đơn hàng</h3>
+                    <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
+                        <h3 className="text-lg font-semibold text-center mb-4">Xác nhận hủy đơn hàng</h3>
                         <p className="text-center text-gray-600 mb-6">Bạn có chắc chắn muốn hủy đơn hàng này không?</p>
                         <div className="flex justify-center gap-4">
                             <button
                                 onClick={() => setShowCancelPopup(false)}
-                                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-all"
                             >
                                 Không
                             </button>
                             <button
                                 onClick={handleCancelConfirm}
-                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-all"
                             >
                                 Có, hủy đơn
                             </button>
@@ -169,5 +148,5 @@ export default function OrderManagement({data}: { data: OrderResponse[] }) {
                 </div>
             )}
         </div>
-    )
+    );
 }

@@ -2,10 +2,9 @@
 import {useEffect, useState} from 'react';
 import {Menu} from 'lucide-react';
 
-import type User from "../../models/User";
+
 import type {OrderResponse} from "../../models/Order";
 import type {OrderDetailResponse} from "../../models/OrderDetail";
-import {getPayload} from "../../libs/Cookie/clientSideCookie" //lấy thông tin user từ payload
 import UserInformationComponent from "@/app/components/user-information/information"
 import OrderManagementComponent from "@/app/components/user-information/orderManagement";
 import OrderDetailComponent from "@/app/components/user-information/orderDetail";
@@ -120,7 +119,10 @@ export default function ProfilePage() {
                         )}
 
                         {activeTab === 'Quản lý đơn hàng' && (
-                            <OrderManagementComponent data={orders}/>
+                            <OrderManagementComponent data={orders}
+                                                      setActiveTab={setActiveTab}
+                                                      setOrderDetailId={setOrderDetailId}
+                            />
                         )}
 
                         {activeTab === 'Chi tiết đơn hàng' && (

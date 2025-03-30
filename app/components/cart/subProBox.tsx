@@ -28,19 +28,19 @@ export default function SubProBox({data}: { data: Product }) {
                 )}
 
             </div>
-            <div className="flex gap-2">
-                {data.sizes
-                    .filter((object) => object.stock > 0)
-                    .map((object, index) => (
-                        <div
-                            key={index}
-                            className="w-8 h-8 bg-gray-200 hover:bg-white text-xs border-2 rounded-lg flex justify-center items-center"
-                        >
-                            {object.size}
-                        </div>
-                    ))
-                }
-            </div>
+            {/*<div className="flex gap-2">*/}
+            {/*    {data.sizes*/}
+            {/*        .filter((object) => object.stock > 0)*/}
+            {/*        .map((object, index) => (*/}
+            {/*            <div*/}
+            {/*                key={index}*/}
+            {/*                className="w-8 h-8 bg-gray-200 hover:bg-white text-xs border-2 rounded-lg flex justify-center items-center"*/}
+            {/*            >*/}
+            {/*                {object.size}*/}
+            {/*            </div>*/}
+            {/*        ))*/}
+            {/*    }*/}
+            {/*</div>*/}
             <div
                 className="absolute w-12 h-5 bg-[#034292] text-white text-xs flex justify-center items-center rounded-xl right-2 top-2">
                 New
