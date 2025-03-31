@@ -1,8 +1,8 @@
-import Product from "@/app/models/Product";
+import type {ProductResponse} from "@/app/models/Product";
 
 interface CartState {
     cart: {
-        products: Product[];
+        products: ProductResponse[];
     };
 }
 
