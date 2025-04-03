@@ -5,12 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Plus, ShoppingCart } from "lucide-react";
 
-import Product from "../../models/Product";
+import type {ProductResponse} from "../../models/Product";
 import CartState from "../../models/CartState";
 import { removeAll } from "@/redux/slices/cartSlice";
 import ProBox from "../../components/cart/proBox";
 import CartEmpty from "../../components/cart/cartEmpty";
-import SubProBox from "../../components/cart/subProBox";
+// import SubProBox from "../../components/cart/subProBox";
 
 export default function Cart() {
     const dispatch = useDispatch();
@@ -19,7 +19,7 @@ export default function Cart() {
 
     const subTotal = useMemo(() => {
         return cart.reduce(
-            (total: number, item: Product) => total + item.price * item.quantity,
+            (total: number, item: ProductResponse) => total + item.price * item.quantity,
             0
         );
     }, [cart]);
@@ -30,7 +30,7 @@ export default function Cart() {
     }
 
     const fetcher = (url: string) => fetch(url).then((res) => res.json());
-    const { data, error } = useSWR<Product[]>(
+    const { data, error } = useSWR<ProductResponse[]>(
         "http://localhost:3000/products",
         fetcher,
         {
@@ -52,7 +52,7 @@ export default function Cart() {
                                 <p className="w-[14%] text-center">Giá</p>
                                 <p className="w-[14%] text-center">Tổng</p>
                             </div>
-                            {cart.map((product: Product) => (
+                            {cart.map((product: ProductResponse) => (
                                 <ProBox key={product._id} data={product} />
                             ))}
                             {/* navigation pages/shop ? delete cart */}

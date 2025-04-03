@@ -5,14 +5,14 @@ import {useDispatch} from "react-redux";
 import {ChevronUp, Minus, Plus, Trash2} from "lucide-react";
 
 import {decreaseQuantity, increaseQuantity, removeItem} from "@/redux/slices/cartSlice";
-import Product from "../../models/Product";
+import type {ProductResponse} from "../../models/Product";
 
-export default function ProBox({data}: { data: Product }) {
+export default function ProBox({data}: { data: ProductResponse }) {
     const dispatch = useDispatch();
     const [selectedSize, setSelectedSize] = useState(data.selectedSize || "Chọn size");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const handleDecrease = (product: Product) => {
+    const handleDecrease = (product: ProductResponse) => {
         if (product.quantity === 1) {
             const text = `Xóa sản phẩm ${product.name}`;
             if (confirm(text) == true) {

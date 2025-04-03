@@ -1,20 +1,14 @@
+import Link from "next/link";
 import {useState} from "react";
 import {FileText, Trash2} from 'lucide-react';
-
-import type {OrderResponse} from "@/app/models/Order";
 import {formatDate} from "@/app/libs/formatDate";
 
-export default function OrderManagement({
-                                            data,
-                                            setActiveTab,
-                                            setOrderDetailId
-                                        }: {
-    data: OrderResponse[];
-    setActiveTab: (tab: string) => void;
-    setOrderDetailId: (id: string) => void;
-}) {
+import type {OrderResponse} from "@/app/models/Order";
+
+
+export default function OrderManagement({data}: { data: OrderResponse[] }) {
     const [showCancelPopup, setShowCancelPopup] = useState(false);
-    const [selectedOrderId, setSelectedOrderId] = useState('');
+    const [orderId, setOrderId] = useState('');
 
     type OrderStatus = "Processing" | "Shipped" | "Delivered" | "Cancelled";
     const statusStyles: Record<OrderStatus, string> = {
@@ -24,14 +18,13 @@ export default function OrderManagement({
         Cancelled: "bg-gray-100 text-gray-800"
     };
 
-    const handleCancelClick = (orderId: string) => {
-        setSelectedOrderId(orderId);
+    const handleCancelClick = (id: string) => {
+        setOrderId(id);
         setShowCancelPopup(true);
     };
 
-    const handleCancelConfirm = async () => {
-        await cancelOrder(selectedOrderId);
-        setShowCancelPopup(false);
+    const handleCancelConfirm = () => {
+        cancelOrder(orderId);
     };
 
     const cancelOrder = async (id: string) => {
@@ -44,7 +37,7 @@ export default function OrderManagement({
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({...order, status: "Cancelled"})
             });
-            alert("Hủy đơn hàng thành công");
+            setShowCancelPopup(false);
         } catch (error) {
             console.error("Lỗi hệ thống:", error);
         }
@@ -59,90 +52,117 @@ export default function OrderManagement({
             case "Delivered":
                 return "Hoàn thành";
             default:
-                return "Đơn hàng đã bị hủy";
+                return "Đã bị hủy";
         }
     }
 
-    const handleViewDetail = (orderId: string) => {
-        setOrderDetailId(orderId); // Lưu orderDetailId
-        setActiveTab("Chi tiết đơn hàng"); // Chuyển tab về "Chi tiết đơn hàng"
-    };
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-sm border border-gray-300 rounded-lg shadow-md">
-                <thead>
-                <tr className="bg-gray-100 text-gray-700">
-                    <th className="p-3 text-left">Mã đơn hàng</th>
-                    <th className="p-3 text-left">Ngày đặt hàng</th>
-                    <th className="p-3 text-left">Tổng tiền</th>
-                    <th className="p-3 text-left">Trạng thái</th>
-                    <th className="p-3 text-center">Xem chi tiết</th>
-                    <th className="p-3 text-center">Hủy đơn hàng</th>
-                </tr>
-                </thead>
-                <tbody>
-                {data.map((order) => (
-                    <tr key={order._id} className="border-t border-gray-200 hover:bg-gray-50">
-                        <td className="p-3">{order._id}</td>
-                        <td className="p-3">{formatDate(order.createdAt)}</td>
-                        <td className="p-3">{order.amount.toLocaleString("vn-VN")} VND</td>
-                        <td className="p-3">
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[order.status as OrderStatus] || 'bg-gray-100 text-gray-800'}`}>
-                                   {handleStatus(order.status)}
-                                </span>
-                        </td>
-                        <td className="p-3 flex justify-center items-center">
-                            <button
-                                onClick={() => handleViewDetail(order.orderDetailId._id)}
-                                className="text-blue-600 flex items-center gap-1"
-                            >
-                                <p>Chi tiết đơn hàng</p>
-                                <FileText size={20}/>
-                            </button>
-                        </td>
-                        <td className="p-3">
-                            {handleStatus(order.status) === "Đang xử lí" ? (
-                                <button
-                                    onClick={() => handleCancelClick(order._id)}
-                                    className="text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
-                                >
-                                    <p>Hủy</p>
-                                    <Trash2 size={20}/>
-                                </button>
-                            ) : (
-                                <div title={`Hủy đơn hàng`} className={`flex items-center gap-1`}>
-                                    <p>Hủy</p>
-                                    <Trash2 size={20} className={`opacity-50 cursor-not-allowed`}/>
-                                </div>
-                                // <span className="text-gray-400 cursor-not-allowed" title={`Không thể hủy đơn hàng`}>Hủy đơn</span>
-                            )}
-
-                        </td>
+        <div className="w-full bg-white py-4 rounded-xl">
+            {/* Table Container */}
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
+                <table className="w-full min-w-[800px] text-sm">
+                    {/* Table Header */}
+                    <thead>
+                    <tr className="bg-gray-100">
+                        <th className="p-4 font-semibold text-gray-700 border-b">Mã đơn hàng</th>
+                        <th className="p-4 font-semibold text-gray-700 border-b">Ngày đặt hàng</th>
+                        <th className="p-4 font-semibold text-gray-700 border-b">Tổng tiền</th>
+                        <th className="p-4 font-semibold text-gray-700 border-b">Trạng thái</th>
+                        <th className="p-4 font-semibold text-gray-700 border-b">Xem chi tiết</th>
+                        <th className="p-4 font-semibold text-gray-700 border-b">Hủy đơn hàng</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
 
-            {/* Popup xác nhận hủy đơn */}
+                    {/* Table Body */}
+                    <tbody>
+                    {data.map((order) => (
+                        <tr
+                            key={order._id}
+                            className="text-center border-b border-gray-200 hover:bg-blue-50/30 transition-colors duration-200"
+                        >
+                            <td className="p-4 text-gray-700">{order.uniqueKey}</td>
+                            <td className="p-4 text-gray-700">{formatDate(order.createdAt)}</td>
+                            <td className="p-4 font-medium text-gray-700">
+                                {order.amount.toLocaleString("vn-VN")} VND
+                            </td>
+                            <td className="p-4  ">
+                                    <span
+                                        className={`inline-flex items-center px-3 py-1 rounded-full ${statusStyles[order.status as OrderStatus]} text-sm font-medium 
+                                        `}>
+                                        {handleStatus(order.status)}
+                                    </span>
+                            </td>
+                            <td className="p-4">
+                                <div className="flex justify-center  ">
+                                    <Link href={`/pages/user/order/orderDetail/${order._id}`}>
+                                        <button
+                                            className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700
+                                                rounded-lg transition-all duration-200 hover:bg-blue-50"
+                                        >
+                                            <span>Chi tiết đơn hàng</span>
+                                            <FileText className="w-5 h-5"/>
+                                        </button>
+                                    </Link>
+                                </div>
+                            </td>
+                            <td className="p-4">
+                                <div className="flex justify-center">
+                                    {handleStatus(order.status) === "Đang xử lí" ? (
+                                        <button
+                                            onClick={() => handleCancelClick(order._id)}
+                                            className="flex items-center gap-2 px-4 py-2 text-red-500 hover:text-red-600
+                                                    rounded-lg transition-all duration-200 hover:bg-red-50"
+                                        >
+                                            <span>Hủy</span>
+                                            <Trash2 className="w-5 h-5"/>
+                                        </button>
+                                    ) : (
+                                        <div
+                                            className="flex items-center gap-2 px-4 py-2 text-gray-400 cursor-not-allowed">
+                                            <span>Hủy</span>
+                                            <Trash2 className="w-5 h-5 opacity-50"/>
+                                        </div>
+                                    )}
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Cancel Confirmation Modal */}
             {showCancelPopup && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
-                        <h3 className="text-lg font-semibold text-center mb-4">Xác nhận hủy đơn hàng</h3>
-                        <p className="text-center text-gray-600 mb-6">Bạn có chắc chắn muốn hủy đơn hàng này không?</p>
-                        <div className="flex justify-center gap-4">
-                            <button
-                                onClick={() => setShowCancelPopup(false)}
-                                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-all"
-                            >
-                                Không
-                            </button>
-                            <button
-                                onClick={handleCancelConfirm}
-                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-all"
-                            >
-                                Có, hủy đơn
-                            </button>
+                    <div className="relative transform transition-all duration-300 opacity-100 scale-100">
+                        <div className="bg-white rounded-xl p-6 w-full max-w-lg shadow-2xl">
+                            {/* Modal Header */}
+                            <div className="mb-6">
+                                <h3 className="text-xl font-semibold text-gray-800 text-center">
+                                    Xác nhận hủy đơn hàng
+                                </h3>
+                                <p className="mt-2 text-center text-gray-600">
+                                    Bạn có chắc chắn muốn hủy đơn hàng này không?
+                                </p>
+                            </div>
+
+                            {/* Modal Actions */}
+                            <div className="flex justify-center gap-4">
+                                <button
+                                    onClick={() => setShowCancelPopup(false)}
+                                    className="px-6 py-2.5 rounded-lg bg-gray-100 text-gray-700 font-medium
+                                        hover:bg-gray-200 active:bg-gray-300"
+                                >
+                                    Không
+                                </button>
+                                <button
+                                    onClick={handleCancelConfirm}
+                                    className="px-6 py-2.5 rounded-lg bg-red-500 text-white font-medium
+                                        hover:bg-red-600 active:bg-red-700"
+                                >
+                                    Có, hủy đơn
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

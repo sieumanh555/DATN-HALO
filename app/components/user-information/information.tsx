@@ -1,3 +1,5 @@
+"use client"
+// import {useRouter} from "next/navigation";
 import Image from "next/image";
 import {useEffect, useState} from "react";
 import {ChevronUp, Edit, Save, X} from "lucide-react";
@@ -6,7 +8,12 @@ import type User from "@/app/models/User";
 import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSideCookie";
 
 export default function UserInformation() {
+    // const router = useRouter();
     const token = getCookieCSide("as_tn");
+    // if(!token){
+    //     alert("Phiên đăng nhập hết hạn")
+    //     router.push("/pages/login")
+    // }
     const [isEditing, setIsEditing] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [name, setName] = useState(user?.name);
@@ -30,7 +37,7 @@ export default function UserInformation() {
         }
     }, []);
 
-    const userChange = async () => {
+    const updateUserInfo = async () => {
         try {
             const values = {name, gender, birthday, phone, address, zipcode};
             const response = await fetch(`http://localhost:3000/users/${user?._id}`, {
@@ -57,30 +64,28 @@ export default function UserInformation() {
     }
     return (
         <div className="w-full mx-auto py-4 sm:p-6 bg-white rounded-xl">
-            <div className="flex flex-col gap-8">
-                <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-gray-100 rounded-lg">
-                    <div className="relative">
-                        <Image
-                            src={`/assets/images/MLB-Chunky-Runner-NY-Black-White(4).png`}
-                            alt="Avatar"
-                            width={120}
-                            height={120}
-                            className="rounded-full object-cover ring-4 ring-white shadow-md"
-                        />
-                        <div
-                            className="absolute -bottom-2 right-0 w-8 h-8 bg-gray-100 rounded-full border-4 border-white flex items-center justify-center">
-                            <div className="w-4 h-4 rounded-full bg-green-500"></div>
+            {user && (
+
+                <div className="flex flex-col gap-8">
+
+                    <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-gray-100 rounded-lg">
+                        <div className="relative">
+                            <Image
+                                src={`/assets/images/MLB-Chunky-Runner-NY-Black-White(4).png`}
+                                alt="Avatar"
+                                width={120}
+                                height={120}
+                                className="rounded-full object-cover ring-4 ring-white shadow-md"
+                            />
+                        </div>
+                        <div className="flex flex-col text-center sm:text-left">
+                            <h2 className="text-2xl font-bold text-gray-800 capitalize">{name}</h2>
+                            <p className="text-gray-500 mt-1">{user?.email}</p>
                         </div>
                     </div>
-                    <div className="flex flex-col text-center sm:text-left">
-                        <h2 className="text-2xl font-bold text-gray-800 capitalize">{name}</h2>
-                        <p className="text-gray-500 mt-1">{user?.email}</p>
-                    </div>
-                </div>
 
-                {/* Form Grid */}
-                <div className="w-full">
-                    {user && (
+                    {/* Form Grid */}
+                    <div className="w-full">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="block font-semibold text-gray-700">Tên tài khoản</label>
@@ -97,56 +102,50 @@ export default function UserInformation() {
                             <div className="space-y-2">
                                 <label className="block font-semibold text-gray-700">Giới tính</label>
                                 {isEditing ? (
-                                    <div
-                                        className={`relative w-full px-4 py-2.5 rounded-lg border flex justify-between items-center`}>
-                                        <input type="text" value={gender} readOnly={isEditing}
-                                               className={`text-sm focus:outline-none`}/>
-                                        <button
-                                            onClick={() => setDropDown(!dropDown)}
-                                            className={`transition-transform transform duration-300 ${dropDown ? `-rotate-180` : `rotate-0`}`}>
-                                            <ChevronUp size={20} strokeWidth={1.5}/>
-                                        </button>
+                                    <div className="relative w-full">
+                                        <div className={`w-full px-4 py-2.5 rounded-lg border transition-all duration-300 border-gray-200'} 
+                                            flex justify-between items-center cursor-pointer`}
+                                             onClick={() => setDropDown(!dropDown)}>
+                                            <input
+                                                type="text"
+                                                value={gender}
+                                                readOnly
+                                                className="text-sm focus:outline-none cursor-pointer bg-transparent w-full"
+                                            />
+                                            <ChevronUp
+                                                size={20}
+                                                strokeWidth={1.5}
+                                                className={`transition-transform duration-300 ${dropDown ? '-rotate-180' : 'rotate-0'}`}
+                                            />
+                                        </div>
+                                        {/* Dropdown Menu */}
                                         <div
-                                            className={`${!dropDown ? `hidden` : `block`} absolute w-full top-10 left-0 border rounded-lg flex flex-col`}>
-                                            {["Nam", "Nữ", "Khác"].filter((genderValue: string) => genderValue !== gender).map((value: string) => (
-                                                <button
-                                                    key={value}
-                                                    onClick={() => {
-                                                        setGender(value);
-                                                        setDropDown(!dropDown);
-                                                    }}
-                                                    className={`group bg-gray-50 hover:bg-gray-100  py-2.5 px-4 flex justify-start`}
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={value}
-                                                        readOnly={true}
-                                                        className={`bg-gray-50 text-sm group-hover:bg-gray-100 text-gray-700 focus:outline-none cursor-pointer`}
-                                                    />
-                                                </button>
-                                            ))}
+                                            className={`${dropDown ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'} 
+                                            absolute w-full top-12 left-0 border-2 rounded-lg bg-white shadow-lg transition-all duration-300 z-10`}>
+                                            {["Nam", "Nữ", "Khác"]
+                                                .filter((genderValue) => genderValue !== gender)
+                                                .map((value) => (
+                                                    <button
+                                                        key={value}
+                                                        onClick={() => {
+                                                            setGender(value);
+                                                            setDropDown(false);
+                                                        }}
+                                                        className="w-full text-left px-4 py-2.5 hover:bg-gray-100 transition-colors duration-200 text-sm"
+                                                    >
+                                                        {value}
+                                                    </button>
+                                                ))}
                                         </div>
                                     </div>
                                 ) : (
-                                    <div
-                                        className={`w-full px-4 py-2 rounded-lg border bg-gray-50 cursor-not-allowed`}>
-                                        <input
-                                            type="text"
-                                            value={gender}
-                                            readOnly={true}
-                                            className={`bg-gray-50 text-sm text-gray-700 focus:outline-none cursor-not-allowed`}
-                                        />
-                                    </div>
+                                    <input
+                                        type="text"
+                                        value={gender}
+                                        readOnly
+                                        className="w-full px-4 py-2.5 rounded-lg border bg-gray-50 cursor-not-allowed text-sm text-gray-700"
+                                    />
                                 )}
-
-                                {/*<input*/}
-                                {/*    type="text"*/}
-                                {/*    value={gender}*/}
-                                {/*    readOnly={!isEditing}*/}
-                                {/*    onChange={(e) => setGender(e.target.value)}*/}
-                                {/*    className={`w-full px-4 py-2.5 rounded-lg text-sm text-gray-700 focus:outline-none border*/}
-                                {/*        ${!isEditing ? 'bg-gray-50  cursor-not-allowed' : 'bg-white'}`}*/}
-                                {/*/>*/}
                             </div>
 
                             <div className="space-y-2">
@@ -196,47 +195,50 @@ export default function UserInformation() {
                                         ${!isEditing ? 'bg-gray-50  cursor-not-allowed' : 'bg-white'}`}
                                 />
                             </div>
+
                         </div>
-                    )}
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-3 mt-8">
-                        {!isEditing ? (
-                            <button
-                                onClick={() => setIsEditing(!isEditing)}
-                                className={`px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all duration-200 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white`}
-                            >
-                                <Edit size={18}/>
-                                <span>Sửa</span>
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => {
-                                    userChange();
-                                    setIsEditing(!isEditing)
-                                }}
-                                className={`px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all duration-200 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white`}
-                            >
-                                <Save size={18}/>
-                                <span>Lưu</span>
-                            </button>
-                        )}
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap gap-3 mt-8">
+                            {!isEditing ? (
+                                <button
+                                    onClick={() => setIsEditing(!isEditing)}
+                                    className={`px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all duration-200 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white`}
+                                >
+                                    <Edit size={18}/>
+                                    <span>Sửa</span>
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        updateUserInfo();
+                                        setIsEditing(!isEditing)
+                                    }}
+                                    className={`px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all duration-200 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white`}
+                                >
+                                    <Save size={18}/>
+                                    <span>Lưu</span>
+                                </button>
+                            )}
 
-                        {isEditing && (
-                            <button
-                                onClick={() => {
-                                    // resetFormData();
-                                    setIsEditing(false);
-                                }}
-                                className="px-6 py-2.5 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-lg flex items-center gap-2 font-medium transition-all duration-200"
-                            >
-                                <X size={18}/>
-                                <span>Hủy</span>
-                            </button>
-                        )}
+                            {isEditing && (
+                                <button
+                                    onClick={() => {
+                                        // resetFormData();
+                                        setIsEditing(false);
+                                    }}
+                                    className="px-6 py-2.5 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-lg flex items-center gap-2 font-medium transition-all duration-200"
+                                >
+                                    <X size={18}/>
+                                    <span>Hủy</span>
+                                </button>
+                            )}
+                        </div>
                     </div>
+
                 </div>
-            </div>
+            )}
+
         </div>
     );
 }

@@ -40,3 +40,14 @@ export const getUserId = () => {
     }
     return null;
 }
+
+export const deleteOneCookie = (name: string)=>{
+    document.cookie = `${name}=; expires=Mon, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+export const deleteCookies = () => {
+    document.cookie.split(";").forEach((cookie) => {
+        document.cookie = cookie
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=; expires=Sun, 01 Jan 1970 00:00:00 UTC; path=/");
+    });
+}

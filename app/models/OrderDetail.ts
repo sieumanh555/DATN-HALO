@@ -1,4 +1,4 @@
-import Product from "@/app/models/Product";
+import type {ProductResponse} from "@/app/models/Product";
 
 export interface OrderDetailRequest {
     _id: string,
@@ -19,7 +19,7 @@ export interface OrderDetailResponse {
     _id: string,
     items: [
         {
-            productId: Product,
+            productId: ProductResponse,
             selectedColor: string,
             selectedSize: number,
             quantity: number,

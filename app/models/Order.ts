@@ -13,6 +13,7 @@ export interface OrderRequest {
 
 export interface OrderResponse {
     _id: string,
+    uniqueKey: string,
     userId: User,
     orderDetailId: OrderDetailResponse,
     amount: number,

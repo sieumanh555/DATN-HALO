@@ -115,7 +115,6 @@ export default function Trangchitiet() {
     if (loading) return <p className="text-center">Đang tải...</p>;
     if (error) return <p className="text-center text-red-500">Lỗi: {error}</p>;
     if (!product) return <p className="text-center">Không tìm thấy sản phẩm.</p>;
-    console.log(">>>> Check porduct: ",product);
 
     return (
         <div className="max-w-[1920px] px-[100px] py-[48px]">
@@ -238,7 +237,7 @@ export default function Trangchitiet() {
 
                     <div className="mt-8 flex flex-col md:flex-row gap-4">
                         <button
-                            onClick={()=> dispatch(addItem({...product, selectedSize, selectedColor, quantity}))}
+                            onClick={()=> dispatch(addItem({...product, selectedSize: selectedSize, selectedColor:selectedColor, quantity: quantity}))}
                             className="flex-1 px-6 py-3 border border-blue-500 rounded-md text-gray-900 hover:bg-blue-500 hover:text-white transition-all">
                             Thêm vào giỏ hàng
                         </button>

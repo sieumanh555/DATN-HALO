@@ -48,3 +48,7 @@ export interface ProductResponse {
     variants: [Variant]
 }
 
+export interface ProductCart extends ProductResponse{
+    selectedSize: string,
+    selectedColor: string,
+}
