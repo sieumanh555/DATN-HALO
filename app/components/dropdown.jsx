@@ -51,7 +51,7 @@ export default function DropDown({ onChange }) {
       case "new":
         // Giả định sản phẩm mới dựa trên createdAt (ví dụ: trong vòng 30 ngày)
         const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 10);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         filtered = filtered.filter(
           (product) => new Date(product?.createdAt) >= thirtyDaysAgo
         );

@@ -19,12 +19,12 @@ export default function Product({ products = [], limit = Infinity }) {
                 HOT
               </div>
             )}
-            <div className="w-full h-60 overflow-hidden rounded-md flex-shrink-0">
+            <div className="w-full h-60 overflow-hidden rounded-md flex-shrink-0 flex items-center justify-center">
               <Image
-                src={product?.image || "/assets/images/default.webp"}
+                src={product?.hinhanh || "/assets/images/default.webp"}
                 width={321}
                 height={240}
-                className="w-full h-full object-cover cursor-pointer transition duration-300 ease-in-out"
+                className="object-contain cursor-pointer transition duration-300 ease-in-out"
                 alt={product?.name || "Sản phẩm"}
               />
             </div>

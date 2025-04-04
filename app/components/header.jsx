@@ -39,7 +39,7 @@ export default function Header() {
 
   return (
     <header className="text-xl text-gray-800 font-medium mx-4 md:mx-12 py-4">
-      <div className="container">
+      <div className="">
         <div className="w-full text-center mx-auto uppercase pb-2 border-b-[3px] flex justify-between items-center">
           <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
             <Menu className="w-6 h-6" />

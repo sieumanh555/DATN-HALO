@@ -34,14 +34,14 @@ const BannerSlider = ({ banners }) => {
   };
 
   return (
-    <div className="w-screen h-full relative">
+    <div className="w-full h-full relative">
       <Slider {...settings}>
         {banners.map((banner) => (
           <div key={banner.id} className="w-screen">
             <img
               src={banner.image}
               alt={banner.alt}
-              className="w-screen h-[500px] object-cover"
+              className="w-full h-[500px] object-cover"
             />
           </div>
         ))}
@@ -98,6 +98,7 @@ const StorePage = () => {
       </div>
 
       {/* Main Content */}
+      
       <div className="max-w-6xl mx-auto p-6">
         <CategoryList />
         {productsSections.map((section) => (
@@ -113,7 +114,7 @@ const StorePage = () => {
               </h2>
             </div>
             <div className="grid gap-6 mt-6">
-              <Product products={filterProducts(section.category)} limit={6} />
+              <Product products={filterProducts(section.category)} limit={3} />
             </div>
           </div>
         ))}
