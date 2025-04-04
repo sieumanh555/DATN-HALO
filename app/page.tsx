@@ -8,17 +8,17 @@ import Product from "./components/product";
 import CategoryList from "./components/CategoryList";
 
 const staticData = {
-  "banners": [
-    { "id": 1, "image": "/assets/images/banner1.jpg", "alt": "Giày chạy bộ khuyến mãi" },
-    { "id": 2, "image": "/assets/images/banner2.webp", "alt": "Giày bóng rổ mới" },
-    { "id": 3, "image": "/assets/images/banner3.webp", "alt": "Giày sneaker hot trend" }
+  banners: [
+    { id: 1, image: "/assets/images/banner1.jpg", alt: "Giày chạy bộ khuyến mãi" },
+    { id: 2, image: "/assets/images/banner2.webp", alt: "Giày bóng rổ mới" },
+    { id: 3, image: "/assets/images/banner3.webp", alt: "Giày sneaker hot trend" },
   ],
-  "productsSections": [
-    { "id": 1, "banner": "/assets/images/banner2.webp", "category": "Sản phẩm nổi bật" },
-    { "id": 2, "banner": "/assets/images/banner2.webp", "category": "Giày Nam" },
-    { "id": 3, "banner": "/assets/images/banner2.webp", "category": "Giày Nữ" },
-    { "id": 4, "banner": "/assets/images/banner2.webp", "category": "Phụ kiện" }
-  ]
+  productsSections: [
+    { id: 1, banner: "/assets/images/banner2.webp", category: "Sản phẩm nổi bật" },
+    { id: 2, banner: "/assets/images/banner2.webp", category: "Giày Nam" },
+    { id: 3, banner: "/assets/images/banner2.webp", category: "Giày Nữ" },
+    { id: 4, banner: "/assets/images/banner2.webp", category: "Phụ kiện" },
+  ],
 };
 
 const BannerSlider = ({ banners }) => {
@@ -31,6 +31,9 @@ const BannerSlider = ({ banners }) => {
     autoplay: true,
     autoplaySpeed: 1500,
     arrows: false,
+    responsive: [
+      { breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+    ],
   };
 
   return (
@@ -41,7 +44,7 @@ const BannerSlider = ({ banners }) => {
             <img
               src={banner.image}
               alt={banner.alt}
-              className="w-full h-[500px] object-cover"
+              className="w-full h-auto md:h-[500px] object-contain md:object-cover"
             />
           </div>
         ))}
@@ -54,6 +57,7 @@ const StorePage = () => {
   const [products, setProducts] = useState([]);
   const [banners] = useState(staticData.banners);
   const [productsSections] = useState(staticData.productsSections);
+  const [selectedCategory, setSelectedCategory] = useState(null); // Thêm state cho danh mục được chọn
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,25 +75,27 @@ const StorePage = () => {
     fetchData();
   }, []);
 
-  // Hàm lọc sản phẩm theo danh mục
   const filterProducts = (category) => {
     if (category === "Sản phẩm nổi bật") {
-      return products.filter((product) => product.hot === 1); // Lọc sản phẩm nổi bật
+      return products.filter((product) => product.hot === 1);
     }
-    // Lọc sản phẩm theo category.categoryName
     return products.filter((product) => product.category?.categoryName === category);
+  };
+
+  const handleCategorySelect = (categoryName) => {
+    setSelectedCategory(categoryName); // Cập nhật danh mục được chọn
   };
 
   return (
     <>
       {/* Video Banner */}
       <div className="max-w-[1920px] flex flex-col">
-        <div className="relative flex h-screen w-full mb-12 overflow-hidden">
+        <div className="relative flex w-full h-auto md:h-screen mb-12 overflow-hidden">
           <video
             autoPlay
             loop
             muted
-            className="absolute inset-0 w-full h-full object-cover"
+            className="w-full h-auto md:h-full object-contain md:object-cover"
           >
             <source src="/banner.mp4" type="video/mp4" />
             Your browser does not support the video tag.
@@ -97,17 +103,29 @@ const StorePage = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      
+
       <div className="max-w-6xl mx-auto p-6">
-        <CategoryList />
-        {productsSections.map((section) => (
+        <CategoryList onCategorySelect={handleCategorySelect} />
+        
+        {selectedCategory && (
+          <div className="mt-12">
+            <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md">
+              {selectedCategory}
+            </h2>
+            <div className="grid gap-6 mt-6">
+              <Product products={filterProducts(selectedCategory)} limit={6} />
+            </div>
+          </div>
+        )}
+
+        {/* categoryLiss */}
+        {!selectedCategory && productsSections.map((section) => (
           <div key={section.id} className="mt-12">
             <div className="relative mb-6">
               <img
                 src={section.banner}
                 alt={`Banner ${section.category}`}
-                className="w-full h-80 object-cover rounded-lg shadow-md"
+                className="w-full h-auto md:h-80 object-contain md:object-cover rounded-lg shadow-md"
               />
               <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md mt-2">
                 {section.category}
@@ -123,13 +141,14 @@ const StorePage = () => {
       {/* Other Sections */}
       <div className="max-w-6xl mx-auto p-6">
         <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-12">
+          {/* Bộ sưu tập nam */}
           <div className="w-full flex flex-col lg:flex-row items-center gap-6">
             <div className="w-full lg:w-1/2">
               <video
                 autoPlay
                 loop
                 muted
-                className="relative z-10 w-full h-auto rounded-lg shadow-md"
+                className="w-full h-auto rounded-lg shadow-md object-contain"
               >
                 <source src="/banner.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
@@ -140,8 +159,7 @@ const StorePage = () => {
                 Bộ sưu tập nam
               </h1>
               <p className="text-lg text-gray-600">
-                This collection brings together dreamy spirit with Hello Kitty’s
-                timeless adorableness...
+                This collection brings together dreamy spirit with Hello Kitty’s timeless adorableness...
               </p>
               <button className="bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-700 hover:to-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">
                 Xem ngay
@@ -149,13 +167,14 @@ const StorePage = () => {
             </div>
           </div>
 
+          {/* Bộ sưu tập nữ */}
           <div className="w-full flex flex-col lg:flex-row-reverse items-center gap-6">
             <div className="w-full lg:w-1/2">
               <video
                 autoPlay
                 loop
                 muted
-                className="relative z-10 w-full h-auto rounded-lg shadow-md"
+                className="w-full h-auto rounded-lg shadow-md object-contain"
               >
                 <source src="/banner.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
@@ -166,8 +185,7 @@ const StorePage = () => {
                 Bộ sưu tập nữ
               </h1>
               <p className="text-lg text-gray-600">
-                This collection brings together dreamy spirit with Hello Kitty’s
-                timeless adorableness...
+                This collection brings together dreamy spirit with Hello Kitty’s timeless adorableness...
               </p>
               <button className="bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-700 hover:to-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">
                 Xem ngay

@@ -9,6 +9,7 @@
   export default function Trangchitiet() {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
+    const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageHeight, setImageHeight] = useState('auto');
@@ -24,6 +25,16 @@
           }
           const data = await response.json();
           setProduct(data);
+
+          const productsResponse = await fetch(`http://localhost:5000/product`); // Giả sử endpoint này trả về tất cả sản phẩm
+        if (!productsResponse.ok) {
+          throw new Error(`Failed to fetch products: ${productsResponse.status}`);
+        }
+        const allProducts = await productsResponse.json();
+
+        const filteredProducts = allProducts.filter(p => p._id !== id);
+        setRelatedProducts(filteredProducts);
+
         } catch (err) {
           setError(err.message);
         } finally {
@@ -170,8 +181,8 @@
     if (!product) return <p className="text-center">Không tìm thấy sản phẩm.</p>;
 
     return (
-      <div className="max-w-[1920px] px-[100px] py-[48px]">
-        <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-6 md:p-10 bg-white rounded-xl shadow-md">
+      <div className="max-w-[1920px] px-4 md:px-[100px] py-12 md:py-[48px]">
+        <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-4 md:p-6 lg:p-10 bg-white rounded-xl shadow-md">
           {/* Product Image */}
           <div className="md:col-span-6 flex items-center justify-center">
             <div 
@@ -235,17 +246,14 @@
                 {selectedSize && (
                   <div className="mt-4">
                     <h3 className="text-lg font-medium">Màu sắc</h3>
-                    <div className="flex flex-row gap-4 mt-2">
+                    <div className="flex flex-row flex-wrap gap-3 mt-2 max-w-full">
                       {allColors.map((color) => {
                         const variant = availableColors.find((v) => v.color === color);
                         const isAvailable = !!variant;
                         return (
-                          <div
-                            key={color}
-                            className="flex flex-col items-center"
-                          >
+                          <div key={color} className="flex flex-col items-center">
                             <div
-                              className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${
+                              className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-2 transition-all duration-300 ${
                                 isAvailable
                                   ? selectedColor?.color.toLowerCase() === color
                                     ? "border-blue-500 scale-110"
@@ -255,11 +263,6 @@
                               style={{ backgroundColor: color }}
                               onClick={() => isAvailable && handleColorChange(color)}
                             />
-                            {/* {selectedColor?.color.toLowerCase() === color && (
-                              <span className="text-sm mt-1 text-center text-gray-600">
-                                {isAvailable ? `${variant.stock} còn` : "Hết hàng"}
-                              </span>
-                            )} */}
                           </div>
                         );
                       })}
@@ -438,7 +441,9 @@
 
         <div className="mt-10">
           <h2 className="text-2xl font-bold text-center">Sản phẩm khác</h2>
-          <Product products={relatedProducts} limit={3} />
+          <div className="mt-12">
+            <Product products={relatedProducts} limit={3} />
+          </div>
         </div>
       </div>
     );

@@ -16,7 +16,8 @@ export default {
         foreground: "var(--foreground)",
       },
       padding: {
-        "100": "100px",
+        "100": "100px", // Đã có
+        "48": "48px",   // Thêm giá trị 48px để dùng px-48, py-48
       },
     },
   },
