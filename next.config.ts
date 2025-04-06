@@ -22,7 +22,13 @@ const nextConfig: NextConfig = {
       "down-th.img.susercontent.com",
       "product.hstatic.net",
       "bizweb.dktcdn.net",
-      "cdn-img.poizonapp.com"
+      "cdn-img.poizonapp.com",
+      "imagedelivery.net",
+      "www.jordan1.vn",
+      "i8.amplience.net",
+      "supersports.com.vn",
+      "sneakerdaily.vn",
+      "www.reebok.com"
     ],
   },
 };

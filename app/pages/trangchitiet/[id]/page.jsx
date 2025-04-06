@@ -1,4 +1,4 @@
-  "use client";
+"use client";
   import { useState, useEffect, useRef } from "react";
   import Image from "next/image";
   import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,7 +26,7 @@
           const data = await response.json();
           setProduct(data);
 
-          const productsResponse = await fetch(`http://localhost:5000/product`); // Giả sử endpoint này trả về tất cả sản phẩm
+          const productsResponse = await fetch(`http://localhost:5000/product`);
         if (!productsResponse.ok) {
           throw new Error(`Failed to fetch products: ${productsResponse.status}`);
         }
@@ -102,7 +102,7 @@
         username: "User123",
         content: comment,
         time: new Date().toLocaleString(),
-        avatar: "/assets/images/avatar-default.png",
+        avatar: "https://i.pinimg.com/736x/b7/91/44/b79144e03dc4996ce319ff59118caf65.jpg",
         replies: [],
       };
       setComments([newComment, ...comments]);
@@ -116,7 +116,7 @@
         username: "User123",
         content: replyInput[commentId],
         time: new Date().toLocaleString(),
-        avatar: "/assets/images/avatar-default.png",
+        avatar: "https://i.pinimg.com/736x/b7/91/44/b79144e03dc4996ce319ff59118caf65.jpg",
       };
       
       setComments(comments.map(comment => 
@@ -125,7 +125,6 @@
           : comment
       ));
       setReplyInput(prev => ({ ...prev, [commentId]: "" }));
-      // Tự động hiển thị replies sau khi thêm reply mới
       setShowReplies(prev => ({ ...prev, [commentId]: true }));
     };
 
@@ -185,20 +184,18 @@
         <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-4 md:p-6 lg:p-10 bg-white rounded-xl shadow-md">
           {/* Product Image */}
           <div className="md:col-span-6 flex items-center justify-center">
-            <div 
-              className="w-full rounded-xl overflow-hidden shadow-lg border"
-              style={{ height: imageHeight }}
-            >
-              <Image
-                src={selectedColor?.images?.[0] || product.image || "/placeholder.jpg"}
-                alt={product.name || "Product"}
-                width={600}
-                height={520}
-                sizes="100vw"
-                className="object-cover w-full h-full rounded-xl"
-              />
-            </div>
-          </div>
+  <div 
+    className="w-[600px] h-[520px] rounded-xl overflow-hidden shadow-lg border" 
+  >
+    <Image
+      src={selectedColor?.images?.[0] || product.image || "/placeholder.jpg"}
+      alt={product.name || "Product"}
+      width={600}
+      height={520}
+      className="object-cover w-full h-full"
+    />
+  </div>
+</div>
 
           {/* Product Info */}
           <div 

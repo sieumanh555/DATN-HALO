@@ -1,9 +1,9 @@
 import React from "react";
 
 const categories = [
-  { name: "Giày Mizuno", image: "..." },
-  { name: "Giày Reebok Nano", image: "..." },
-  { name: "Giày Adidas", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwBJOtyZGcC-5b0xtu4SHUb4-iXz2ApiIsG4gW04yxm6sbAPShYWzHeEQN7zN7d9IhFG4&usqp=CAU" },
+  { name: "Giày Mizuno", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFq3w-kZEZRGkXvAJcDzFdVDizSPTJxoAblDzGd2RExhReF5R8G_XiMaS__s6ZehOLtV8&usqp=CAU" },
+  { name: "Giày New Balance", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTW1FhtlC_2dOqBdJ2P4IoGFlSOqFEzbPlIVw&s" },
+  { name: "Giày Adidas", image: "https://www.pngmart.com/files/23/Adidas-Logo-PNG-File.png" },
   { name: "Giày Nike", image: "https://www.pngall.com/wp-content/uploads/2016/06/Nike-Logo.png" },
 ];
 

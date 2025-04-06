@@ -15,9 +15,9 @@ const staticData = {
   ],
   productsSections: [
     { id: 1, banner: "/assets/images/banner2.webp", category: "Sản phẩm nổi bật" },
-    { id: 2, banner: "/assets/images/banner2.webp", category: "Giày Nam" },
-    { id: 3, banner: "/assets/images/banner2.webp", category: "Giày Nữ" },
-    { id: 4, banner: "/assets/images/banner2.webp", category: "Phụ kiện" },
+    { id: 2, banner: "https://i.pinimg.com/736x/54/bb/b5/54bbb5dc42afe72d2665fd6d1f34629e.jpg", category: "Giày Nam" },
+    { id: 3, banner: "https://i.pinimg.com/736x/a9/60/14/a96014649ad55a7f69f1eb20d790766a.jpg", category: "Giày Nữ" },
+    { id: 4, banner: "https://giaycaosmartmen.com/wp-content/uploads/2024/06/anh-anh-2.jpg", category: "Phụ kiện" },
   ],
 };
 
@@ -37,14 +37,16 @@ const BannerSlider = ({ banners }) => {
   };
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-[300px] md:h-[520px] relative overflow-hidden bg-black">
       <Slider {...settings}>
         {banners.map((banner) => (
-          <div key={banner.id} className="w-screen">
+          <div key={banner.id} className="w-full h-full flex items-center justify-center">
             <img
               src={banner.image}
               alt={banner.alt}
-              className="w-full h-auto md:h-[500px] object-contain md:object-cover"
+              className="w-full h-full object-contain object-center"
+              style={{ imageRendering: 'crisp-edges' }}
+              loading="lazy"
             />
           </div>
         ))}
@@ -122,11 +124,13 @@ const StorePage = () => {
         {!selectedCategory && productsSections.map((section) => (
           <div key={section.id} className="mt-12">
             <div className="relative mb-6">
-              <img
-                src={section.banner}
-                alt={`Banner ${section.category}`}
-                className="w-full h-auto md:h-80 object-contain md:object-cover rounded-lg shadow-md"
-              />
+              <div className="w-full h-[200px] md:h-[450px] overflow-hidden rounded-lg shadow-md">
+                <img
+                  src={section.banner}
+                  alt={`Banner ${section.category}`}
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
               <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md mt-2">
                 {section.category}
               </h2>
