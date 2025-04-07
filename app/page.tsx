@@ -45,7 +45,7 @@ const BannerSlider = ({ banners }) => {
               src={banner.image}
               alt={banner.alt}
               className="w-full h-full object-contain object-center"
-              style={{ imageRendering: 'crisp-edges' }}
+              style={{ imageRendering: "crisp-edges" }}
               loading="lazy"
             />
           </div>
@@ -59,7 +59,7 @@ const StorePage = () => {
   const [products, setProducts] = useState([]);
   const [banners] = useState(staticData.banners);
   const [productsSections] = useState(staticData.productsSections);
-  const [selectedCategory, setSelectedCategory] = useState(null); // Thêm state cho danh mục được chọn
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +85,7 @@ const StorePage = () => {
   };
 
   const handleCategorySelect = (categoryName) => {
-    setSelectedCategory(categoryName); // Cập nhật danh mục được chọn
+    setSelectedCategory(categoryName);
   };
 
   return (
@@ -105,41 +105,55 @@ const StorePage = () => {
         </div>
       </div>
 
-
       <div className="max-w-6xl mx-auto p-6">
+      <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md">
+        Danh mục nổi bật
+      </h2>
         <CategoryList onCategorySelect={handleCategorySelect} />
-        
-        {selectedCategory && (
-          <div className="mt-12">
-            <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md">
-              {selectedCategory}
-            </h2>
-            <div className="grid gap-6 mt-6">
-              <Product products={filterProducts(selectedCategory)} limit={6} />
-            </div>
-          </div>
-        )}
 
-        {/* categoryLiss */}
-        {!selectedCategory && productsSections.map((section) => (
-          <div key={section.id} className="mt-12">
-            <div className="relative mb-6">
-              <div className="w-full h-[200px] md:h-[450px] overflow-hidden rounded-lg shadow-md">
-                <img
-                  src={section.banner}
-                  alt={`Banner ${section.category}`}
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-              <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md mt-2">
-                {section.category}
-              </h2>
-            </div>
-            <div className="grid gap-6 mt-6">
-              <Product products={filterProducts(section.category)} limit={3} />
-            </div>
-          </div>
-        ))}
+        {/* Hiển thị sản phẩm của danh mục được chọn từ CategoryList */}
+        {selectedCategory && (
+  <div className="mt-12">
+    <div className="flex justify-between items-center px-4 py-2">
+      <h2 className="text-left text-gray-900 text-2xl font-bold rounded-md">
+        {selectedCategory}
+      </h2>
+      <a href="#" className="text-black hover:text-blue-600 text-lg">
+        Xem thêm
+      </a>
+    </div>
+    <div className="grid gap-6 mt-6">
+      <Product products={filterProducts(selectedCategory)} limit={6} />
+    </div>
+  </div>
+)}
+
+<div className="mt-12">
+  {productsSections.map((section) => (
+    <div key={section.id} className="mb-12">
+      <div className="relative mb-6">
+        <div className="w-full h-[200px] md:h-[450px] overflow-hidden rounded-lg shadow-md">
+          <img
+            src={section.banner}
+            alt={`Banner ${section.category}`}
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+        <div className="flex justify-between items-center px-4 py-2 mt-2">
+          <h2 className="text-left text-gray-900 text-2xl font-bold rounded-md">
+            {section.category}
+          </h2>
+          <a href="#" className="text-black hover:text-blue-600 text-lg">
+            Xem thêm
+          </a>
+        </div>
+      </div>
+      <div className="grid gap-6 mt-6">
+        <Product products={filterProducts(section.category)} limit={3} />
+      </div>
+    </div>
+  ))}
+</div>
       </div>
 
       {/* Other Sections */}

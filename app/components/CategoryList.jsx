@@ -15,7 +15,7 @@ const CategoryList = ({ onCategorySelect }) => {
           <div
             key={index}
             className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
-            onClick={() => onCategorySelect(category.name)} // Thêm sự kiện click
+            onClick={() => onCategorySelect(category.name)}
           >
             <img
               src={category.image}
