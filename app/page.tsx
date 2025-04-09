@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -31,9 +32,7 @@ const BannerSlider = ({ banners }) => {
     autoplay: true,
     autoplaySpeed: 1500,
     arrows: false,
-    responsive: [
-      { breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1 } },
-    ],
+    responsive: [{ breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1 } }],
   };
 
   return (
@@ -60,14 +59,13 @@ const StorePage = () => {
   const [banners] = useState(staticData.banners);
   const [productsSections] = useState(staticData.productsSections);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const productsResponse = await fetch("http://localhost:5000/product");
-        if (!productsResponse.ok) {
-          throw new Error("Failed to fetch products");
-        }
+        if (!productsResponse.ok) throw new Error("Failed to fetch products");
         const productsData = await productsResponse.json();
         setProducts(productsData);
       } catch (error) {
@@ -88,9 +86,14 @@ const StorePage = () => {
     setSelectedCategory(categoryName);
   };
 
+  const handleViewMore = (category) => {
+    const filter = category === "Sản phẩm nổi bật" ? "hot" : null;
+    const query = filter ? `?filter=${filter}` : `?category=${encodeURIComponent(category)}`;
+    router.push(`/pages/product${query}`); // Hoàn thiện navigation
+  };
+
   return (
     <>
-      {/* Video Banner */}
       <div className="max-w-[1920px] flex flex-col">
         <div className="relative flex w-full h-auto md:h-screen mb-12 overflow-hidden">
           <video
@@ -106,60 +109,63 @@ const StorePage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md">
-        Danh mục nổi bật
-      </h2>
+        <h2 className="text-left text-gray-900 text-2xl font-bold px-4 py-2 rounded-md">
+          Danh mục nổi bật
+        </h2>
         <CategoryList onCategorySelect={handleCategorySelect} />
 
-        {/* Hiển thị sản phẩm của danh mục được chọn từ CategoryList */}
         {selectedCategory && (
-  <div className="mt-12">
-    <div className="flex justify-between items-center px-4 py-2">
-      <h2 className="text-left text-gray-900 text-2xl font-bold rounded-md">
-        {selectedCategory}
-      </h2>
-      <a href="#" className="text-black hover:text-blue-600 text-lg">
-        Xem thêm
-      </a>
-    </div>
-    <div className="grid gap-6 mt-6">
-      <Product products={filterProducts(selectedCategory)} limit={6} />
-    </div>
-  </div>
-)}
+          <div className="mt-12">
+            <div className="flex justify-between items-center px-4 py-2">
+              <h2 className="text-left text-gray-900 text-2xl font-bold rounded-md">
+                {selectedCategory}
+              </h2>
+              <button
+                onClick={() => handleViewMore(selectedCategory)}
+                className="text-black hover:text-blue-600 text-lg"
+              >
+                Xem thêm
+              </button>
+            </div>
+            <div className="grid gap-6 mt-6">
+              <Product products={filterProducts(selectedCategory)} limit={4} columns={4} />
+            </div>
+          </div>
+        )}
 
-<div className="mt-12">
-  {productsSections.map((section) => (
-    <div key={section.id} className="mb-12">
-      <div className="relative mb-6">
-        <div className="w-full h-[200px] md:h-[450px] overflow-hidden rounded-lg shadow-md">
-          <img
-            src={section.banner}
-            alt={`Banner ${section.category}`}
-            className="w-full h-full object-cover object-center"
-          />
+        <div className="mt-12">
+          {productsSections.map((section) => (
+            <div key={section.id} className="mb-12">
+              <div className="relative mb-6">
+                <div className="w-full h-[200px] md:h-[450px] overflow-hidden rounded-lg shadow-md">
+                  <img
+                    src={section.banner}
+                    alt={`Banner ${section.category}`}
+                    className="w-full h-full object-cover object-center"
+                  />
+                </div>
+                <div className="flex justify-between items-center px-4 py-2 mt-2">
+                  <h2 className="text-left text-gray-900 text-2xl font-bold rounded-md">
+                    {section.category}
+                  </h2>
+                  <button
+                    onClick={() => handleViewMore(section.category)}
+                    className="text-black hover:text-blue-600 text-lg"
+                  >
+                    Xem thêm
+                  </button>
+                </div>
+              </div>
+              <div className="">
+                <Product products={filterProducts(section.category)} limit={4} columns={4} />
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="flex justify-between items-center px-4 py-2 mt-2">
-          <h2 className="text-left text-gray-900 text-2xl font-bold rounded-md">
-            {section.category}
-          </h2>
-          <a href="#" className="text-black hover:text-blue-600 text-lg">
-            Xem thêm
-          </a>
-        </div>
-      </div>
-      <div className="grid gap-6 mt-6">
-        <Product products={filterProducts(section.category)} limit={3} />
-      </div>
-    </div>
-  ))}
-</div>
       </div>
 
-      {/* Other Sections */}
       <div className="max-w-6xl mx-auto p-6">
         <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-12">
-          {/* Bộ sưu tập nam */}
           <div className="w-full flex flex-col lg:flex-row items-center gap-6">
             <div className="w-full lg:w-1/2">
               <video
@@ -185,7 +191,6 @@ const StorePage = () => {
             </div>
           </div>
 
-          {/* Bộ sưu tập nữ */}
           <div className="w-full flex flex-col lg:flex-row-reverse items-center gap-6">
             <div className="w-full lg:w-1/2">
               <video

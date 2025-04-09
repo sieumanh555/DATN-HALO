@@ -8,7 +8,6 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
   const MAX_LIMIT = 5000000;
   const STEP = 10000;
 
-  // Đảm bảo initialMin và initialMax luôn là số hợp lệ
   const safeInitialMin = Math.max(MIN_LIMIT, Math.min(Number(initialMin) || 0, MAX_LIMIT - STEP));
   const safeInitialMax = Math.min(MAX_LIMIT, Math.max(Number(initialMax) || MAX_LIMIT, MIN_LIMIT + STEP));
 
@@ -17,17 +16,14 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
   const [formattedMinPrice, setFormattedMinPrice] = useState("");
   const [formattedMaxPrice, setFormattedMaxPrice] = useState("");
 
-  // Định dạng giá trị tiền tệ
   const formatPrice = (value) =>
     value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
-  // Cập nhật giá trị định dạng
   useEffect(() => {
     setFormattedMinPrice(formatPrice(minPrice));
     setFormattedMaxPrice(formatPrice(maxPrice));
   }, [minPrice, maxPrice]);
 
-  // Xử lý thay đổi giá trị từ input số hoặc thanh trượt
   const handleMinChange = (value) => {
     const newMin = Math.max(MIN_LIMIT, Math.min(Number(value) || 0, maxPrice - STEP));
     setMinPrice(newMin);
@@ -38,17 +34,14 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
     setMaxPrice(newMax);
   };
 
-  // Hàm xử lý tìm kiếm
-  const handleSearch = () => {
-    onPriceChange({ min: minPrice, max: maxPrice });
-  };
+  const debouncedSearch = useCallback(
+    debounce(() => onPriceChange({ min: minPrice, max: maxPrice }), 300),
+    [minPrice, maxPrice, onPriceChange]
+  );
 
-  // Xử lý khi nhấn Enter
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
+  useEffect(() => {
+    debouncedSearch();
+  }, [minPrice, maxPrice, debouncedSearch]);
 
   return (
     <div className="bg-white w-full p-4 rounded-lg shadow-md">
@@ -62,7 +55,6 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
             step={STEP}
             value={minPrice}
             onChange={(e) => handleMinChange(e.target.value)}
-            onKeyPress={handleKeyPress}
             className="w-full p-2 mt-1 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
@@ -75,13 +67,10 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
             step={STEP}
             value={maxPrice}
             onChange={(e) => handleMaxChange(e.target.value)}
-            onKeyPress={handleKeyPress}
             className="w-full p-2 mt-1 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
       </div>
-
-      {/* Thanh trượt giá */}
       <div className="mt-6">
         <div className="relative">
           <input
@@ -101,7 +90,7 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
             step={STEP}
             value={maxPrice}
             onChange={(e) => handleMaxChange(e.target.value)}
-            className="absolute w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            className="absolute w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer"
             style={{ zIndex: 1 }}
           /> */}
           <div className="relative h-2 bg-gray-200 rounded-lg">
@@ -115,18 +104,10 @@ export default function PriceRange({ onPriceChange, initialMin = 0, initialMax =
           </div>
         </div>
       </div>
-
       <p className="text-sm text-gray-700 mt-4">
-        Khoảng giá:
-        <span className="font-semibold text-blue-600"> {formattedMinPrice}</span> - 
-        <span className="font-semibold text-blue-600"> {formattedMaxPrice}</span>
+        Khoảng giá: <span className="font-semibold text-blue-600">{formattedMinPrice}</span> - 
+        <span className="font-semibold text-blue-600">{formattedMaxPrice}</span>
       </p>
-      <button
-        className="mt-4 w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-200"
-        onClick={handleSearch}
-      >
-        Tìm kiếm
-      </button>
     </div>
   );
 }

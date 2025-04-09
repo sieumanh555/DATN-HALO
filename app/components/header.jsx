@@ -105,7 +105,7 @@ export default function Header() {
       </div>
       {isOpen && (
         <div className="md:hidden bg-white py-4 px-6 space-y-4 text-center">
-          <Link href="/pages/product" className="block hover:text-gray-400">TẤT CẢ SẢN PHẨM</Link>
+          <Link href="/pages/product?category=Tất cả danh mục" className="block hover:text-gray-400">TẤT CẢ SẢN PHẨM</Link>
           <Link href="/pages/product?filter=discount" className="block hover:text-gray-400">SẢN PHẨM ƯU ĐÃI</Link>
           <Link href="/pages/product?category=Giày nam" className="block hover:text-gray-400">GIÀY NAM</Link>
           <Link href="/pages/product?category=Giày nữ" className="block hover:text-gray-400">GIÀY NỮ</Link>
