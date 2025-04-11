@@ -11,11 +11,11 @@ const cartSlice = createSlice({
                 (item) => item._id === action.payload._id
             );
             if (existItem) {
-                existItem.quantity += action.payload.quantity;
+                existItem.quantityy += action.payload.quantityy;
             } else {
                 state.products.push({
                     ...action.payload,
-                    quantity: action.payload.quantity,
+                    quantityy: action.payload.quantityy,
                 });
             }
         },
@@ -30,22 +30,26 @@ const cartSlice = createSlice({
         increaseQuantity: (state, action) => {
             const product = state.products.find((item) => item._id === action.payload);
             if (product) {
-                product.quantity += 1;
-                if (product.quantity >= 11) {
+                product.quantityy += 1;
+                if (product.quantityy >= 11) {
                     alert("Chỉ có thể mua tối đa 10 sản phẩm");
-                    product.quantity = 10;
+                    product.quantityy = 10;
                 }
             }
         },
         decreaseQuantity: (state, action) => {
             const product = state.products.find((item) => item._id === action.payload);
             if (product) {
-                product.quantity -= 1;
+                product.quantityy -= 1;
             }
         },
     },
 });
 
-export const {addItem, removeItem, removeAll, increaseQuantity, decreaseQuantity} =
-    cartSlice.actions;
+export const {
+    addItem,
+    removeItem,
+    removeAll,
+    increaseQuantity,
+    decreaseQuantity} = cartSlice.actions;
 export default cartSlice;

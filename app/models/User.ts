@@ -7,7 +7,7 @@ interface User {
     password: string,
     email: string,
     address?: string,
-    zipcode?: number,
+    zipcode?: string,
     role?: number,
     createdAt?: Date,
     updatedAt?: Date

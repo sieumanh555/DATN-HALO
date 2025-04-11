@@ -29,7 +29,6 @@ export default function Orders() {
             const ordersData = await getOrders();
             setOrders(ordersData);
         };
-
         fetchOrders();
     }, []);
 

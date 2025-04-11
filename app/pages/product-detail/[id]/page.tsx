@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
-import { useParams } from "next/navigation";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faThumbsUp} from "@fortawesome/free-solid-svg-icons";
+import {useParams} from "next/navigation";
 import Product from "../../../components/product";
 
 import type {ProductResponse} from "@/app/models/Product";
@@ -15,8 +15,8 @@ export default function Trangchitiet() {
     const dispatch = useDispatch();
     const cart = useSelector((state: CartState) => state.cart.products || []);
     console.log(">>>> check cart: ", cart);
-    const { id } = useParams();
-    const [product, setProduct] = useState<ProductResponse| null>(null);
+    const {id} = useParams();
+    const [product, setProduct] = useState<ProductResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageHeight, setImageHeight] = useState('auto');
@@ -64,7 +64,7 @@ export default function Trangchitiet() {
     const availableColors = selectedSize
         ? product?.variants
         ?.filter((v) => v.size === selectedSize)
-        .map((v) => ({ color: v.color.toLowerCase(), stock: v.stock, images: v.images })) || []
+        .map((v) => ({color: v.color.toLowerCase(), stock: v.stock, images: v.images})) || []
         : [];
 
     useEffect(() => {
@@ -123,7 +123,7 @@ export default function Trangchitiet() {
                 <div className="md:col-span-6 flex items-center justify-center">
                     <div
                         className="w-full rounded-xl overflow-hidden shadow-lg border"
-                        style={{ height: imageHeight }}
+                        style={{height: imageHeight}}
                     >
                         <Image
                             src={selectedColor?.hinhanh?.[0] || product.hinhanh || "/placeholder.jpg"}
@@ -199,7 +199,7 @@ export default function Trangchitiet() {
                                                                     : "border-gray-300 hover:border-gray-500 cursor-pointer"
                                                                 : "border-gray-300 opacity-50 cursor-not-allowed"
                                                         }`}
-                                                        style={{ backgroundColor: color }}
+                                                        style={{backgroundColor: color}}
                                                         onClick={() => isAvailable && handleColorChange(color)}
                                                     />
                                                     {/* {selectedColor?.color.toLowerCase() === color && (
@@ -237,11 +237,17 @@ export default function Trangchitiet() {
 
                     <div className="mt-8 flex flex-col md:flex-row gap-4">
                         <button
-                            onClick={()=> dispatch(addItem({...product, selectedSize: selectedSize, selectedColor:selectedColor, quantity: quantity}))}
+                            onClick={() => dispatch(addItem({
+                                ...product,
+                                selectedSize: selectedSize,
+                                selectedVariant: selectedColor,
+                                quantityy: quantity
+                            }))}
                             className="flex-1 px-6 py-3 border border-blue-500 rounded-md text-gray-900 hover:bg-blue-500 hover:text-white transition-all">
                             Thêm vào giỏ hàng
                         </button>
-                        <button className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">
+                        <button
+                            className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">
                             Mua ngay
                         </button>
                     </div>
@@ -277,7 +283,7 @@ export default function Trangchitiet() {
                             {comments.map((cmt) => (
                                 <li key={cmt.id} className="p-3 border rounded-lg bg-gray-100 flex flex-col gap-2">
                                     <div className="flex items-start gap-3">
-                                        <img src={cmt.avatar} alt="Avatar" className="w-10 h-10 rounded-full border" />
+                                        <img src={cmt.avatar} alt="Avatar" className="w-10 h-10 rounded-full border"/>
                                         <div>
                                             <span className="font-bold text-blue-600">{cmt.username}</span>
                                             <p className="text-gray-800">{cmt.content}</p>
@@ -289,7 +295,7 @@ export default function Trangchitiet() {
                                                     }`}
                                                     onClick={() => toggleLike(cmt.id)}
                                                 >
-                                                    <FontAwesomeIcon icon={faThumbsUp} /> {likes[cmt.id] || 0}
+                                                    <FontAwesomeIcon icon={faThumbsUp}/> {likes[cmt.id] || 0}
                                                 </button>
                                             </div>
                                         </div>
@@ -303,7 +309,7 @@ export default function Trangchitiet() {
 
             <div className="mt-10">
                 <h2 className="text-2xl font-bold text-center">Sản phẩm khác</h2>
-                <Product products={[product]} limit={3} />
+                <Product products={[product]} limit={3}/>
             </div>
         </div>
     );

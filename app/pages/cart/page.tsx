@@ -1,44 +1,85 @@
 "use client";
 import Link from "next/link";
 import useSWR from "swr";
-import { useDispatch, useSelector } from "react-redux";
-import { useMemo, useState } from "react";
-import { ArrowLeft, Plus, ShoppingCart } from "lucide-react";
+import {useRouter} from "next/navigation";
+import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useMemo, useState} from "react";
+import {ArrowLeft, ChevronLeft, Plus, ShoppingCart, Ticket} from "lucide-react";
+import {getCookieCSide} from "@/app/libs/Cookie/clientSideCookie"
 
-import type {ProductResponse} from "../../models/Product";
-import CartState from "../../models/CartState";
-import { removeAll } from "@/redux/slices/cartSlice";
+import Discount from "@/app/models/Discount";
+import {CartState, CheckoutState} from "../../models/CartState";
+import {ProductCart, ProductResponse} from "@/app/models/Product";
+import {removeAll} from "@/redux/slices/cartSlice";
+
 import ProBox from "../../components/cart/proBox";
-import CartEmpty from "../../components/cart/cartEmpty";
 // import SubProBox from "../../components/cart/subProBox";
+import CartEmpty from "../../components/cart/cartEmpty";
+
 
 export default function Cart() {
+    const router = useRouter();
     const dispatch = useDispatch();
     const cart = useSelector((state: CartState) => state.cart.products || []);
+    const checkout = useSelector((state: CheckoutState) => state.checkout.products || [])
     const [popup, setPopup] = useState(false);
+    const [discounts, setDiscounts] = useState<Discount[]>([]);
+    const [discount, setDiscount] = useState<Discount>({
+        _id: "",
+        name: "",
+        description: "",
+        condition: 0,
+        minus: 0,
+        percent: 0,
+        stock: 0,
+    });
+    const [voucherPopup, setVoucherPopup] = useState(false);
+    useEffect(() => {
+        fetch("http://localhost:3000/discounts")
+            .then((res) => res.json())
+            .then((data) => setDiscounts(data))
+            .catch((err) =>
+                console.error("Lỗi fetching http://localhost:3000/discounts", err)
+            );
+    }, []);
 
     const subTotal = useMemo(() => {
-        return cart.reduce(
-            (total: number, item: ProductResponse) => total + item.price * item.quantity,
+        return checkout.reduce(
+            (total: number, item: ProductCart) => total + item.pricePromo * item.quantityy,
             0
         );
-    }, [cart]);
+    }, [checkout]);
 
-    function handleClosePopup() {
+    const total = useMemo(() => {
+        if (!discount) return subTotal;
+        const discountValue =
+            discount.minus > 0 ? discount.minus : (subTotal * discount.percent) / 100;
+        const finalTotal = subTotal - discountValue;
+        return finalTotal > 0 ? finalTotal : 0;
+    }, [subTotal, discount]);
+
+    const handleClosePopup = () => {
         dispatch(removeAll());
         setPopup(false);
     }
 
-    const fetcher = (url: string) => fetch(url).then((res) => res.json());
-    const { data, error } = useSWR<ProductResponse[]>(
-        "http://localhost:3000/products",
-        fetcher,
-        {
-            refreshInterval: 3000,
+    const handleCheckout = () => {
+        const token = getCookieCSide("as_tn");
+        if (!token) {
+            router.push("/pages/login");
+        } else {
+            router.push("/pages/checkout");
         }
+    }
+
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+    const {data, error} = useSWR<ProductResponse[]>("http://localhost:3000/products",
+        fetcher,
+        {refreshInterval: 3000}
     );
     if (!data) return <div>Loading...</div>;
     if (error) return <div>Lỗi fetching data: {error.message}</div>;
+    console.log(">>>Checkout: ", checkout);
     return (
         <section className="px-[100px] py-6 bg-[#F2F4F7] tracking-wide">
             {cart.length > 0 ? (
@@ -47,18 +88,20 @@ export default function Cart() {
                         {/*cart*/}
                         <div className="w-[60%]">
                             <div className="w-full px-5 text-xl flex justify-between">
-                                <p className="w-[52%]">Sản phẩm</p>
+                                <p className="w-[52%] ml-5">Sản phẩm</p>
                                 <p className="w-[14%] text-center">Số lượng</p>
                                 <p className="w-[14%] text-center">Giá</p>
                                 <p className="w-[14%] text-center">Tổng</p>
                             </div>
-                            {cart.map((product: ProductResponse) => (
-                                <ProBox key={product._id} data={product} />
+                            {cart.map((product: ProductCart) => (
+                                <div key={product._id}>
+                                    <ProBox data={product}/>
+                                </div>
                             ))}
                             {/* navigation pages/shop ? delete cart */}
                             <div className={`w-full mt-[18px] flex justify-between`}>
                                 <Link href="#" className="flex items-center space-x-2">
-                                    <ArrowLeft className={`w-5 h-5`} />
+                                    <ArrowLeft className={`w-5 h-5`}/>
                                     <p>Tiếp tục mua hàng</p>
                                 </Link>
                                 <button
@@ -73,36 +116,63 @@ export default function Cart() {
                             </div>
                         </div>
 
-                        {/*checkout information*/}
-                        <div
-                            className={`w-[38%] h-[380px] bg-[#fff] rounded-lg mt-[46px] px-10 py-8 space-y-4`}
-                        >
-                            <p className="text-3xl font-semibold uppercase">đơn hàng</p>
-                            <div className="w-full flex justify-between">
-                                <p className="w-[40%] text-xl font-medium">Tổng đơn hàng</p>
+                        {/*checkout.ts information*/}
+                        <div className={`w-[38%] bg-[#fff] rounded-lg mt-[46px] px-10 py-8 space-y-4`}>
+                            <div className="w-full border-b pb-4 flex justify-between">
+                                <p className="w-[40%] text-xl font-semibold uppercase">Tổng cộng</p>
                                 <p className="w-[40%] text-right">
-                                    {subTotal.toLocaleString("vi-VN")}đ
+                                    {total.toLocaleString("vi-VN")}đ
                                 </p>
                             </div>
 
-                            <div className="w-full border-t-2 border-gray-300 pt-4 flex justify-between">
-                                <p className="w-[40%] text-xl font-medium">Tổng tiền</p>
+                            <div className="w-full border-b pb-4 flex flex-col">
+                                <div className={`w-full flex justify-between items-center`}>
+                                    <div className="flex items-center gap-2">
+                                        <Ticket strokeWidth={1.5} size={26}/>
+                                        <p className={`text-lg`}>Mã giảm giá</p>
+                                    </div>
 
-                                <div className="w-[40%] text-right">
-                                    <p>{subTotal.toLocaleString("vi-VN")}đ</p>
+                                    {discount.condition <= subTotal && discount.stock <= 0 ? (
+                                        <button onClick={() => setVoucherPopup(true)} title={`Chọn mã`}>
+                                            <p className={`text-[#034292]`}>Áp dụng mã</p>
+                                        </button>
+                                    ) : (
+                                        <div>
+                                            <button
+                                                onClick={() => setVoucherPopup(true)}
+                                                className={`w-full flex justify-end`}
+                                                title={`Chọn mã`}
+                                            >
+                                                <p className={`text-[#034292] flex justify-end`}>
+                                                    {discount.name}
+                                                </p>
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                                <div
+                                    className={`${
+                                        discount.condition > subTotal && discount.stock <= 0
+                                            ? `hidden`
+                                            : `block`
+                                    } text-sm flex justify-end`}
+                                >
+                                    {discount.description}
                                 </div>
                             </div>
 
-                            <Link href="/pages/checkout">
-                                <button className="w-full h-10 mt-[18px] bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
-                                    Thanh toán
-                                </button>
-                            </Link>
+
+                            <button
+                                onClick={() => handleCheckout()}
+                                className="w-full h-10 mt-[18px] bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
+                                Thanh toán
+                            </button>
+
                         </div>
                     </div>
                 </div>
             ) : (
-                <CartEmpty />
+                <CartEmpty/>
             )}
 
             {/* recently viewed product */}
@@ -129,7 +199,66 @@ export default function Cart() {
                 {/*</div>*/}
             </div>
 
-            {/* Popup */}
+            {/* Voucher popup */}
+            <div>
+                <div
+                    onClick={() => setVoucherPopup(false)}
+                    className={`${
+                        voucherPopup === false ? `hidden` : `fixed top-0 right-0 z-10`
+                    } w-full h-full bg-[#00000066]`}
+                ></div>
+                <div
+                    className={`${
+                        voucherPopup === false ? `hidden` : `fixed top-0 right-0 z-10`
+                    } w-[320px] h-full bg-[#fff] flex flex-col justify-between`}
+                >
+                    <div className={`w-full h-12 border-b-[2px] flex items-center`}>
+                        <ChevronLeft
+                            onClick={() => setVoucherPopup(false)}
+                            strokeWidth={1.5}
+                            className={`w-[10%] cursor-pointer`}
+                        />
+                        <div className={`w-[90%] font-medium flex justify-center`}>
+                            Mã giảm giá
+                        </div>
+                    </div>
+                    <div className={`w-full px-4 flex flex-col gap-2`}>
+                        {discounts.map((discount: Discount) => (
+                            <div
+                                key={discount._id}
+                                className={`${
+                                    discount.stock <= 0 ? `hidden` : `block`
+                                } w-full h-[100px] text-sm py-2 border-2 border-dashed flex justify-between items-center`}
+                            >
+                                <Ticket strokeWidth={0.5} className={`w-[120px] h-[80px]`}/>
+                                <div className={`w-[160px] flex flex-col gap-y-1`}>
+                                    <p className={`text-[#124062] uppercase`}>{discount.name}</p>
+                                    <p className={`text-xs text-gray-600`}>
+                                        {discount.description}
+                                    </p>
+                                    <button
+                                        onClick={() => {
+                                            setDiscount(discount);
+                                            setPopup(false)
+                                        }}
+                                        className={`w-[100px] h-6 text-xs text-[#fff] bg-[#165b8d] rounded-xl`}
+                                    >
+                                        Áp dụng
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <button
+                        onClick={() => setPopup(false)}
+                        className={`w-[90%] h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}
+                    >
+                        Quay lại trang thanh toán
+                    </button>
+                </div>
+            </div>
+
+            {/*Cancel Popup */}
             <div className={`${popup === false ? `hidden` : `block`}`}>
                 <div
                     onClick={() => setPopup(false)}
@@ -139,9 +268,10 @@ export default function Cart() {
                     className={`bg-gray-100 w-[480px] h-[240px] fixed top-[25%] right-[35%] z-20 p-8 rounded-xl flex flex-col justify-center items-center gap-4`}
                 >
                     <div>
-                        <ShoppingCart className={`w-12 h-12`} />
+                        <ShoppingCart className={`w-12 h-12`}/>
                     </div>
-                    <p>Bạn có muốn xóa {cart.length} sản phẩm trong giỏ hàng?</p>
+                    <p>Bạn có muốn xóa <span className={`text-[#D92D20]`}>{cart.length}</span> sản phẩm trong giỏ hàng?
+                    </p>
                     <div className={`text-sm font-semibold mt-4 flex gap-6`}>
                         <button
                             onClick={() => setPopup(false)}

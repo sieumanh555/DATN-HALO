@@ -128,7 +128,7 @@ export default function OrderDetail({orderId}: { orderId: string }) {
                                     <td className="p-3">{item.quantity}</td>
                                     <td className="p-3">{item.price.toLocaleString("vi-VN")} VND</td>
                                     <td className="p-3 hover:cursor text-blue-600">
-                                        <Link href={`/pages/product-detail/${item.productId._id}`}>
+                                        <Link href={`/pages/productDetail/${item.productId._id}`}>
                                             Mua lại
                                         </Link>
                                     </td>

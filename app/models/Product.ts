@@ -51,4 +51,5 @@ export interface ProductResponse {
 export interface ProductCart extends ProductResponse{
     selectedSize: string,
     selectedColor: string,
+    quantityy: number,
 }

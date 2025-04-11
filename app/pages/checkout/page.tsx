@@ -1,15 +1,20 @@
 "use client";
-// import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
-import { ChevronLeft, Package, Ticket, Truck } from "lucide-react";
+import * as Yup from "yup";
+import {Field, Form, Formik} from "formik";
+import Image from "next/image";
+import {useEffect, useMemo, useState} from "react";
+import {useSelector} from "react-redux";
+import {ChevronLeft, Package, Ticket, Truck} from "lucide-react";
+import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSideCookie";
 
-import CartState from "../../models/CartState";
-// import Product from "../../models/Product";
 import Discount from "../../models/Discount";
+import type User from "@/app/models/User";
+import {CheckoutState} from "../../models/CartState";
+
 
 export default function CheckOut() {
-    const cart = useSelector((state: CartState) => state.cart.products || []);
+    const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
+    const [user, setUser] = useState<User | null>(null);
     const [shipping, setShipping] = useState<number>(40000);
     const [discounts, setDiscounts] = useState<Discount[]>([]);
     const [discount, setDiscount] = useState<Discount>({
@@ -22,17 +27,15 @@ export default function CheckOut() {
         stock: 0,
     });
     const [popup, setPopup] = useState(false);
-    useEffect(() => {
-        fetch("http://localhost:3000/discounts")
-            .then((res) => res.json())
-            .then((data) => setDiscounts(data))
-            .catch((err) =>
-                console.error("Lỗi fetching http://localhost:3000/discounts", err)
-            );
-    }, []);
+    const [checkoutPopup, setCheckoutPopup] = useState(false);
+
+    const getInformation = () => {
+        const info = getPayload();
+        setUser(info);
+    }
     const subTotal = useMemo(() => {
-        return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-    }, [cart]);
+        return checkout.reduce((total, item) => total + item.pricePromo * item.quantityy, 0);
+    }, [checkout]);
     const total = useMemo(() => {
         if (!discount) return subTotal + shipping;
         const discountValue =
@@ -41,139 +44,204 @@ export default function CheckOut() {
         return finalTotal > 0 ? finalTotal : 0;
     }, [subTotal, shipping, discount]);
     const percent = Math.abs(Math.ceil(((total - subTotal + shipping) * 100) / (total + shipping)));
+    const validationSchema = Yup.object().shape({
+        name: Yup.string()
+            .trim()
+            .required("* Vui lòng nhập tên"),
+        phone: Yup.string()
+            .trim()
+            .length(10, "Vui lòng nhập đủ 10 số")
+            .required("* Vui lòng nhập số điện thoại"),
+        email: Yup.string()
+            .trim()
+            .email("* Email không hợp lệ")
+            .required("* Vui lòng nhập email"),
+        zipcode: Yup.string()
+            .trim()
+            .length(5, "Vui lòng nhập đúng mã bưu điện")
+            .required("* Vui lòng nhập mã bưu điện"),
+        address: Yup.string()
+            .required("* Vui lòng nhập địa chỉ"),
+    });
+    const updateUserInfo = async (values: Partial<User>) => {
+        try {
+            const {name, phone, email, zipcode, address} = values;
+            const data = {name, phone, email, zipcode, address};
+            if (user) {
+                const token = getCookieCSide("as_tn");
+                const response = await fetch(`http://localhost:3000/users/${user._id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify(data),
+                });
+                const responseData = await response.json();
+                if (response) {
+                    setCookie(`as_tn`, responseData.access_token, 3);
+                    setCookie(`rh_tn`, responseData.refresh_token, 7);
+                    setUser(getPayload());
+                } else {
+                    alert(responseData.message);
+                }
+            }
+        } catch (error) {
+            console.log("Lỗi đăng nhập:" + error);
+            alert("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+        }
+    };
+    useEffect(() => {
+        getInformation();
+    }, []);
+    useEffect(() => {
+        fetch("http://localhost:3000/discounts")
+            .then((res) => res.json())
+            .then((data) => setDiscounts(data))
+            .catch((err) =>
+                console.error("Lỗi fetching http://localhost:3000/discounts", err)
+            );
+    }, []);
     return (
         <section className="container grid grid-cols-1 md:grid-cols-2 gap-8 px-[100px] py-10 tracking-wide">
             {/* customer info */}
-            <div className="grid-cols-1">
-                <p className="text-3xl font-semibold">Thông tin giao hàng</p>
-                <form
-                    action=""
-                    className="bg-[#fff] rounded-lg mt-6 px-8 py-6 flex flex-wrap gap-x-[14px] gap-y-4"
-                >
-                    <div className="w-[280px] flex flex-col">
-                        <label htmlFor="name" className="font-semibold">
-                            Họ và tên
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            placeholder="Oách Xà Lách"
-                            value="Võ Tấn Đạt"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
+            {user && (
+                <div className="grid-cols-1">
+                    <p className="text-3xl font-semibold">Thông tin giao hàng</p>
+                    <Formik
+                        initialValues={{
+                            name: user.name,
+                            phone: user.phone,
+                            email: user.email,
+                            zipcode: user.zipcode,
+                            address: user.address
+                        }}
+                        validationSchema={validationSchema}
+                        onSubmit={updateUserInfo}
+                    >
+                        {/*{({errors, touched}) => (*/}
+                        {({errors, touched, setTouched, handleSubmit}) => (
+                            <Form
+                                className="bg-[#fff] rounded-lg mt-6 px-8 py-6 flex flex-wrap gap-x-[14px] gap-y-4"
+                                onSubmit={(e) => {
+                                    e.preventDefault(); // Ngăn submit mặc định
+                                    // Force touch tất cả field
+                                    setTouched({
+                                        name: true,
+                                        phone: true,
+                                        email: true,
+                                        zipcode: true,
+                                        address: true,
+                                    });
+                                    handleSubmit(); // Sau đó gọi submit
+                                }}
+                            >
+                                {/*name*/}
+                                <div className="w-[280px] flex flex-col">
+                                    <label htmlFor="name" className="font-semibold">
+                                        Họ và tên
+                                    </label>
+                                    <Field
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                    />
+                                    {errors.name && touched.name && (
+                                        <div className="text-xs text-red-500 mt-1">{errors.name}</div>
+                                    )}
+                                </div>
 
-                    <div className="w-[280px] flex flex-col">
-                        <label htmlFor="phone" className="font-semibold">
-                            Số điện thoại
-                        </label>
-                        <input
-                            type="text"
-                            id="phone"
-                            placeholder="079xxxxxxx"
-                            value="0797373333"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
+                                {/*phone*/}
+                                <div className="w-[280px] flex flex-col">
+                                    <label htmlFor="phone" className="font-semibold">
+                                        Số điện thoại
+                                    </label>
+                                    <Field
+                                        id="phone"
+                                        name="phone"
+                                        type="text"
+                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                    />
+                                    {errors.phone && touched.phone && (
+                                        <div className="text-xs text-red-500 mt-1">{errors.phone}</div>
+                                    )}
+                                </div>
 
-                    <div className="w-[280px] flex flex-col">
-                        <label htmlFor="email" className="font-semibold">
-                            Email
-                        </label>
-                        <input
-                            type="text"
-                            id="email"
-                            placeholder="OachXaLach123@gmail.com"
-                            value="vtandat0720@gmail.com"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
+                                {/*email*/}
+                                <div className="w-[280px] flex flex-col">
+                                    <label htmlFor="email" className="font-semibold">
+                                        Email
+                                    </label>
+                                    <Field
+                                        id="email"
+                                        name="email"
+                                        type="text"
+                                        readOnly
+                                        disabled
+                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded  hover:cursor-not-allowed focus:outline-none"
+                                    />
+                                </div>
 
-                    <div className="w-[80px] flex flex-col">
-                        <label htmlFor="zipcode" className="font-semibold">
-                            ZIP
-                        </label>
-                        <input
-                            type="text"
-                            id="zipcode"
-                            placeholder="90250"
-                            value="90250"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
+                                {/*zipcode*/}
+                                <div className="w-[80px] flex flex-col">
+                                    <label htmlFor="zipcode" className="font-semibold">
+                                        ZIP
+                                    </label>
+                                    {/*<select id="zipcode">*/}
+                                    {/*    {zipcode.map((item) => item.code.map((code) => (*/}
+                                    {/*        <option key={code.code} value={code.code} className={`p-2`}>{`${code.code} - ${code.name}`}</option>*/}
+                                    {/*    )))*/}
+                                    {/*    }*/}
+                                    {/*</select>*/}
+                                    <Field
+                                        id="zipcode"
+                                        name="zipcode"
+                                        type="text"
+                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                    />
+                                </div>
 
-                    <div className="w-full flex flex-col">
-                        <label htmlFor="address" className="font-semibold">
-                            Địa chỉ
-                        </label>
-                        <input
-                            type="text"
-                            id="address"
-                            placeholder="58 Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Thành phố Hà Nội"
-                            value="58 Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Thành phố Hà Nội"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
+                                {/*address*/}
+                                <div className="w-full flex flex-col">
+                                    <label htmlFor="address" className="font-semibold">
+                                        Địa chỉ
+                                    </label>
+                                    <Field
+                                        id="address"
+                                        name="address"
+                                        type="text"
+                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                    />
+                                    {errors.address && touched.address && (
+                                        <div className="text-xs text-red-500 mt-1">{errors.address}</div>
+                                    )}
+                                </div>
 
-                    <div className="w-[183px] flex flex-col">
-                        <label htmlFor="province" className="font-semibold">
-                            Tỉnh/Thành phố
-                        </label>
-                        <input
-                            type="text"
-                            id="province"
-                            placeholder="Hà Nội"
-                            value="Hà Nội"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
+                                <div className="w-full flex flex-col">
+                                    <label htmlFor="note" className="font-semibold">
+                                        Ghi chú
+                                    </label>
+                                    <textarea
+                                        id="note"
+                                        placeholder="dunno :v"
+                                        className="w-full h-[100px] text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                    ></textarea>
+                                </div>
 
-                    <div className="w-[183px] flex flex-col">
-                        <label htmlFor="district" className="font-semibold">
-                            Quận/Huyện
-                        </label>
-                        <input
-                            type="text"
-                            id="district"
-                            placeholder="Cầu Giấy"
-                            value="Cầu Giấy"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
+                                {/* Submit button */}
+                                <button
+                                    type="submit"
+                                    className="w-[10%] h-8 bg-[#034292] hover:bg-[#023170] text-white rounded mt-2 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                                >
+                                    Lưu
+                                </button>
+                            </Form>
+                        )}
+                    </Formik>
+                </div>
+            )}
 
-                    <div className="w-[183px] flex flex-col">
-                        <label htmlFor="commune" className="font-semibold">
-                            Phường/Xã
-                        </label>
-                        <input
-                            type="text"
-                            id="commune"
-                            placeholder="Quan Hoa"
-                            value="Quan Hoa"
-                            readOnly
-                            className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        />
-                    </div>
-
-                    <div className="w-full flex flex-col">
-                        <label htmlFor="note" className="font-semibold">
-                            Ghi chú
-                        </label>
-                        <textarea
-                            id="note"
-                            placeholder="dunno :v"
-                            className="w-full h-[100px] text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                        ></textarea>
-                    </div>
-                </form>
-            </div>
             {/* payment method */}
             <div className="grid-cols-1">
                 <p className="text-3xl font-bold">Phương thức thanh toán</p>
@@ -220,11 +288,13 @@ export default function CheckOut() {
                 {/*order info*/}
                 <div className="bg-[#fff] mt-4 rounded-lg px-8 py-6 space-y-4">
                     <p className="text-xl font-semibold uppercase">đơn hàng</p>
-
                     <div className="w-full mt-[18px] flex justify-between items-center">
                         <div className="h-19 flex items-center gap-2">
-                            <Package strokeWidth={1} className={`w-9 h-9`} />
-                            <p>{cart.length} sản phẩm</p>
+                            <Package strokeWidth={1} className={`w-9 h-9`}/>
+                            <button
+                                onClick={() => setCheckoutPopup(!checkoutPopup)}
+                                className={`hover:text-blue-600`}>{checkout.length} sản phẩm
+                            </button>
                         </div>
                         <p>{subTotal.toLocaleString("vi-VN")}đ</p>
                     </div>
@@ -232,7 +302,7 @@ export default function CheckOut() {
                     <div className={`w-full mt-[18px]`}>
                         <div className="w-full mt-[18px] flex justify-between items-center">
                             <div className="h-10 flex items-center gap-2">
-                                <Truck strokeWidth={1} className={`w-9 h-9`} />
+                                <Truck strokeWidth={1} className={`w-9 h-9`}/>
                                 <p>Chi phí vận chuyển</p>
                             </div>
                             <p>{shipping.toLocaleString("vi-VN")}đ</p>
@@ -275,7 +345,7 @@ export default function CheckOut() {
                     <div className="w-full mt-[18px] flex flex-col">
                         <div className={`w-full flex justify-between items-center`}>
                             <div className="flex items-center gap-2">
-                                <Ticket strokeWidth={1} className={`w-9 h-9`} />
+                                <Ticket strokeWidth={1} className={`w-9 h-9`}/>
                                 <p>Mã giảm giá</p>
                             </div>
 
@@ -336,7 +406,7 @@ export default function CheckOut() {
                 </div>
             </div>
 
-            {/* Popup */}
+            {/* Voucher popup */}
             <div>
                 <div
                     onClick={() => setPopup(false)}
@@ -367,14 +437,17 @@ export default function CheckOut() {
                                     discount.stock <= 0 ? `hidden` : `block`
                                 } w-full h-[100px] text-sm py-2 border-2 border-dashed flex justify-between items-center`}
                             >
-                                <Ticket strokeWidth={0.5} className={`w-[120px] h-[80px]`} />
+                                <Ticket strokeWidth={0.5} className={`w-[120px] h-[80px]`}/>
                                 <div className={`w-[160px] flex flex-col gap-y-1`}>
                                     <p className={`text-[#124062] uppercase`}>{discount.name}</p>
                                     <p className={`text-xs text-gray-600`}>
                                         {discount.description}
                                     </p>
                                     <button
-                                        onClick={() => {setDiscount(discount); setPopup(false)}}
+                                        onClick={() => {
+                                            setDiscount(discount);
+                                            setPopup(false)
+                                        }}
                                         className={`w-[100px] h-6 text-xs text-[#fff] bg-[#165b8d] rounded-xl`}
                                     >
                                         Áp dụng
@@ -391,6 +464,73 @@ export default function CheckOut() {
                     </button>
                 </div>
             </div>
+
+            {/*Checkout popup*/}
+            {checkoutPopup && (
+                <div onClick={() => setCheckoutPopup(!checkoutPopup)}
+                     className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 print:static print:bg-white backdrop-blur-sm">
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        className="relative w-full max-w-5xl bg-white rounded-lg p-4 shadow-xl overflow-y-auto max-h-[90vh] border print:shadow-none print:max-h-full animate-fadeIn"
+                    >
+                        {/* Header */}
+                        <div className="px-6 mb-4">
+                            <h1 className="text-2xl text-center uppercase font-bold text-gray-800 tracking-wide">
+                                Chi tiết đơn hàng
+                            </h1>
+                        </div>
+
+                        {/* Bảng sản phẩm */}
+                        <div className="overflow-x-auto border border-gray-200">
+                            <table className="w-full text-sm">
+                                <thead className="bg-gray-50 text-center">
+                                <tr>
+                                    <th className="p-4 font-semibold text-gray-600">Hình ảnh</th>
+                                    <th className="p-4 font-semibold text-gray-600">Màu chọn</th>
+                                    <th className="p-4 font-semibold text-gray-600">Size chọn</th>
+                                    <th className="p-4 font-semibold text-gray-600">Số lượng</th>
+                                    <th className="p-4 font-semibold text-gray-600">Giá tiền</th>
+                                    <th className="p-4 font-semibold text-gray-600">Tổng</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {checkout.map((item) => (
+                                    <tr key={item._id}
+                                        className="border-t border-gray-200 hover:bg-gray-50/50 text-center transition-colors">
+                                        <td className="p-4">
+                                            <div className="flex justify-center">
+                                                <Image
+                                                    src="/assets/images/MLB-Chunky-Runner-NY-Black-White(1).png"
+                                                    alt="MLB Chunky Runner NY Black White"
+                                                    width={80}
+                                                    height={80}
+                                                    className="rounded-lg object-cover shadow-sm"
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="p-4 font-medium">{item.selectedColor}</td>
+                                        <td className="p-4 font-medium">{item.selectedSize}</td>
+                                        <td className="p-4 font-medium">{item.quantityy}</td>
+                                        <td className="p-4 font-medium">{item.pricePromo.toLocaleString("vi-VN")} VND</td>
+                                        <td className="p-4 font-medium">{(item.pricePromo * item.quantityy).toLocaleString("vi-VN")} VND</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="mt-6 flex items-center justify-start gap-4 print:hidden">
+                            <button
+                                onClick={() => setCheckoutPopup(!checkoutPopup)}
+                                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                            >
+                                Đóng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }
