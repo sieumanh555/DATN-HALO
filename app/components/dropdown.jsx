@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 
-export default function DropDown({ onSortChange, onFilterChange, sortOption, filterOption }) {
+export default function DropDown({
+  onSortChange = () => {},
+  onFilterChange = () => {},
+  onGenderChange = () => {},
+  sortOption = "",
+  filterOption = "all",
+  genderOption = "all",
+}) {
   const filterOptions = [
     { value: "all", label: "Tất cả sản phẩm" },
     { value: "hot", label: "Sản phẩm hot" },
@@ -10,14 +17,21 @@ export default function DropDown({ onSortChange, onFilterChange, sortOption, fil
     { value: "discount", label: "Sản phẩm được ưu đãi" },
   ];
 
+  const genderOptions = [
+    { value: "all", label: "Tất cả giới tính" },
+    { value: "Giày Nam", label: "Giày Nam" },
+    { value: "Giày Nữ", label: "Giày Nữ" },
+  ];
+
   const handleSortChange = (e) => onSortChange(e.target.value);
   const handleFilterChange = (e) => onFilterChange(e.target.value);
+  const handleGenderChange = (e) => onGenderChange(e.target.value);
 
   return (
-    <div className="flex gap-4">
+    <>
       <select
         aria-label="Sort products"
-        className="text-gray-900 bg-gray-50 border-2 border-gray-900/40 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-3"
+        className="text-gray-900 bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium rounded-lg text-sm px-4 py-2.5 w-full"
         value={sortOption}
         onChange={handleSortChange}
       >
@@ -32,7 +46,7 @@ export default function DropDown({ onSortChange, onFilterChange, sortOption, fil
       </select>
       <select
         aria-label="Filter products"
-        className="text-gray-900 bg-gray-50 border-2 border-gray-900/40 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-3"
+        className="text-gray-900 bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium rounded-lg text-sm px-4 py-2.5 w-full"
         value={filterOption}
         onChange={handleFilterChange}
       >
@@ -42,6 +56,18 @@ export default function DropDown({ onSortChange, onFilterChange, sortOption, fil
           </option>
         ))}
       </select>
-    </div>
+      <select
+        aria-label="Filter by gender"
+        className="text-gray-900 bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium rounded-lg text-sm px-4 py-2.5 w-full"
+        value={genderOption}
+        onChange={handleGenderChange}
+      >
+        {genderOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </>
   );
 }

@@ -16,9 +16,9 @@ const staticData = {
   ],
   productsSections: [
     { id: 1, banner: "/assets/images/banner2.webp", category: "Sản phẩm nổi bật" },
-    { id: 2, banner: "https://i.pinimg.com/736x/54/bb/b5/54bbb5dc42afe72d2665fd6d1f34629e.jpg", category: "Giày Nam" },
-    { id: 3, banner: "https://i.pinimg.com/736x/a9/60/14/a96014649ad55a7f69f1eb20d790766a.jpg", category: "Giày Nữ" },
-    { id: 4, banner: "https://giaycaosmartmen.com/wp-content/uploads/2024/06/anh-anh-2.jpg", category: "Phụ kiện" },
+    { id: 2, banner: "/assets/images/banner1.jpg", category: "Giày Nam" },
+    { id: 3, banner: "/assets/images/banner3.webp", category: "Giày Nữ" },
+    { id: 4, banner: "/assets/images/banner2.webp", category: "Phụ kiện" },
   ],
 };
 
@@ -64,7 +64,7 @@ const StorePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsResponse = await fetch("http://localhost:5000/product");
+        const productsResponse = await fetch("https://datn-api-production.up.railway.app/product");
         if (!productsResponse.ok) throw new Error("Failed to fetch products");
         const productsData = await productsResponse.json();
         setProducts(productsData);

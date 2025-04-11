@@ -18,9 +18,10 @@ export default function Products() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 5000000 });
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategories, setSelectedCategories] = useState([]); // Đổi thành mảng
   const [sortOption, setSortOption] = useState("");
   const [filterOption, setFilterOption] = useState("all");
+  const [genderOption, setGenderOption] = useState("all");
   const productsPerPage = 9;
   const maxPrice = 5000000;
 
@@ -30,7 +31,7 @@ export default function Products() {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch("http://localhost:5000/product");
+        const response = await fetch("https://datn-api-production.up.railway.app/product");
         if (!response.ok) throw new Error("API không phản hồi");
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -50,17 +51,28 @@ export default function Products() {
   useEffect(() => {
     const filter = searchParams.get("filter");
     const category = searchParams.get("category");
+    const gender = searchParams.get("gender");
     if (filter) setFilterOption(filter);
-    if (category) setSelectedCategory(category);
+    if (category) setSelectedCategories(category === "all" ? [] : [category]);
+    if (gender) setGenderOption(gender);
   }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
     let result = [...initialProducts];
 
-    if (selectedCategory !== "all") {
-      result = result.filter((product) => product.category?.categoryName === selectedCategory);
+    // Category filter
+    if (selectedCategories.length > 0) {
+      result = result.filter((product) =>
+        selectedCategories.includes(product.category?.categoryName)
+      );
     }
 
+    // Gender filter
+    if (genderOption !== "all") {
+      result = result.filter((product) => product.gender === genderOption);
+    }
+
+    // Filter options (hot, new, discount)
     switch (filterOption) {
       case "hot":
         result = result.filter((product) => product?.hot === 1);
@@ -78,18 +90,21 @@ export default function Products() {
         break;
     }
 
+    // Price range filter
     result = result.filter(
       (product) =>
         (product.price || product.pricePromo || 0) >= priceRange.min &&
         (product.price || product.pricePromo || 0) <= priceRange.max
     );
 
+    // Search query filter
     if (searchQuery.trim()) {
       result = result.filter((product) =>
         (product?.name || "").toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
+    // Sort options
     switch (sortOption) {
       case "price-asc":
         result.sort((a, b) => (a.price || a.pricePromo || 0) - (b.price || b.pricePromo || 0));
@@ -108,11 +123,24 @@ export default function Products() {
     }
 
     return result;
-  }, [initialProducts, selectedCategory, filterOption, priceRange, searchQuery, sortOption]);
+  }, [
+    initialProducts,
+    selectedCategories, // Cập nhật dependency
+    filterOption,
+    genderOption,
+    priceRange,
+    searchQuery,
+    sortOption,
+  ]);
 
-  const handleCategoryChange = useCallback((category) => setSelectedCategory(category), []);
+  const handleCategoryChange = useCallback((categories) => {
+    // Xử lý cả mảng hoặc chuỗi "all"
+    setSelectedCategories(categories === "all" ? [] : categories);
+  }, []);
+
   const handleSortChange = useCallback((sort) => setSortOption(sort), []);
   const handleFilterChange = useCallback((filter) => setFilterOption(filter), []);
+  const handleGenderChange = useCallback((gender) => setGenderOption(gender), []);
   const handleSearch = useCallback((query) => setSearchQuery(query), []);
   const handlePriceChange = useCallback(({ min, max }) => setPriceRange({ min, max }), []);
   const handlePageChange = useCallback((page) => {
@@ -122,9 +150,10 @@ export default function Products() {
   const resetFilters = useCallback(() => {
     setSearchQuery("");
     setPriceRange({ min: 0, max: maxPrice });
-    setSelectedCategory("all");
+    setSelectedCategories([]); // Đặt lại về rỗng (tương đương "all")
     setSortOption("");
     setFilterOption("all");
+    setGenderOption("all");
     setCurrentPage(1);
   }, [maxPrice]);
 
@@ -150,7 +179,7 @@ export default function Products() {
                   <Sidebar
                     products={initialProducts}
                     onCategoryChange={handleCategoryChange}
-                    initialCategory={selectedCategory}
+                    initialCategory={selectedCategories.length === 0 ? "all" : selectedCategories}
                   />
                 ),
               },
@@ -180,23 +209,23 @@ export default function Products() {
               onClick={resetFilters}
               className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 rounded-lg mt-4"
             >
-              Đặt lại bộ lọc
+              Đặt lại
             </button>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="w-full lg:w-[75%]">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-blue-400 to-blue-600 text-white py-4 px-5 rounded-lg shadow-md gap-4 sm:gap-0">
-            <div className="w-full sm:w-auto">
+          <div className="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-4 px-5 rounded-lg shadow-md">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <DropDown
                 onSortChange={handleSortChange}
                 onFilterChange={handleFilterChange}
+                onGenderChange={handleGenderChange}
                 sortOption={sortOption}
                 filterOption={filterOption}
+                genderOption={genderOption}
               />
-            </div>
-            <div className="w-full sm:w-auto">
               <SearchComponent onSearch={handleSearch} initialQuery={searchQuery} />
             </div>
           </div>

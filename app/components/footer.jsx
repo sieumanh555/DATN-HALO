@@ -5,37 +5,37 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="tracking-wide py-10 px-6 md:px-12">
+    <footer className="tracking-wide py-10 px-6 md:px-12 bg-blue-500">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
         <div className="space-y-4 md:col-span-2">
           <h2 className="text-lg font-semibold">Về HALO</h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-white">
             HALO - “Highlight Alluring Lifestyle Outfit” tượng trưng cho phong
             cách thời trang nổi bật và cuốn hút.
           </p>
           <h2 className="text-lg font-semibold">Công ty TNHH HALO</h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-white">
             0315986019 cấp ngày 31/10/2019 tại Sở kế hoạch đầu tư TPHCM
           </p>
         </div>
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Địa chỉ</h2>
-          <p className="text-sm font-semibold">Tp Hồ Chí Minh:</p>
-          <ul className="list-inside list-disc text-sm text-gray-600">
+          <p className="text-sm font-semibold text-white">Tp Hồ Chí Minh:</p>
+          <ul className="list-inside list-disc text-sm text-white">
             <li>43 Huỳnh Văn Bánh, P.17, Q.Phú Nhuận.</li>
           </ul>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-white">
             <span className="font-semibold">Điện thoại:</span> 0999999999
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-white">
             <span className="font-semibold">Email:</span> halo@gmail.com
           </p>
         </div>
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Hỗ trợ khách hàng</h2>
-          <ul className="text-sm text-gray-600 space-y-2">
+          <ul className="text-sm text-white space-y-2">
             <li>
               <Link href="/" className="hover:text-[#034292]">
                 Giới thiệu về HALO
@@ -61,7 +61,7 @@ export default function Footer() {
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Điều khoản & điều kiện</h2>
-          <ul className="text-sm text-gray-600 space-y-2">
+          <ul className="text-sm text-white space-y-2">
             <li>
               <Link href="/" className="hover:text-[#034292]">
                 Chính sách & quy định
@@ -89,7 +89,7 @@ export default function Footer() {
             placeholder="Nhập email của bạn"
             className="w-[280px] px-4 py-2 focus:outline-none"
           />
-          <button className="absolute top-[8px] right-[12px] text-gray-600">
+          <button className="absolute top-[8px] right-[12px] text-white">
             <Send />
           </button>
         </form>
@@ -132,7 +132,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <p className="text-center mt-4">
+      <p className="text-center mt-4 text-white.">
         &copy;2025{" "}
         <Link href="/" className="hover:text-[#034292]" title="Trang chủ">
           HALO

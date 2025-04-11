@@ -22,17 +22,17 @@ export default function Product({ products = [], limit = Infinity, columns = 3 }
         <Link key={product._id || index} href={`/pages/trangchitiet/${product._id}`} className="block">
           <div className="relative bg-white shadow-md rounded-lg p-4 transition-all duration-300 hover:shadow-lg hover:scale-102 h-full flex flex-col min-w-[200px] mx-auto">
             {product?.hot === 1 && (
-              <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">
+              <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
                 HOT
               </div>
             )}
-            <div className="w-full h-[240px] overflow-hidden rounded-md flex-shrink-0 flex items-center justify-center bg-gray-100">
+            <div className="w-full h-[240px] overflow-hidden rounded-md flex-shrink-0 relative bg-gray-100">
               <Image
                 src={product?.hinhanh || "/assets/images/default.webp"}
-                width={240}
-                height={240}
-                className="object-contain w-full h-full cursor-pointer transition duration-300 ease-in-out"
                 alt={product?.name || "Sản phẩm"}
+                fill
+                style={{ objectFit: "cover" }}
+                className="rounded-md cursor-pointer transition duration-300 ease-in-out"
                 priority={index < 3}
                 quality={80}
               />

@@ -28,7 +28,8 @@ const nextConfig: NextConfig = {
       "i8.amplience.net",
       "supersports.com.vn",
       "sneakerdaily.vn",
-      "www.reebok.com"
+      "www.reebok.com",
+      "footgearh.vn"
     ],
   },
 };
