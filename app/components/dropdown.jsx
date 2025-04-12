@@ -19,8 +19,8 @@ export default function DropDown({
 
   const genderOptions = [
     { value: "all", label: "Tất cả giới tính" },
-    { value: "Giày Nam", label: "Giày Nam" },
-    { value: "Giày Nữ", label: "Giày Nữ" },
+    { value: "Nam", label: "Giày Nam" },
+    { value: "Nữ", label: "Giày Nữ" },
   ];
 
   const handleSortChange = (e) => onSortChange(e.target.value);

@@ -1,57 +1,114 @@
-import React, { useState } from "react";
+"use client";
 
-const vouchers = [
-  { code: "PEAK10", discount: "10K", condition: "500k", expiry: "31/03/2025" },
-  { code: "PEAK50", discount: "50K", condition: "1500k", expiry: "31/03/2025" },
-  { code: "PEAK100", discount: "100K", condition: "2500k", expiry: "31/03/2025" },
-  { code: "PEAK200", discount: "200K", condition: "4000k", expiry: "31/03/2025" },
-];
+import React, { useState, useEffect } from "react";
 
-const VoucherList = () => {
-  const [copiedVoucher, setCopiedVoucher] = useState(null);
+const VoucherFloatingButton = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [vouchers, setVouchers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(null); // Track which voucher code was copied
 
-  const copyToClipboard = (code) => {
-    navigator.clipboard.writeText(code);
-    setCopiedVoucher(code);
+  // Fetch dữ liệu voucher từ API
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("https://datn-api-production.up.railway.app/voucher");
+        if (!response.ok) {
+          throw new Error("Lỗi khi lấy dữ liệu");
+        }
+        const data = await response.json();
+        setVouchers(data); // Lưu dữ liệu vào state
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Đặt timeout để reset lại nút sau 10 giây
-    setTimeout(() => {
-      setCopiedVoucher(null);
-    }, 3000);
+    fetchVouchers();
+  }, []); // Gọi API khi component mount
+
+  // Hàm xử lý khi click vào nút nổi
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  // Hàm xử lý sao chép mã voucher
+  const handleCopy = async (code) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(code); // Mark this code as copied
+      setTimeout(() => setCopiedCode(null), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error("Lỗi khi sao chép:", err);
+    }
   };
 
   return (
-    <div className="my-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Khuyến Mãi Hấp Dẫn</h2>
-      <div className="grid grid-cols-4 gap-4">
-        {vouchers.map((voucher, index) => (
-          <div key={index} className="bg-white shadow-md rounded-lg p-4 border border-gray-200 text-center">
-            <p className="text-blue-600 font-semibold">NHẬP MÃ: {voucher.code}</p>
-            <p className="text-gray-600 text-sm">Giảm {voucher.discount} cho đơn hàng từ {voucher.condition}</p>
+    <div className="relative">
+      {/* Nút nổi */}
+      <button
+        onClick={toggleModal}
+        className="fixed bottom-16 right-8 bg-blue-600 text-white rounded-full px-4 py-2 flex items-center justify-center shadow-lg hover:bg-blue-700 transition duration-300 z-20"
+      >
+        <span className="text-base font-semibold">Voucher</span>
+      </button>
 
-            <div className="flex justify-center my-2">
-              <div className="bg-blue-500 text-white w-16 h-16 flex flex-col items-center justify-center rounded-md">
-                <span className="text-xs">VOUCHER</span>
-                <span className="text-lg font-bold">{voucher.discount}</span>
-              </div>
+      {/* Bảng thông báo voucher */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Danh sách Voucher</h2>
+              <button onClick={toggleModal} className="text-gray-500 hover:text-gray-700">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
-            <p className="text-gray-500 text-sm">Mã: <strong>{voucher.code}</strong></p>
-            <p className="text-gray-500 text-sm">HSD: {voucher.expiry}</p>
-
-            <button
-              onClick={() => copyToClipboard(voucher.code)}
-              className={`mt-2 px-4 py-1 rounded-md transition ${
-                copiedVoucher === voucher.code ? "bg-blue-300 text-white" : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              {copiedVoucher === voucher.code ? "Đã sao chép" : "Sao chép"}
-            </button>
+            {/* Trạng thái loading hoặc lỗi */}
+            {loading ? (
+              <p className="text-gray-500">Đang tải dữ liệu...</p>
+            ) : error ? (
+              <p className="text-red-500">Lỗi: {error}</p>
+            ) : (
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {vouchers.length > 0 ? (
+                  vouchers.map((voucher, index) => (
+                    <div
+                      key={voucher.id || `${voucher.code}-${index}`}
+                      className="border p-4 rounded-lg shadow-sm"
+                    >
+                      <p className="font-semibold text-lg">{voucher.code}</p>
+                      <p className="text-gray-600">Giảm giá: {voucher.value}%</p>
+                      {/* <p className="text-gray-500 text-sm">Thời hạn: {voucher.status}</p> */}
+                      <button
+                        onClick={() => handleCopy(voucher.code)}
+                        className="mt-2 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition duration-300"
+                      >
+                        {copiedCode === voucher.code ? "Đã sao chép!" : "Sao chép"}
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">Hiện tại không có voucher nào.</p>
+                )}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default VoucherList;
+export default VoucherFloatingButton;

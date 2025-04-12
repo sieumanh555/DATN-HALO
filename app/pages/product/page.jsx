@@ -18,7 +18,7 @@ export default function Products() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 5000000 });
-  const [selectedCategories, setSelectedCategories] = useState([]); // Đổi thành mảng
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [sortOption, setSortOption] = useState("");
   const [filterOption, setFilterOption] = useState("all");
   const [genderOption, setGenderOption] = useState("all");
@@ -54,7 +54,7 @@ export default function Products() {
     const gender = searchParams.get("gender");
     if (filter) setFilterOption(filter);
     if (category) setSelectedCategories(category === "all" ? [] : [category]);
-    if (gender) setGenderOption(gender);
+    if (gender) setGenderOption(gender); // Now expects "all", "Nam", or "Nữ"
   }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
@@ -67,9 +67,11 @@ export default function Products() {
       );
     }
 
-    // Gender filter
+    // Gender filter (based on product name)
     if (genderOption !== "all") {
-      result = result.filter((product) => product.gender === genderOption);
+      result = result.filter((product) =>
+        product.name?.toLowerCase().includes(genderOption.toLowerCase())
+      );
     }
 
     // Filter options (hot, new, discount)
@@ -125,7 +127,7 @@ export default function Products() {
     return result;
   }, [
     initialProducts,
-    selectedCategories, // Cập nhật dependency
+    selectedCategories,
     filterOption,
     genderOption,
     priceRange,
@@ -134,7 +136,6 @@ export default function Products() {
   ]);
 
   const handleCategoryChange = useCallback((categories) => {
-    // Xử lý cả mảng hoặc chuỗi "all"
     setSelectedCategories(categories === "all" ? [] : categories);
   }, []);
 
@@ -150,7 +151,7 @@ export default function Products() {
   const resetFilters = useCallback(() => {
     setSearchQuery("");
     setPriceRange({ min: 0, max: maxPrice });
-    setSelectedCategories([]); // Đặt lại về rỗng (tương đương "all")
+    setSelectedCategories([]);
     setSortOption("");
     setFilterOption("all");
     setGenderOption("all");
@@ -207,7 +208,7 @@ export default function Products() {
             ))}
             <button
               onClick={resetFilters}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 rounded-lg mt-4"
+              className="w-full bg-gray-200 hover:bg-blue-400 hover:text-white text-gray-900 font-semibold py-2 rounded-lg mt-4"
             >
               Đặt lại
             </button>

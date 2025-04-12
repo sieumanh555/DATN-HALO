@@ -107,8 +107,8 @@ export default function Header() {
         <div className="md:hidden bg-white py-4 px-6 space-y-4 text-center">
           <Link href="/pages/product" className="block hover:text-gray-400">TẤT CẢ SẢN PHẨM</Link>
           <Link href="/pages/product?filter=discount" className="block hover:text-gray-400">SẢN PHẨM ƯU ĐÃI</Link>
-          <Link href="/pages/product?category=Giày nam" className="block hover:text-gray-400">GIÀY NAM</Link>
-          <Link href="/pages/product?category=Giày nữ" className="block hover:text-gray-400">GIÀY NỮ</Link>
+          <Link href="/pages/product?gender=Nam" className="block hover:text-gray-400">GIÀY NAM</Link>
+          <Link href="/pages/product?gender=Nữ" className="block hover:text-gray-400">GIÀY NỮ</Link>
           <Link href="/pages/product?category=Phụ Kiện" className="block hover:text-gray-400">PHỤ KIỆN</Link>
           <Link href="/pages/tintuc" className="block hover:text-gray-400">TIN TỨC</Link>
         </div>
@@ -117,8 +117,8 @@ export default function Header() {
         <div className="w-[90%] mx-auto flex justify-between">
           <Link href="/pages/product" className="hover:text-gray-400">TẤT CẢ SẢN PHẨM</Link>
           <Link href="/pages/product?filter=discount" className="hover:text-gray-400">SẢN PHẨM ƯU ĐÃI</Link>
-          <Link href="/pages/product?category=Giày nam" className="hover:text-gray-400">GIÀY NAM</Link>
-          <Link href="/pages/product?category=Giày nữ" className="hover:text-gray-400">GIÀY NỮ</Link>
+          <Link href="/pages/product?gender=Nam" className="hover:text-gray-400">GIÀY NAM</Link>
+          <Link href="/pages/product?gender=Nữ" className="hover:text-gray-400">GIÀY NỮ</Link>
           <Link href="/pages/product?category=Phụ Kiện" className="hover:text-gray-400">PHỤ KIỆN</Link>
           <Link href="/pages/tintuc" className="hover:text-gray-400">TIN TỨC</Link>
         </div>

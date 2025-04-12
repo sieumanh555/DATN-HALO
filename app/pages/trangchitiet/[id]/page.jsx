@@ -1,3 +1,4 @@
+// pages/trangchitiet.jsx
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -5,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "next/navigation";
 import Product from "../../../components/product";
+import Dhsize from "@/app/components/hdsize";
 
 export default function Trangchitiet() {
   const { id } = useParams();
@@ -14,6 +16,7 @@ export default function Trangchitiet() {
   const [error, setError] = useState(null);
   const [imageHeight, setImageHeight] = useState("auto");
   const productInfoRef = useRef(null);
+  const [showSizeGuide, setShowSizeGuide] = useState(false); // State to control modal visibility
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -103,7 +106,6 @@ export default function Trangchitiet() {
     if (variant && variant.stock > 0) {
       setSelectedColor(variant);
     } else {
-      // Chọn màu hết hàng, giữ images của selectedColor hiện tại hoặc rỗng
       setSelectedColor({
         color,
         stock: 0,
@@ -215,7 +217,7 @@ export default function Trangchitiet() {
               alt={product.name || "Product"}
               width={600}
               height={520}
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-full" // Sử dụng object-cover để đảm bảo ảnh lấp đầy
               priority
             />
           </div>
@@ -243,7 +245,7 @@ export default function Trangchitiet() {
             </div>
 
             {/* Stock Status */}
-            <div className="mt-3">
+            <div className="mt-2">
               {selectedSize && selectedColor ? (
                 selectedColor.stock > 0 ? (
                   <p className="text-blue-600 font-medium">Tình trạng: Còn hàng ({selectedColor.stock})</p>
@@ -258,7 +260,16 @@ export default function Trangchitiet() {
             </div>
 
             <div className="mt-2">
-              <h3 className="text-lg font-medium">Size</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Size</h3>
+                {/* Add "Hướng dẫn chọn size" link */}
+                <button
+                  onClick={() => setShowSizeGuide(true)}
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  Hướng dẫn chọn size
+                </button>
+              </div>
               <div className="flex gap-3 mt-2">
                 {sizes.map((size) => (
                   <div
@@ -336,149 +347,149 @@ export default function Trangchitiet() {
       </div>
 
       {/* Comments Section */}
-<div className="mt-6 w-full">
-  <h3 className="text-lg font-medium text-gray-700">Bình luận</h3>
-  <div className="flex items-center mt-4">
-    <input
-      type="text"
-      placeholder="Viết bình luận..."
-      className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      value={comment}
-      onChange={(e) => setComment(e.target.value)}
-      onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
-    />
-    <button
-      className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-      onClick={handleAddComment}
-    >
-      Gửi
-    </button>
-  </div>
-  <div className="mt-4">
-    {comments.length === 0 ? (
-      <p className="text-gray-500">Không có bình luận.</p>
-    ) : (
-      <ul className="space-y-4">
-        {comments.map((cmt) => (
-          <li key={cmt.id} className="p-3 border rounded-lg bg-gray-100">
-            <div className="flex items-start gap-3">
-              <img src={cmt.avatar} alt="Avatar" className="w-10 h-10 rounded-full border" />
-              <div className="flex-1">
-                <span className="font-bold text-blue-600">{cmt.username}</span>
-                <p className="text-gray-800">{cmt.content}</p>
-                <span className="text-gray-500 text-sm">{cmt.time}</span>
-                <div className="flex gap-4 mt-1">
-                  <button
-                    className={`text-lg flex items-center gap-1 ${
-                      likedComments[cmt.id] ? "text-blue-600" : "text-gray-600 hover:text-gray-800"
-                    }`}
-                    onClick={() => toggleLike(cmt.id)}
-                  >
-                    <FontAwesomeIcon icon={faThumbsUp} /> {likes[cmt.id] || 0}
-                  </button>
-                  <button
-                    className={`text-lg flex items-center gap-1 ${
-                      dislikedComments[cmt.id] ? "text-red-600" : "text-gray-600 hover:text-gray-800"
-                    }`}
-                    onClick={() => toggleDislike(cmt.id)}
-                  >
-                    <FontAwesomeIcon icon={faThumbsDown} /> {dislikes[cmt.id] || 0}
-                  </button>
-                  <button
-                    className="text-sm text-gray-600 hover:text-blue-600"
-                    onClick={() => setReplyInput((prev) => ({ ...prev, [cmt.id]: prev[cmt.id] || "" }))}
-                  >
-                    Trả lời
-                  </button>
-                </div>
+      <div className="mt-6 w-full">
+        <h3 className="text-lg font-medium text-gray-700">Bình luận</h3>
+        <div className="flex items-center mt-4">
+          <input
+            type="text"
+            placeholder="Viết bình luận..."
+            className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
+          />
+          <button
+            className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            onClick={handleAddComment}
+          >
+            Gửi
+          </button>
+        </div>
+        <div className="mt-4">
+          {comments.length === 0 ? (
+            <p className="text-gray-500">Không có bình luận.</p>
+          ) : (
+            <ul className="space-y-4">
+              {comments.map((cmt) => (
+                <li key={cmt.id} className="p-3 border rounded-lg bg-gray-100">
+                  <div className="flex items-start gap-3">
+                    <img src={cmt.avatar} alt="Avatar" className="w-10 h-10 rounded-full border" />
+                    <div className="flex-1">
+                      <span className="font-bold text-blue-600">{cmt.username}</span>
+                      <p className="text-gray-800">{cmt.content}</p>
+                      <span className="text-gray-500 text-sm">{cmt.time}</span>
+                      <div className="flex gap-4 mt-1">
+                        <button
+                          className={`text-lg flex items-center gap-1 ${
+                            likedComments[cmt.id] ? "text-blue-600" : "text-gray-600 hover:text-gray-800"
+                          }`}
+                          onClick={() => toggleLike(cmt.id)}
+                        >
+                          <FontAwesomeIcon icon={faThumbsUp} /> {likes[cmt.id] || 0}
+                        </button>
+                        <button
+                          className={`text-lg flex items-center gap-1 ${
+                            dislikedComments[cmt.id] ? "text-red-600" : "text-gray-600 hover:text-gray-800"
+                          }`}
+                          onClick={() => toggleDislike(cmt.id)}
+                        >
+                          <FontAwesomeIcon icon={faThumbsDown} /> {dislikes[cmt.id] || 0}
+                        </button>
+                        <button
+                          className="text-sm text-gray-600 hover:text-blue-600"
+                          onClick={() => setReplyInput((prev) => ({ ...prev, [cmt.id]: prev[cmt.id] || "" }))}
+                        >
+                          Trả lời
+                        </button>
+                      </div>
 
-                {/* Reply Input */}
-                {replyInput[cmt.id] !== undefined && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="Viết câu trả lời..."
-                      className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      value={replyInput[cmt.id]}
-                      onChange={(e) =>
-                        setReplyInput((prev) => ({ ...prev, [cmt.id]: e.target.value }))
-                      }
-                      onKeyDown={(e) => e.key === "Enter" && handleAddReply(cmt.id)}
-                    />
-                    <button
-                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                      onClick={() => handleAddReply(cmt.id)}
-                    >
-                      Gửi
-                    </button>
+                      {/* Reply Input */}
+                      {replyInput[cmt.id] !== undefined && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder="Viết câu trả lời..."
+                            className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={replyInput[cmt.id]}
+                            onChange={(e) =>
+                              setReplyInput((prev) => ({ ...prev, [cmt.id]: e.target.value }))
+                            }
+                            onKeyDown={(e) => e.key === "Enter" && handleAddReply(cmt.id)}
+                          />
+                          <button
+                            className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                            onClick={() => handleAddReply(cmt.id)}
+                          >
+                            Gửi
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Reply Toggle */}
+                      {cmt.replies.length > 0 && (
+                        <div className="mt-2">
+                          <button
+                            className="text-sm text-gray-600 hover:text-blue-600"
+                            onClick={() => toggleShowReplies(cmt.id)}
+                          >
+                            {showReplies[cmt.id] ? "Ẩn phản hồi" : `Xem ${cmt.replies.length} phản hồi`}
+                          </button>
+
+                          {/* Replies */}
+                          {showReplies[cmt.id] && (
+                            <ul className="mt-2 ml-6 space-y-2">
+                              {cmt.replies.map((reply) => (
+                                <li key={reply.id} className="border-l-2 pl-2">
+                                  <div className="flex items-start gap-2">
+                                    <img
+                                      src={reply.avatar}
+                                      alt="Avatar"
+                                      className="w-8 h-8 rounded-full border"
+                                    />
+                                    <div>
+                                      <span className="font-bold text-blue-600">{reply.username}</span>
+                                      <p className="text-gray-800">{reply.content}</p>
+                                      <span className="text-gray-500 text-sm">{reply.time}</span>
+                                      <div className="flex gap-4 mt-1">
+                                        <button
+                                          className={`text-sm flex items-center gap-1 ${
+                                            likedComments[`${cmt.id}-${reply.id}`]
+                                              ? "text-blue-600"
+                                              : "text-gray-600 hover:text-gray-800"
+                                          }`}
+                                          onClick={() => toggleLike(reply.id, true, cmt.id)}
+                                        >
+                                          <FontAwesomeIcon icon={faThumbsUp} />{" "}
+                                          {likes[`${cmt.id}-${reply.id}`] || 0}
+                                        </button>
+                                        <button
+                                          className={`text-sm flex items-center gap-1 ${
+                                            dislikedComments[`${cmt.id}-${reply.id}`]
+                                              ? "text-red-600"
+                                              : "text-gray-600 hover:text-gray-800"
+                                          }`}
+                                          onClick={() => toggleDislike(reply.id, true, cmt.id)}
+                                        >
+                                          <FontAwesomeIcon icon={faThumbsDown} />{" "}
+                                          {dislikes[`${cmt.id}-${reply.id}`] || 0}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-
-                {/* Reply Toggle */}
-                {cmt.replies.length > 0 && (
-                  <div className="mt-2">
-                    <button
-                      className="text-sm text-gray-600 hover:text-blue-600"
-                      onClick={() => toggleShowReplies(cmt.id)}
-                    >
-                      {showReplies[cmt.id] ? "Ẩn phản hồi" : `Xem ${cmt.replies.length} phản hồi`}
-                    </button>
-
-                    {/* Replies */}
-                    {showReplies[cmt.id] && (
-                      <ul className="mt-2 ml-6 space-y-2">
-                        {cmt.replies.map((reply) => (
-                          <li key={reply.id} className="border-l-2 pl-2">
-                            <div className="flex items-start gap-2">
-                              <img
-                                src={reply.avatar}
-                                alt="Avatar"
-                                className="w-8 h-8 rounded-full border"
-                              />
-                              <div>
-                                <span className="font-bold text-blue-600">{reply.username}</span>
-                                <p className="text-gray-800">{reply.content}</p>
-                                <span className="text-gray-500 text-sm">{reply.time}</span>
-                                <div className="flex gap-4 mt-1">
-                                  <button
-                                    className={`text-sm flex items-center gap-1 ${
-                                      likedComments[`${cmt.id}-${reply.id}`]
-                                        ? "text-blue-600"
-                                        : "text-gray-600 hover:text-gray-800"
-                                    }`}
-                                    onClick={() => toggleLike(reply.id, true, cmt.id)}
-                                  >
-                                    <FontAwesomeIcon icon={faThumbsUp} />{" "}
-                                    {likes[`${cmt.id}-${reply.id}`] || 0}
-                                  </button>
-                                  <button
-                                    className={`text-sm flex items-center gap-1 ${
-                                      dislikedComments[`${cmt.id}-${reply.id}`]
-                                        ? "text-red-600"
-                                        : "text-gray-600 hover:text-gray-800"
-                                    }`}
-                                    onClick={() => toggleDislike(reply.id, true, cmt.id)}
-                                  >
-                                    <FontAwesomeIcon icon={faThumbsDown} />{" "}
-                                    {dislikes[`${cmt.id}-${reply.id}`] || 0}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
 
       {/* Related Products */}
       <div className="mt-10">
@@ -487,6 +498,9 @@ export default function Trangchitiet() {
           <Product products={relatedProducts} limit={3} />
         </div>
       </div>
+
+      {/* Render Size Guide Modal */}
+      {showSizeGuide && <Dhsize onClose={() => setShowSizeGuide(false)} />}
     </div>
   );
 }
