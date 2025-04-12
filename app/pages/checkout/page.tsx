@@ -1,6 +1,4 @@
 "use client";
-import * as Yup from "yup";
-import {Field, Form, Formik} from "formik";
 import Image from "next/image";
 import {useEffect, useMemo, useState} from "react";
 import {useSelector} from "react-redux";
@@ -26,6 +24,12 @@ export default function CheckOut() {
         percent: 0,
         stock: 0,
     });
+    const [name, setName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [zipcode, setZipcode] = useState("");
+    const [address, setAddress] = useState("");
+    const [note, setNote] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState("COD");
     const [popup, setPopup] = useState(false);
     const [checkoutPopup, setCheckoutPopup] = useState(false);
 
@@ -44,29 +48,9 @@ export default function CheckOut() {
         return finalTotal > 0 ? finalTotal : 0;
     }, [subTotal, shipping, discount]);
     const percent = Math.abs(Math.ceil(((total - subTotal + shipping) * 100) / (total + shipping)));
-    const validationSchema = Yup.object().shape({
-        name: Yup.string()
-            .trim()
-            .required("* Vui lòng nhập tên"),
-        phone: Yup.string()
-            .trim()
-            .length(10, "Vui lòng nhập đủ 10 số")
-            .required("* Vui lòng nhập số điện thoại"),
-        email: Yup.string()
-            .trim()
-            .email("* Email không hợp lệ")
-            .required("* Vui lòng nhập email"),
-        zipcode: Yup.string()
-            .trim()
-            .length(5, "Vui lòng nhập đúng mã bưu điện")
-            .required("* Vui lòng nhập mã bưu điện"),
-        address: Yup.string()
-            .required("* Vui lòng nhập địa chỉ"),
-    });
-    const updateUserInfo = async (values: Partial<User>) => {
+    const updateUserInfo = async () => {
         try {
-            const {name, phone, email, zipcode, address} = values;
-            const data = {name, phone, email, zipcode, address};
+            const data = {name, phone, zipcode, address};
             if (user) {
                 const token = getCookieCSide("as_tn");
                 const response = await fetch(`http://localhost:3000/users/${user._id}`, {
@@ -91,9 +75,21 @@ export default function CheckOut() {
             alert("Đã xảy ra lỗi. Vui lòng thử lại sau.");
         }
     };
+    const createOrder = async () =>{
+        const userId = user?._id;
+
+    }
     useEffect(() => {
         getInformation();
     }, []);
+    useEffect(() => {
+        if (user) {
+            setName(user.name || "");
+            setPhone(user.phone || "");
+            setZipcode(user.zipcode || "");
+            setAddress(user.address || "");
+        }
+    }, [user]);
     useEffect(() => {
         fetch("http://localhost:3000/discounts")
             .then((res) => res.json())
@@ -102,143 +98,114 @@ export default function CheckOut() {
                 console.error("Lỗi fetching http://localhost:3000/discounts", err)
             );
     }, []);
+
+    console.log(paymentMethod)
     return (
         <section className="container grid grid-cols-1 md:grid-cols-2 gap-8 px-[100px] py-10 tracking-wide">
             {/* customer info */}
             {user && (
                 <div className="grid-cols-1">
                     <p className="text-3xl font-semibold">Thông tin giao hàng</p>
-                    <Formik
-                        initialValues={{
-                            name: user.name,
-                            phone: user.phone,
-                            email: user.email,
-                            zipcode: user.zipcode,
-                            address: user.address
-                        }}
-                        validationSchema={validationSchema}
-                        onSubmit={updateUserInfo}
-                    >
-                        {/*{({errors, touched}) => (*/}
-                        {({errors, touched, setTouched, handleSubmit}) => (
-                            <Form
-                                className="bg-[#fff] rounded-lg mt-6 px-8 py-6 flex flex-wrap gap-x-[14px] gap-y-4"
-                                onSubmit={(e) => {
-                                    e.preventDefault(); // Ngăn submit mặc định
-                                    // Force touch tất cả field
-                                    setTouched({
-                                        name: true,
-                                        phone: true,
-                                        email: true,
-                                        zipcode: true,
-                                        address: true,
-                                    });
-                                    handleSubmit(); // Sau đó gọi submit
-                                }}
-                            >
-                                {/*name*/}
-                                <div className="w-[280px] flex flex-col">
-                                    <label htmlFor="name" className="font-semibold">
-                                        Họ và tên
-                                    </label>
-                                    <Field
-                                        id="name"
-                                        name="name"
-                                        type="text"
-                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                                    />
-                                    {errors.name && touched.name && (
-                                        <div className="text-xs text-red-500 mt-1">{errors.name}</div>
-                                    )}
-                                </div>
+                    <div className={`bg-[#fff] rounded-lg mt-6 px-8 py-6 flex flex-wrap gap-x-[14px] gap-y-4`}>
+                        {/*name*/}
+                        <div className="w-[280px] flex flex-col">
+                            <label htmlFor="name" className="font-semibold">
+                                Họ và tên
+                            </label>
+                            <input
+                                id="name"
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                            />
+                        </div>
 
-                                {/*phone*/}
-                                <div className="w-[280px] flex flex-col">
-                                    <label htmlFor="phone" className="font-semibold">
-                                        Số điện thoại
-                                    </label>
-                                    <Field
-                                        id="phone"
-                                        name="phone"
-                                        type="text"
-                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                                    />
-                                    {errors.phone && touched.phone && (
-                                        <div className="text-xs text-red-500 mt-1">{errors.phone}</div>
-                                    )}
-                                </div>
+                        {/*phone*/}
+                        <div className="w-[280px] flex flex-col">
+                            <label htmlFor="phone" className="font-semibold">
+                                Số điện thoại
+                            </label>
+                            <input
+                                id="phone"
+                                type="text"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                            />
 
-                                {/*email*/}
-                                <div className="w-[280px] flex flex-col">
-                                    <label htmlFor="email" className="font-semibold">
-                                        Email
-                                    </label>
-                                    <Field
-                                        id="email"
-                                        name="email"
-                                        type="text"
-                                        readOnly
-                                        disabled
-                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded  hover:cursor-not-allowed focus:outline-none"
-                                    />
-                                </div>
+                        </div>
 
-                                {/*zipcode*/}
-                                <div className="w-[80px] flex flex-col">
-                                    <label htmlFor="zipcode" className="font-semibold">
-                                        ZIP
-                                    </label>
-                                    {/*<select id="zipcode">*/}
-                                    {/*    {zipcode.map((item) => item.code.map((code) => (*/}
-                                    {/*        <option key={code.code} value={code.code} className={`p-2`}>{`${code.code} - ${code.name}`}</option>*/}
-                                    {/*    )))*/}
-                                    {/*    }*/}
-                                    {/*</select>*/}
-                                    <Field
-                                        id="zipcode"
-                                        name="zipcode"
-                                        type="text"
-                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                                    />
-                                </div>
+                        {/*email*/}
+                        <div className="w-[280px] flex flex-col">
+                            <label htmlFor="email" className="font-semibold">
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                type="text"
+                                value={user?.email}
+                                readOnly
+                                disabled
+                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded  hover:cursor-not-allowed"
+                            />
+                        </div>
 
-                                {/*address*/}
-                                <div className="w-full flex flex-col">
-                                    <label htmlFor="address" className="font-semibold">
-                                        Địa chỉ
-                                    </label>
-                                    <Field
-                                        id="address"
-                                        name="address"
-                                        type="text"
-                                        className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                                    />
-                                    {errors.address && touched.address && (
-                                        <div className="text-xs text-red-500 mt-1">{errors.address}</div>
-                                    )}
-                                </div>
+                        {/*zipcode*/}
+                        <div className="w-[80px] flex flex-col">
+                            <label htmlFor="zipcode" className="font-semibold">
+                                ZIP
+                            </label>
+                            {/*<select id="zipcode">*/}
+                            {/*    {zipcode.map((item) => item.code.map((code) => (*/}
+                            {/*        <option key={code.code} value={code.code} className={`p-2`}>{`${code.code} - ${code.name}`}</option>*/}
+                            {/*    )))*/}
+                            {/*    }*/}
+                            {/*</select>*/}
+                            <input
+                                id="zipcode"
+                                type="text"
+                                value={zipcode}
+                                onChange={(e) => setZipcode(e.target.value)}
+                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                            />
+                        </div>
 
-                                <div className="w-full flex flex-col">
-                                    <label htmlFor="note" className="font-semibold">
-                                        Ghi chú
-                                    </label>
-                                    <textarea
-                                        id="note"
-                                        placeholder="dunno :v"
-                                        className="w-full h-[100px] text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
-                                    ></textarea>
-                                </div>
+                        {/*address*/}
+                        <div className="w-full flex flex-col">
+                            <label htmlFor="address" className="font-semibold">
+                                Địa chỉ
+                            </label>
+                            <input
+                                id="address"
+                                type="text"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                            />
+                        </div>
 
-                                {/* Submit button */}
-                                <button
-                                    type="submit"
-                                    className="w-[10%] h-8 bg-[#034292] hover:bg-[#023170] text-white rounded mt-2 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
-                                >
-                                    Lưu
-                                </button>
-                            </Form>
-                        )}
-                    </Formik>
+                        <div className="w-full flex flex-col">
+                            <label htmlFor="note" className="font-semibold">
+                                Ghi chú
+                            </label>
+                            <textarea
+                                id="note"
+                                name="note"
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                className="w-full h-[100px] text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                            ></textarea>
+                        </div>
+
+                        {/* Submit button */}
+                        <button
+                            onClick={()=> updateUserInfo()}
+                            className="w-[10%] h-8 bg-blue-700 hover:bg-blue-600 text-white rounded mt-2 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                        >
+                            Lưu
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -247,12 +214,15 @@ export default function CheckOut() {
                 <p className="text-3xl font-bold">Phương thức thanh toán</p>
                 {/*payment*/}
                 <div className="bg-[#fff] mt-[24px] rounded-lg px-[30px] py-[20px] flex justify-evenly">
+
                     <div className="w-[240px] flex justify-center items-center">
                         <input
-                            type="radio"
-                            name="paymentMethod"
                             id="cod"
+                            name="paymentMethod"
                             defaultChecked
+                            type="radio"
+                            value="cod"
+                            onChange={(e)=> setPaymentMethod(e.target.value)}
                             className="w-[14px] h-[14px] cursor-pointer"
                         />
                         <label htmlFor="cod" className="ml-[8px] cursor-pointer">
@@ -262,9 +232,11 @@ export default function CheckOut() {
 
                     <div className="w-[240px] flex justify-center items-center">
                         <input
-                            type="radio"
+                            id="zalopay"
                             name="paymentMethod"
-                            id="pos"
+                            type="radio"
+                            value="zalopay"
+                            onChange={(e)=> setPaymentMethod(e.target.value)}
                             className="w-[14px] h-[14px] cursor-pointer"
                         />
                         <label htmlFor="pos" className="ml-[8px] cursor-pointer">
@@ -274,15 +246,18 @@ export default function CheckOut() {
 
                     <div className="w-[240px] flex justify-center items-center">
                         <input
-                            type="radio"
-                            name="paymentMethod"
                             id="creditCard"
+                            name="paymentMethod"
+                            type="radio"
+                            value="creditCard"
+                            onChange={(e)=> setPaymentMethod(e.target.value)}
                             className="w-[14px] h-[14px] cursor-pointer"
                         />
                         <label htmlFor="creditCard" className="ml-[8px] cursor-pointer">
-                            Thẻ tín dụng
+                            Thẻ ngân hàng
                         </label>
                     </div>
+
                 </div>
 
                 {/*order info*/}
@@ -388,7 +363,7 @@ export default function CheckOut() {
                                     {total.toLocaleString("vi-VN")}đ (-{percent}%)
                                 </p>
                                 <p className="line-through">
-                                    {subTotal.toLocaleString("vi-VN")}đ
+                                    {(subTotal + shipping).toLocaleString("vi-VN")}đ
                                 </p>
                             </div>
                         ) : (

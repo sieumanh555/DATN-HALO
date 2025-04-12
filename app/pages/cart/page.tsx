@@ -20,6 +20,7 @@ import CartEmpty from "../../components/cart/cartEmpty";
 export default function Cart() {
     const router = useRouter();
     const dispatch = useDispatch();
+    const token = getCookieCSide("as_tn");
     const cart = useSelector((state: CartState) => state.cart.products || []);
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || [])
     const [popup, setPopup] = useState(false);
@@ -64,7 +65,6 @@ export default function Cart() {
     }
 
     const handleCheckout = () => {
-        const token = getCookieCSide("as_tn");
         if (!token) {
             router.push("/pages/login");
         } else {
@@ -79,7 +79,6 @@ export default function Cart() {
     );
     if (!data) return <div>Loading...</div>;
     if (error) return <div>Lỗi fetching data: {error.message}</div>;
-    console.log(">>>Checkout: ", checkout);
     return (
         <section className="px-[100px] py-6 bg-[#F2F4F7] tracking-wide">
             {cart.length > 0 ? (
@@ -162,11 +161,19 @@ export default function Cart() {
                             </div>
 
 
-                            <button
-                                onClick={() => handleCheckout()}
-                                className="w-full h-10 mt-[18px] bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
-                                Thanh toán
-                            </button>
+                            {checkout.length > 0 && token!== null ? (
+                                <button
+                                    onClick={() => handleCheckout()}
+                                    className="w-full h-10 mt-[18px] bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
+                                    Thanh toán
+                                </button>
+                            ): (
+                                <button
+                                    disabled
+                                    className="w-full h-10 mt-[18px] bg-gray-400  rounded">
+                                    Thanh toán
+                                </button>
+                            )}
 
                         </div>
                     </div>

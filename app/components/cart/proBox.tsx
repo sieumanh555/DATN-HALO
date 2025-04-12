@@ -58,7 +58,7 @@ export default function ProBox({data}: { data: ProductCart }) {
         <div className="w-full bg-white opacity-100 rounded-lg mt-[18px] p-[20px] flex justify-between">
             <button
                 onClick={() => handleCheckout({...data, selectedColor: selectedColor, selectedSize: selectedSize})}
-                className={`w-6 h-6 ${checked ? 'bg-blue-600 text-white' : 'bg-white'} p-1 border rounded flex justify-center items-center`}>
+                className={`w-6 h-6 ${checked ? 'bg-blue-600 text-white' : 'bg-white'} mt-12 p-1 border rounded flex items-center`}>
                 {checked ? (
                     <Check strokeWidth={4}/>
                 ) : (
