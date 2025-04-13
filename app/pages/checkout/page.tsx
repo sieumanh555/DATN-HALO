@@ -8,11 +8,16 @@ import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSid
 import Discount from "../../models/Discount";
 import type User from "@/app/models/User";
 import {CheckoutState} from "../../models/CartState";
-
+import {OrderRequest} from "@/app/models/Order";
 
 export default function CheckOut() {
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
     const [user, setUser] = useState<User | null>(null);
+    const [name, setName] = useState(user?.name || "");
+    const [phone, setPhone] = useState(user?.phone || "");
+    const [zipcode, setZipcode] = useState(user?.zipcode || "");
+    const [address, setAddress] = useState(user?.address || "");
+    const [note, setNote] = useState("");
     const [shipping, setShipping] = useState<number>(40000);
     const [discounts, setDiscounts] = useState<Discount[]>([]);
     const [discount, setDiscount] = useState<Discount>({
@@ -24,14 +29,11 @@ export default function CheckOut() {
         percent: 0,
         stock: 0,
     });
-    const [name, setName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [zipcode, setZipcode] = useState("");
-    const [address, setAddress] = useState("");
-    const [note, setNote] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState("COD");
+    const [paymentMethod, setPaymentMethod] = useState("cod");
+    const [order, setOrder] = useState<OrderRequest | null>(null);
     const [popup, setPopup] = useState(false);
     const [checkoutPopup, setCheckoutPopup] = useState(false);
+    const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
     const getInformation = () => {
         const info = getPayload();
@@ -75,10 +77,43 @@ export default function CheckOut() {
             alert("Đã xảy ra lỗi. Vui lòng thử lại sau.");
         }
     };
-    const createOrder = async () =>{
-        const userId = user?._id;
+    const createOrder = async () => {
+        switch (paymentMethod) {
+            case "cod": {
+                const paymentResponse = await fetch("http://localhost:3000/orders", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(order)
+                });
 
+                const data = await paymentResponse.json();
+                if (paymentResponse.ok) {
+                    // gửi email thông báo mua hàng thành công
+                    const timer = setTimeout(() => {
+                        setCheckoutSuccess(!checkoutSuccess)
+                    });
+                    return () => clearTimeout(timer);
+                } else {
+                    console.log("Lỗi thanh toán:", data)
+                }
+                break;
+            }
+            case "zalopay": {
+
+                break;
+            }
+            case "creditCard": {
+
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
+
     useEffect(() => {
         getInformation();
     }, []);
@@ -98,8 +133,56 @@ export default function CheckOut() {
                 console.error("Lỗi fetching http://localhost:3000/discounts", err)
             );
     }, []);
+    const createOrderDetail = async () => {
+        if (user && user._id) {
+            const {_id: userId} = user;
+            const createOrderDetail = async () => {
+                try {
+                    const response = await fetch("http://localhost:3000/orderDetails", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            items: checkout.map((item) => ({
+                                productId: item._id,
+                                selectedSize: item.selectedSize,
+                                selectedColor: item.selectedColor,
+                                quantity: item.quantityy,
+                                price: item.price
+                            }))
+                        })
+                    })
+                    if (response.ok) {
+                        const data = await response.json();
+                        const orderDetailId = data.data._id;
+                        console.log("orderDetailId: ",orderDetailId);
 
-    console.log(paymentMethod)
+                        setOrder({
+                            userId,
+                            orderDetailId: orderDetailId,
+                            amount: total,
+                            description: note,
+                            discountId: discount?._id,
+                            address: address,
+                            paymentMethod: paymentMethod,
+                            paymentStatus: "Uncompleted",
+                            shipping: shipping,
+                            status: "Processing"
+                        })
+                    }
+                } catch (err) {
+                    console.log(">>>Lỗi tạo chi tiết đơn hàng: ", err);
+                }
+            }
+            createOrderDetail();
+        }
+    }
+    const handleCreateOrder = async () => {
+        await createOrderDetail();
+        createOrder();
+    }
+    console.log(order)
     return (
         <section className="container grid grid-cols-1 md:grid-cols-2 gap-8 px-[100px] py-10 tracking-wide">
             {/* customer info */}
@@ -200,7 +283,7 @@ export default function CheckOut() {
 
                         {/* Submit button */}
                         <button
-                            onClick={()=> updateUserInfo()}
+                            onClick={() => updateUserInfo()}
                             className="w-[10%] h-8 bg-blue-700 hover:bg-blue-600 text-white rounded mt-2 transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
                         >
                             Lưu
@@ -222,7 +305,7 @@ export default function CheckOut() {
                             defaultChecked
                             type="radio"
                             value="cod"
-                            onChange={(e)=> setPaymentMethod(e.target.value)}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-[14px] h-[14px] cursor-pointer"
                         />
                         <label htmlFor="cod" className="ml-[8px] cursor-pointer">
@@ -236,7 +319,7 @@ export default function CheckOut() {
                             name="paymentMethod"
                             type="radio"
                             value="zalopay"
-                            onChange={(e)=> setPaymentMethod(e.target.value)}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-[14px] h-[14px] cursor-pointer"
                         />
                         <label htmlFor="pos" className="ml-[8px] cursor-pointer">
@@ -250,7 +333,7 @@ export default function CheckOut() {
                             name="paymentMethod"
                             type="radio"
                             value="creditCard"
-                            onChange={(e)=> setPaymentMethod(e.target.value)}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-[14px] h-[14px] cursor-pointer"
                         />
                         <label htmlFor="creditCard" className="ml-[8px] cursor-pointer">
@@ -375,7 +458,9 @@ export default function CheckOut() {
                         )}
                     </div>
 
-                    <button className="w-full h-10 bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
+                    <button
+                        onClick={() => handleCreateOrder()}
+                        className="w-full h-10 bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
                         Thanh toán
                     </button>
                 </div>
