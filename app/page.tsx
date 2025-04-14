@@ -79,7 +79,20 @@ const StorePage = () => {
     if (category === "Sản phẩm nổi bật") {
       return products.filter((product) => product.hot === 1);
     }
-    return products.filter((product) => product.category?.categoryName === category);
+    if (category === "Giày Nam") {
+      return products.filter((product) =>
+        product.name?.toLowerCase().includes("nam")
+      );
+    }
+    if (category === "Giày Nữ") {
+      return products.filter((product) =>
+        product.name?.toLowerCase().includes("nữ")
+      );
+    }
+    if (category === "Phụ kiện") {
+      return products.filter((product) => product.category?.categoryName === "Phụ Kiện");
+    }
+    return products; // Fallback to all products
   };
 
   const handleCategorySelect = (categoryName) => {
@@ -87,9 +100,17 @@ const StorePage = () => {
   };
 
   const handleViewMore = (category) => {
-    const filter = category === "Sản phẩm nổi bật" ? "hot" : null;
-    const query = filter ? `?filter=${filter}` : `?category=${encodeURIComponent(category)}`;
-    router.push(`/pages/product${query}`); // Hoàn thiện navigation
+    if (category === "Sản phẩm nổi bật") {
+      router.push("/pages/product?filter=hot");
+    } else if (category === "Giày Nam") {
+      router.push("/pages/product?gender=Nam");
+    } else if (category === "Giày Nữ") {
+      router.push("/pages/product?gender=Nữ");
+    } else if (category === "Phụ kiện") {
+      router.push("/pages/product?category=Phụ Kiện");
+    } else {
+      router.push("/pages/product");
+    }
   };
 
   return (
@@ -123,6 +144,7 @@ const StorePage = () => {
               <button
                 onClick={() => handleViewMore(selectedCategory)}
                 className="text-black hover:text-blue-600 text-lg"
+                aria-label={`Xem thêm sản phẩm ${selectedCategory}`}
               >
                 Xem thêm
               </button>
@@ -151,6 +173,7 @@ const StorePage = () => {
                   <button
                     onClick={() => handleViewMore(section.category)}
                     className="text-black hover:text-blue-600 text-lg"
+                    aria-label={`Xem thêm sản phẩm ${section.category}`}
                   >
                     Xem thêm
                   </button>
