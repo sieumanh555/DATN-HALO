@@ -1,4 +1,3 @@
-// pages/trangchitiet.jsx
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -16,27 +15,52 @@ export default function Trangchitiet() {
   const [error, setError] = useState(null);
   const [imageHeight, setImageHeight] = useState("auto");
   const productInfoRef = useRef(null);
-  const [showSizeGuide, setShowSizeGuide] = useState(false); // State to control modal visibility
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
+  // Comment-related states
+  const [comments, setComments] = useState([]);
+  const [comment, setComment] = useState("");
+  const [commentError, setCommentError] = useState(null);
+  const [replyInput, setReplyInput] = useState({});
+  const [showReplies, setShowReplies] = useState({});
+
+  // Giả định token được lưu trong localStorage sau khi đăng nhập
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  // Fetch product and comments
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://datn-api-production.up.railway.app/product/${id}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch product: ${response.status}`);
-        }
-        const data = await response.json();
-        setProduct(data);
 
+        // Fetch product
+        const productResponse = await fetch(`https://datn-api-production.up.railway.app/product/${id}`);
+        if (!productResponse.ok) {
+          throw new Error(`Failed to fetch product: ${productResponse.status}`);
+        }
+        const productData = await productResponse.json();
+        setProduct(productData);
+
+        // Fetch related products
         const productsResponse = await fetch(`https://datn-api-production.up.railway.app/product`);
         if (!productsResponse.ok) {
           throw new Error(`Failed to fetch products: ${productsResponse.status}`);
         }
         const allProducts = await productsResponse.json();
-
         const filteredProducts = allProducts.filter((p) => p._id !== id);
         setRelatedProducts(filteredProducts);
+
+        // Fetch comments
+        const commentsResponse = await fetch(`http://localhost:5000/comments`);
+        if (!commentsResponse.ok) {
+          throw new Error(`Failed to fetch comments: ${commentsResponse.status}`);
+        }
+        const commentsData = await commentsResponse.json();
+        // Lọc comments theo productID
+        const productComments = commentsData.filter(
+          (cmt) => cmt.product.productID.toString() === id
+        );
+        setComments(productComments);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -45,10 +69,11 @@ export default function Trangchitiet() {
     };
 
     if (id) {
-      fetchProduct();
+      fetchData();
     }
   }, [id]);
 
+  // Các phần khác giữ nguyên (size, color, quantity, v.v.)
   useEffect(() => {
     if (productInfoRef.current) {
       const height = productInfoRef.current.offsetHeight;
@@ -59,14 +84,6 @@ export default function Trangchitiet() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [comments, setComments] = useState([]);
-  const [comment, setComment] = useState("");
-  const [replyInput, setReplyInput] = useState({});
-  const [likes, setLikes] = useState({});
-  const [dislikes, setDislikes] = useState({});
-  const [likedComments, setLikedComments] = useState({});
-  const [dislikedComments, setDislikedComments] = useState({});
-  const [showReplies, setShowReplies] = useState({});
 
   const sizes = [...new Set(product?.variants?.map((v) => v.size) || [])];
   const allColors = ["black", "white", "blue", "red", "gray"];
@@ -114,20 +131,124 @@ export default function Trangchitiet() {
     }
   };
 
-  const handleAddComment = () => {
-    if (comment.trim() === "") return;
-    const newComment = {
-      id: Date.now(),
-      username: "User123",
-      content: comment,
-      time: new Date().toLocaleString(),
-      avatar: "https://i.pinimg.com/736x/b7/91/44/b79144e03dc4996ce319ff59118caf65.jpg",
-      replies: [],
-    };
-    setComments([newComment, ...comments]);
-    setComment("");
+  const handleAddToCart = () => {
+    if (!selectedSize || !selectedColor || selectedColor.stock === 0) {
+      alert("Vui lòng chọn size và màu sắc hợp lệ!");
+      return;
+    }
+    alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
   };
 
+  // Comment handlers
+  const handleAddComment = async () => {
+    if (comment.trim() === "") {
+      setCommentError("Bình luận không được để trống");
+      return;
+    }
+    if (!token) {
+      setCommentError("Vui lòng đăng nhập để bình luận");
+      return;
+    }
+
+    try {
+      setCommentError(null);
+      const response = await fetch(`https://datn-api-production.up.railway.app/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          user: localStorage.getItem("userId"), // Giả định userId được lưu
+          product: id,
+          content: comment,
+          like: 0,
+          dislike: 0,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Không thể thêm bình luận");
+      }
+
+      const newComment = await response.json();
+      setComments([newComment, ...comments]);
+      setComment("");
+    } catch (error) {
+      setCommentError(error.message);
+    }
+  };
+
+  const toggleLike = async (commentId) => {
+    if (!token) {
+      setCommentError("Vui lòng đăng nhập để thích bình luận");
+      return;
+    }
+
+    try {
+      const comment = comments.find((cmt) => cmt._id === commentId);
+      const response = await fetch(`http://localhost:5000/comments/${commentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          content: comment.content,
+          like: comment.like + 1,
+          dislike: comment.dislike,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể cập nhật lượt thích");
+      }
+
+      const updatedComment = await response.json();
+      setComments(
+        comments.map((cmt) => (cmt._id === commentId ? updatedComment : cmt))
+      );
+    } catch (error) {
+      setCommentError(error.message);
+    }
+  };
+
+  const toggleDislike = async (commentId) => {
+    if (!token) {
+      setCommentError("Vui lòng đăng nhập để không thích bình luận");
+      return;
+    }
+
+    try {
+      const comment = comments.find((cmt) => cmt._id === commentId);
+      const response = await fetch(`http://localhost:5000/comments/${commentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          content: comment.content,
+          like: comment.like,
+          dislike: comment.dislike + 1,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể cập nhật lượt không thích");
+      }
+
+      const updatedComment = await response.json();
+      setComments(
+        comments.map((cmt) => (cmt._id === commentId ? updatedComment : cmt))
+      );
+    } catch (error) {
+      setCommentError(error.message);
+    }
+  };
+
+  // Trả lời bình luận (chưa hỗ trợ bởi backend, giữ logic cục bộ)
   const handleAddReply = (commentId) => {
     if (!replyInput[commentId]?.trim()) return;
     const newReply = {
@@ -140,51 +261,13 @@ export default function Trangchitiet() {
 
     setComments(
       comments.map((comment) =>
-        comment.id === commentId ? { ...comment, replies: [...comment.replies, newReply] } : comment
+        comment._id === commentId
+          ? { ...comment, replies: [...(comment.replies || []), newReply] }
+          : comment
       )
     );
     setReplyInput((prev) => ({ ...prev, [commentId]: "" }));
     setShowReplies((prev) => ({ ...prev, [commentId]: true }));
-  };
-
-  const toggleLike = (id, isReply = false, parentId = null) => {
-    const target = isReply ? `${parentId}-${id}` : id;
-    setLikedComments((prev) => ({
-      ...prev,
-      [target]: !prev[target],
-    }));
-    setDislikedComments((prev) => ({
-      ...prev,
-      [target]: prev[target] ? false : prev[target],
-    }));
-    setLikes((prev) => ({
-      ...prev,
-      [target]: (prev[target] || 0) + (likedComments[target] ? -1 : 1),
-    }));
-    setDislikes((prev) => ({
-      ...prev,
-      [target]: prev[target] ? prev[target] - 1 : prev[target] || 0,
-    }));
-  };
-
-  const toggleDislike = (id, isReply = false, parentId = null) => {
-    const target = isReply ? `${parentId}-${id}` : id;
-    setDislikedComments((prev) => ({
-      ...prev,
-      [target]: !prev[target],
-    }));
-    setLikedComments((prev) => ({
-      ...prev,
-      [target]: prev[target] ? false : prev[target],
-    }));
-    setDislikes((prev) => ({
-      ...prev,
-      [target]: (prev[target] || 0) + (dislikedComments[target] ? -1 : 1),
-    }));
-    setLikes((prev) => ({
-      ...prev,
-      [target]: prev[target] ? prev[target] - 1 : prev[target] || 0,
-    }));
   };
 
   const toggleShowReplies = (commentId) => {
@@ -192,14 +275,6 @@ export default function Trangchitiet() {
       ...prev,
       [commentId]: !prev[commentId],
     }));
-  };
-
-  const handleAddToCart = () => {
-    if (!selectedSize || !selectedColor || selectedColor.stock === 0) {
-      alert("Vui lòng chọn size và màu sắc hợp lệ!");
-      return;
-    }
-    alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
   };
 
   if (loading) return <p className="text-center">Đang tải...</p>;
@@ -217,7 +292,7 @@ export default function Trangchitiet() {
               alt={product.name || "Product"}
               width={600}
               height={520}
-              className="object-cover w-full h-full" // Sử dụng object-cover để đảm bảo ảnh lấp đầy
+              className="object-cover w-full h-full"
               priority
             />
           </div>
@@ -262,7 +337,6 @@ export default function Trangchitiet() {
             <div className="mt-2">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">Size</h3>
-                {/* Add "Hướng dẫn chọn size" link */}
                 <button
                   onClick={() => setShowSizeGuide(true)}
                   className="text-blue-600 hover:underline text-sm"
@@ -365,60 +439,65 @@ export default function Trangchitiet() {
             Gửi
           </button>
         </div>
+        {commentError && (
+          <p className="text-red-500 text-sm mt-2">{commentError}</p>
+        )}
         <div className="mt-4">
           {comments.length === 0 ? (
             <p className="text-gray-500">Không có bình luận.</p>
           ) : (
             <ul className="space-y-4">
               {comments.map((cmt) => (
-                <li key={cmt.id} className="p-3 border rounded-lg bg-gray-100">
+                <li key={cmt._id} className="p-3 border rounded-lg bg-gray-100">
                   <div className="flex items-start gap-3">
-                    <img src={cmt.avatar} alt="Avatar" className="w-10 h-10 rounded-full border" />
+                    <img
+                      src={cmt.user.avatar || "https://i.pinimg.com/736x/b7/91/44/b79144e03dc4996ce319ff59118caf65.jpg"}
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-full border"
+                    />
                     <div className="flex-1">
-                      <span className="font-bold text-blue-600">{cmt.username}</span>
+                      <span className="font-bold text-blue-600">{cmt.user.name || "Ẩn danh"}</span>
                       <p className="text-gray-800">{cmt.content}</p>
-                      <span className="text-gray-500 text-sm">{cmt.time}</span>
+                      <span className="text-gray-500 text-sm">
+                        {new Date(cmt.createdAt).toLocaleString()}
+                      </span>
                       <div className="flex gap-4 mt-1">
                         <button
-                          className={`text-lg flex items-center gap-1 ${
-                            likedComments[cmt.id] ? "text-blue-600" : "text-gray-600 hover:text-gray-800"
-                          }`}
-                          onClick={() => toggleLike(cmt.id)}
+                          className={`text-lg flex items-center gap-1 text-gray-600 hover:text-gray-800`}
+                          onClick={() => toggleLike(cmt._id)}
                         >
-                          <FontAwesomeIcon icon={faThumbsUp} /> {likes[cmt.id] || 0}
+                          <FontAwesomeIcon icon={faThumbsUp} /> {cmt.like || 0}
                         </button>
                         <button
-                          className={`text-lg flex items-center gap-1 ${
-                            dislikedComments[cmt.id] ? "text-red-600" : "text-gray-600 hover:text-gray-800"
-                          }`}
-                          onClick={() => toggleDislike(cmt.id)}
+                          className={`text-lg flex items-center gap-1 text-gray-600 hover:text-gray-800`}
+                          onClick={() => toggleDislike(cmt._id)}
                         >
-                          <FontAwesomeIcon icon={faThumbsDown} /> {dislikes[cmt.id] || 0}
+                          <FontAwesomeIcon icon={faThumbsDown} /> {cmt.dislike || 0}
                         </button>
                         <button
                           className="text-sm text-gray-600 hover:text-blue-600"
-                          onClick={() => setReplyInput((prev) => ({ ...prev, [cmt.id]: prev[cmt.id] || "" }))}
+                          onClick={() => setReplyInput((prev) => ({ ...prev, [cmt._id]: prev[cmt._id] || "" }))}
                         >
                           Trả lời
                         </button>
                       </div>
 
                       {/* Reply Input */}
-                      {replyInput[cmt.id] !== undefined && (
+                      {replyInput[cmt._id] !== undefined && (
                         <div className="mt-2 flex items-center gap-2">
                           <input
                             type="text"
                             placeholder="Viết câu trả lời..."
                             className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={replyInput[cmt.id]}
+                            value={replyInput[cmt._id]}
                             onChange={(e) =>
-                              setReplyInput((prev) => ({ ...prev, [cmt.id]: e.target.value }))
+                              setReplyInput((prev) => ({ ...prev, [cmt._id]: e.target.value }))
                             }
-                            onKeyDown={(e) => e.key === "Enter" && handleAddReply(cmt.id)}
+                            onKeyDown={(e) => e.key === "Enter" && handleAddReply(cmt._id)}
                           />
                           <button
                             className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                            onClick={() => handleAddReply(cmt.id)}
+                            onClick={() => handleAddReply(cmt._id)}
                           >
                             Gửi
                           </button>
@@ -426,17 +505,17 @@ export default function Trangchitiet() {
                       )}
 
                       {/* Reply Toggle */}
-                      {cmt.replies.length > 0 && (
+                      {cmt.replies?.length > 0 && (
                         <div className="mt-2">
                           <button
                             className="text-sm text-gray-600 hover:text-blue-600"
-                            onClick={() => toggleShowReplies(cmt.id)}
+                            onClick={() => toggleShowReplies(cmt._id)}
                           >
-                            {showReplies[cmt.id] ? "Ẩn phản hồi" : `Xem ${cmt.replies.length} phản hồi`}
+                            {showReplies[cmt._id] ? "Ẩn phản hồi" : `Xem ${cmt.replies.length} phản hồi`}
                           </button>
 
                           {/* Replies */}
-                          {showReplies[cmt.id] && (
+                          {showReplies[cmt._id] && (
                             <ul className="mt-2 ml-6 space-y-2">
                               {cmt.replies.map((reply) => (
                                 <li key={reply.id} className="border-l-2 pl-2">
@@ -450,30 +529,6 @@ export default function Trangchitiet() {
                                       <span className="font-bold text-blue-600">{reply.username}</span>
                                       <p className="text-gray-800">{reply.content}</p>
                                       <span className="text-gray-500 text-sm">{reply.time}</span>
-                                      <div className="flex gap-4 mt-1">
-                                        <button
-                                          className={`text-sm flex items-center gap-1 ${
-                                            likedComments[`${cmt.id}-${reply.id}`]
-                                              ? "text-blue-600"
-                                              : "text-gray-600 hover:text-gray-800"
-                                          }`}
-                                          onClick={() => toggleLike(reply.id, true, cmt.id)}
-                                        >
-                                          <FontAwesomeIcon icon={faThumbsUp} />{" "}
-                                          {likes[`${cmt.id}-${reply.id}`] || 0}
-                                        </button>
-                                        <button
-                                          className={`text-sm flex items-center gap-1 ${
-                                            dislikedComments[`${cmt.id}-${reply.id}`]
-                                              ? "text-red-600"
-                                              : "text-gray-600 hover:text-gray-800"
-                                          }`}
-                                          onClick={() => toggleDislike(reply.id, true, cmt.id)}
-                                        >
-                                          <FontAwesomeIcon icon={faThumbsDown} />{" "}
-                                          {dislikes[`${cmt.id}-${reply.id}`] || 0}
-                                        </button>
-                                      </div>
                                     </div>
                                   </div>
                                 </li>
