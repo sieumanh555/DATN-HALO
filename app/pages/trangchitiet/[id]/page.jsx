@@ -188,7 +188,7 @@ export default function Trangchitiet() {
 
     try {
       const comment = comments.find((cmt) => cmt._id === commentId);
-      const response = await fetch(`http://localhost:5000/comments/${commentId}`, {
+      const response = await fetch(`https://datn-api-production.up.railway.app/comments/${commentId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -222,7 +222,7 @@ export default function Trangchitiet() {
 
     try {
       const comment = comments.find((cmt) => cmt._id === commentId);
-      const response = await fetch(`http://localhost:5000/comments/${commentId}`, {
+      const response = await fetch(`https://datn-api-production.up.railway.app/comments/${commentId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
