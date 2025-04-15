@@ -9,8 +9,10 @@ import Discount from "../../models/Discount";
 import type User from "@/app/models/User";
 import {CheckoutState} from "../../models/CartState";
 import {OrderRequest} from "@/app/models/Order";
+import {useRouter} from "next/navigation";
 
 export default function CheckOut() {
+    const router = useRouter()
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
     const [user, setUser] = useState<User | null>(null);
     const [name, setName] = useState(user?.name || "");
@@ -39,9 +41,11 @@ export default function CheckOut() {
         const info = getPayload();
         setUser(info);
     }
+
     const subTotal = useMemo(() => {
         return checkout.reduce((total, item) => total + item.pricePromo * item.quantityy, 0);
     }, [checkout]);
+
     const total = useMemo(() => {
         if (!discount) return subTotal + shipping;
         const discountValue =
@@ -49,7 +53,9 @@ export default function CheckOut() {
         const finalTotal = subTotal + shipping - discountValue;
         return finalTotal > 0 ? finalTotal : 0;
     }, [subTotal, shipping, discount]);
+
     const percent = Math.abs(Math.ceil(((total - subTotal + shipping) * 100) / (total + shipping)));
+
     const updateUserInfo = async () => {
         try {
             const data = {name, phone, zipcode, address};
@@ -77,10 +83,11 @@ export default function CheckOut() {
             alert("Đã xảy ra lỗi. Vui lòng thử lại sau.");
         }
     };
+
     const createOrder = async () => {
         switch (paymentMethod) {
             case "cod": {
-                const paymentResponse = await fetch("http://localhost:3000/orders", {
+                const codPayment = await fetch("http://localhost:3000/orders", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -88,8 +95,8 @@ export default function CheckOut() {
                     body: JSON.stringify(order)
                 });
 
-                const data = await paymentResponse.json();
-                if (paymentResponse.ok) {
+                const data = await codPayment.json();
+                if (codPayment.ok) {
                     // gửi email thông báo mua hàng thành công
                     const timer = setTimeout(() => {
                         setCheckoutSuccess(!checkoutSuccess)
@@ -101,7 +108,33 @@ export default function CheckOut() {
                 break;
             }
             case "zalopay": {
+                const body = {
+                    products: [...checkout],
+                    total: total,
+                    orderDescription: "Thanh toán đơn hàng",
+                    orderInfo: {}
+                }
+                console.log("check body: ", body);
+                const zaloPayment = await fetch("http://localhost:3000/checkouts/zaloPay", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                });
 
+                const data = await zaloPayment.json();
+                console.log(data);
+                if (zaloPayment.ok) {
+                    // gửi email thông báo mua hàng thành công
+                    router.push(data.data.order_url);
+                    const timer = setTimeout(() => {
+                        setCheckoutSuccess(!checkoutSuccess)
+                    });
+                    return () => clearTimeout(timer);
+                } else {
+                    console.log("Lỗi thanh toán:", data)
+                }
                 break;
             }
             case "creditCard": {
@@ -114,25 +147,6 @@ export default function CheckOut() {
         }
     }
 
-    useEffect(() => {
-        getInformation();
-    }, []);
-    useEffect(() => {
-        if (user) {
-            setName(user.name || "");
-            setPhone(user.phone || "");
-            setZipcode(user.zipcode || "");
-            setAddress(user.address || "");
-        }
-    }, [user]);
-    useEffect(() => {
-        fetch("http://localhost:3000/discounts")
-            .then((res) => res.json())
-            .then((data) => setDiscounts(data))
-            .catch((err) =>
-                console.error("Lỗi fetching http://localhost:3000/discounts", err)
-            );
-    }, []);
     const createOrderDetail = async () => {
         if (user && user._id) {
             const {_id: userId} = user;
@@ -156,7 +170,7 @@ export default function CheckOut() {
                     if (response.ok) {
                         const data = await response.json();
                         const orderDetailId = data.data._id;
-                        console.log("orderDetailId: ",orderDetailId);
+                        console.log("orderDetailId: ", orderDetailId);
 
                         setOrder({
                             userId,
@@ -178,11 +192,48 @@ export default function CheckOut() {
             createOrderDetail();
         }
     }
+
     const handleCreateOrder = async () => {
-        await createOrderDetail();
-        createOrder();
+        const currPaymentMethod = paymentMethod;
+        switch (currPaymentMethod) {
+            case "cod": {
+                await createOrderDetail();
+                createOrder();
+                break;
+            }
+            case "zalopay": {
+                break;
+            }
+            
+            case "creditCard": {
+                break;
+            }
+            default: {
+                break;
+            }
+        }   
     }
-    console.log(order)
+
+    useEffect(() => {
+        getInformation();
+    }, []);
+    useEffect(() => {
+        if (user) {
+            setName(user.name || "");
+            setPhone(user.phone || "");
+            setZipcode(user.zipcode || "");
+            setAddress(user.address || "");
+        }
+    }, [user]);
+    useEffect(() => {
+        fetch("http://localhost:3000/discounts")
+            .then((res) => res.json())
+            .then((data) => setDiscounts(data))
+            .catch((err) =>
+                console.error("Lỗi fetching http://localhost:3000/discounts", err)
+            );
+    }, []);
+
     return (
         <section className="container grid grid-cols-1 md:grid-cols-2 gap-8 px-[100px] py-10 tracking-wide">
             {/* customer info */}
@@ -591,6 +642,7 @@ export default function CheckOut() {
                     </div>
                 </div>
             )}
+
         </section>
     );
 }
