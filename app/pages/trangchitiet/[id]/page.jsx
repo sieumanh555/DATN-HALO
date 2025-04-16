@@ -312,7 +312,7 @@ export default function Trangchitiet() {
               {product.pricePromo && product.price && (
                 <>
                   <span className="text-gray-400 line-through">{product.price.toLocaleString()}đ</span>
-                  <span className="bg-red-500 text-white text-sm font-semibold px-2 py-1 rounded-md">
+                  <span className="bg-blue-500 text-white text-sm font-semibold px-2 py-1 rounded-md">
                     Giảm {Math.round(((product.price - product.pricePromo) / product.price) * 100)}%
                   </span>
                 </>
