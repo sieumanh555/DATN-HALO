@@ -7,9 +7,14 @@ const checkoutSlice = createSlice({
     },
     reducers: {
         addItemCheckout: (state, action) => {
-            const existItem = state.products.find((item) => item._id === action.payload._id);
+            const existItem = state.products.find(
+                (item) => (
+                    item._id === action.payload._id &&
+                    item.selectedSize === action.payload.selectedSize &&
+                    item.selectedColor === action.payload.selectedColor
+                ));
             if (existItem) {
-                existItem.quantityy += action.payload.quantityy;
+                existItem.quantityy += action.payload.payload.quantityy;
             } else {
                 state.products.push({
                     ...action.payload,
@@ -19,7 +24,11 @@ const checkoutSlice = createSlice({
         },
         removeItemCheckout: (state, action) => {
             state.products = state.products.filter(
-                (item) => item._id !== action.payload
+                (item) => !(
+                    item._id === action.payload.id &&
+                    item.selectedSize === action.payload.selectedSize &&
+                    item.selectedColor === action.payload.selectedColor
+                )
             );
         },
     },

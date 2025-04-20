@@ -2,17 +2,19 @@
 import Image from "next/image";
 import {useEffect, useMemo, useState} from "react";
 import {useSelector} from "react-redux";
+// import {useRouter} from "next/navigation";
 import {ChevronLeft, Package, Ticket, Truck} from "lucide-react";
 import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSideCookie";
+import {codPayment, zaloPayment} from "@/app/payment/payment-method"
 
 import Discount from "../../models/Discount";
 import type User from "@/app/models/User";
 import {CheckoutState} from "../../models/CartState";
-import {OrderRequest} from "@/app/models/Order";
-import {useRouter} from "next/navigation";
+// import {OrderRequest} from "@/app/models/Order";
+// import {changeStock} from "@/app/payment/product";
 
 export default function CheckOut() {
-    const router = useRouter()
+    // const router = useRouter()
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
     const [user, setUser] = useState<User | null>(null);
     const [name, setName] = useState(user?.name || "");
@@ -32,10 +34,11 @@ export default function CheckOut() {
         stock: 0,
     });
     const [paymentMethod, setPaymentMethod] = useState("cod");
-    const [order, setOrder] = useState<OrderRequest | null>(null);
+    // const [order, setOrder] = useState<OrderRequest | null>(null);
     const [popup, setPopup] = useState(false);
     const [checkoutPopup, setCheckoutPopup] = useState(false);
     const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+    const [ErrOrderInfo, setErrOrderInfo] = useState(false);
 
     const getInformation = () => {
         const info = getPayload();
@@ -84,134 +87,38 @@ export default function CheckOut() {
         }
     };
 
-    const createOrder = async () => {
-        switch (paymentMethod) {
-            case "cod": {
-                const codPayment = await fetch("http://localhost:3000/orders", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(order)
-                });
-
-                const data = await codPayment.json();
-                if (codPayment.ok) {
-                    // gửi email thông báo mua hàng thành công
-                    const timer = setTimeout(() => {
-                        setCheckoutSuccess(!checkoutSuccess)
-                    });
-                    return () => clearTimeout(timer);
-                } else {
-                    console.log("Lỗi thanh toán:", data)
-                }
-                break;
-            }
-            case "zalopay": {
-                const body = {
-                    products: [...checkout],
-                    total: total,
-                    orderDescription: "Thanh toán đơn hàng",
-                    orderInfo: {}
-                }
-                console.log("check body: ", body);
-                const zaloPayment = await fetch("http://localhost:3000/checkouts/zaloPay", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(body)
-                });
-
-                const data = await zaloPayment.json();
-                console.log(data);
-                if (zaloPayment.ok) {
-                    // gửi email thông báo mua hàng thành công
-                    router.push(data.data.order_url);
-                    const timer = setTimeout(() => {
-                        setCheckoutSuccess(!checkoutSuccess)
-                    });
-                    return () => clearTimeout(timer);
-                } else {
-                    console.log("Lỗi thanh toán:", data)
-                }
-                break;
-            }
-            case "creditCard": {
-
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-
-    const createOrderDetail = async () => {
-        if (user && user._id) {
-            const {_id: userId} = user;
-            const createOrderDetail = async () => {
-                try {
-                    const response = await fetch("http://localhost:3000/orderDetails", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            items: checkout.map((item) => ({
-                                productId: item._id,
-                                selectedSize: item.selectedSize,
-                                selectedColor: item.selectedColor,
-                                quantity: item.quantityy,
-                                price: item.price
-                            }))
-                        })
-                    })
-                    if (response.ok) {
-                        const data = await response.json();
-                        const orderDetailId = data.data._id;
-                        console.log("orderDetailId: ", orderDetailId);
-
-                        setOrder({
-                            userId,
-                            orderDetailId: orderDetailId,
-                            amount: total,
-                            description: note,
-                            discountId: discount?._id,
-                            address: address,
-                            paymentMethod: paymentMethod,
-                            paymentStatus: "Uncompleted",
-                            shipping: shipping,
-                            status: "Processing"
-                        })
-                    }
-                } catch (err) {
-                    console.log(">>>Lỗi tạo chi tiết đơn hàng: ", err);
-                }
-            }
-            createOrderDetail();
-        }
-    }
-
-    const handleCreateOrder = async () => {
-        const currPaymentMethod = paymentMethod;
+    const handleCreateOrder = async (currPaymentMethod: string) => {
         switch (currPaymentMethod) {
             case "cod": {
-                await createOrderDetail();
-                createOrder();
+                if (user && user._id) {
+                    await codPayment(checkout, user, total, discount, address, paymentMethod, shipping);
+                    // await Promise.all(checkout.map((item) => changeStock(item)));
+                    setCheckoutSuccess(!checkoutSuccess);
+                } else {
+                    console.log("Vui lòng đăng nhập");
+                }
                 break;
             }
             case "zalopay": {
+                if (user && user._id) {
+                    const createOrder = await zaloPayment(checkout, user, total, discount, address, paymentMethod, shipping);
+                    if (createOrder) {
+                        window.location.href = `${createOrder.zaloResponse.order_url}`;
+                    }
+                    setCheckoutSuccess(!checkoutSuccess);
+                } else {
+                    console.log("Vui lòng đăng nhập");
+                }
                 break;
             }
-            
+
             case "creditCard": {
                 break;
             }
             default: {
                 break;
             }
-        }   
+        }
     }
 
     useEffect(() => {
@@ -251,8 +158,13 @@ export default function CheckOut() {
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                className={`h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] ${name === "" ? "border-[red]" : ""} rounded focus:outline-none`}
                             />
+                            {name === "" ? (
+                                <div className={`text-xs text-red-500 py-1`}>* Vui lòng nhập tên</div>
+                            ) : (
+                                <div className={`hidden`}>Nothing</div>
+                            )}
                         </div>
 
                         {/*phone*/}
@@ -265,9 +177,13 @@ export default function CheckOut() {
                                 type="text"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
-                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                className={`h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] ${phone === "" ? "border-[red]" : ""} rounded focus:outline-none`}
                             />
-
+                            {phone === "" ? (
+                                <div className={`text-xs text-red-500 py-1`}>* Vui lòng nhập số điện thoại</div>
+                            ) : (
+                                <div className={`hidden`}>Nothing</div>
+                            )}
                         </div>
 
                         {/*email*/}
@@ -281,12 +197,17 @@ export default function CheckOut() {
                                 value={user?.email}
                                 readOnly
                                 disabled
-                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded  hover:cursor-not-allowed"
+                                className={`h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] ${user?.email === "" ? "border-[red]" : ""} rounded  hover:cursor-not-allowed`}
                             />
+                            {user?.email === "" ? (
+                                <div className={`text-xs text-red-500 py-1`}>* Vui lòng nhập email</div>
+                            ) : (
+                                <div className={`hidden`}>Nothing</div>
+                            )}
                         </div>
 
                         {/*zipcode*/}
-                        <div className="w-[80px] flex flex-col">
+                        <div className="w-[180px] flex flex-col">
                             <label htmlFor="zipcode" className="font-semibold">
                                 ZIP
                             </label>
@@ -301,8 +222,13 @@ export default function CheckOut() {
                                 type="text"
                                 value={zipcode}
                                 onChange={(e) => setZipcode(e.target.value)}
-                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                className={`h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] ${zipcode === "" ? "border-[red]" : ""} rounded focus:outline-none`}
                             />
+                            {zipcode === "" ? (
+                                <div className={`text-xs text-red-500 py-1`}>* Vui lòng nhập mã bưu chính</div>
+                            ) : (
+                                <div className={`hidden`}>Nothing</div>
+                            )}
                         </div>
 
                         {/*address*/}
@@ -315,8 +241,13 @@ export default function CheckOut() {
                                 type="text"
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
-                                className="h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] rounded focus:outline-none"
+                                className={`h-10 text-[14px] mt-2 px-3 py-[10px] border-[2px] ${address === "" ? "border-[red]" : ""} rounded focus:outline-none transition-all duration-200`}
                             />
+                            {address === "" ? (
+                                <div className={`text-xs text-red-500 py-1`}>* Vui lòng nhập địa chỉ</div>
+                            ) : (
+                                <div className={`hidden`}>Nothing</div>
+                            )}
                         </div>
 
                         <div className="w-full flex flex-col">
@@ -373,7 +304,7 @@ export default function CheckOut() {
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-[14px] h-[14px] cursor-pointer"
                         />
-                        <label htmlFor="pos" className="ml-[8px] cursor-pointer">
+                        <label htmlFor="zalopay" className="ml-[8px] cursor-pointer">
                             ZaloPay
                         </label>
                     </div>
@@ -510,7 +441,9 @@ export default function CheckOut() {
                     </div>
 
                     <button
-                        onClick={() => handleCreateOrder()}
+                        onClick={() => {
+                            handleCreateOrder(paymentMethod)
+                        }}
                         className="w-full h-10 bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
                         Thanh toán
                     </button>
@@ -606,7 +539,7 @@ export default function CheckOut() {
                                 </thead>
                                 <tbody>
                                 {checkout.map((item) => (
-                                    <tr key={item._id}
+                                    <tr key={`${item._id}_${item.selectedSize}_${item.selectedColor}`}
                                         className="border-t border-gray-200 hover:bg-gray-50/50 text-center transition-colors">
                                         <td className="p-4">
                                             <div className="flex justify-center">

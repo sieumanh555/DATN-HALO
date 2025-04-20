@@ -1,5 +1,6 @@
 interface User {
     _id?: string,
+    image?: string,
     name?: string,
     gender?: string,
     birthday?: Date,
@@ -9,7 +10,9 @@ interface User {
     address?: string,
     zipcode?: string,
     role?: number,
+    status?: string,
     createdAt?: Date,
     updatedAt?: Date
 }
+
 export default User;

@@ -62,6 +62,7 @@ export default function UserInformation() {
             console.log(">>> Lỗi: ", error);
         }
     }
+    console.log(user);
     return (
         <div className="w-full mx-auto py-4 sm:p-6 bg-white rounded-xl">
             {user && (
@@ -69,13 +70,12 @@ export default function UserInformation() {
                 <div className="flex flex-col gap-8">
 
                     <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-gray-100 rounded-lg">
-                        <div className="relative">
+                        <div className="relative w-[120px] h-[120px]">
                             <Image
-                                src={`/assets/images/MLB-Chunky-Runner-NY-Black-White(4).png`}
+                                src={user.image || "/assets/images/default-user.jpg"}
                                 alt="Avatar"
-                                width={120}
-                                height={120}
-                                className="rounded-full object-cover ring-4 ring-white shadow-md"
+                                fill
+                                className="rounded-full object-cover overflow-hidden ring-4 ring-white shadow-md"
                             />
                         </div>
                         <div className="flex flex-col text-center sm:text-left">

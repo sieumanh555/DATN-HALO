@@ -1,4 +1,4 @@
-import {ProductCart} from "@/app/models/Product";
+import {CheckoutCart, ProductCart} from "@/app/models/Product";
 
 export interface CartState {
     cart: {
@@ -8,6 +8,6 @@ export interface CartState {
 
 export interface CheckoutState {
     checkout: {
-        products: ProductCart[];
+        products: CheckoutCart[];
     }
 }

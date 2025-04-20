@@ -48,7 +48,6 @@ export default function Register() {
         try {
             const {name, password, email} = values;
             const data = {name, password, email};
-            console.log(data);
             const response = await fetch("http://localhost:3000/users/register", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},

@@ -4,7 +4,7 @@ import {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Check, ChevronUp, Minus, Plus, Trash2} from "lucide-react";
 
-import {decreaseQuantity, increaseQuantity, removeItem} from "@/redux/slices/cartSlice";
+import {decreaseQuantity, increaseQuantity, updateVariant, removeItem} from "@/redux/slices/cartSlice";
 import {addItemCheckout, removeItemCheckout} from "@/redux/slices/checkoutSlice";
 import {ProductCart} from "../../models/Product";
 import {CheckoutState} from "@/app/models/CartState";
@@ -17,47 +17,99 @@ export default function ProBox({data}: { data: ProductCart }) {
     const [colorDropdown, setColorDropdown] = useState(false);
     const [sizeDropdown, setSizeDropdown] = useState(false);
     const [checked, setChecked] = useState(false);
+    const currentVariant = data.variants.find((variant) => variant.size === selectedSize && variant.color === selectedColor);
+    const productStock = currentVariant?.stock;
 
     const handleDecrease = (product: ProductCart) => {
         if (product.quantityy === 1) {
             const text = `Xóa sản phẩm ${product.name}`;
-            if (confirm(text) == true) {
+            if (confirm(text) === true) {
                 alert("Xóa thành công");
-                dispatch(removeItem(product._id));
+                dispatch(removeItem({id: product._id, selectedSize, selectedColor}));
             } else {
                 console.log(
                     ".-- .... -.-- / -.. .. -.. / -.-- --- ..- / -.. --- / - .... .. ... / - --- / -- . . . . . . . . . / ..--.."
                 );
             }
         } else {
-            dispatch(decreaseQuantity(product._id));
+            dispatch(decreaseQuantity({id: product._id, selectedSize, selectedColor}));
         }
     };
 
     const handleSizeSelected = (size: string) => {
+        dispatch(updateVariant({
+            id: data._id,
+            oldSize: selectedSize,
+            oldColor: selectedColor,
+            newSize: size,
+            newColor: selectedColor
+        }));
         setSelectedSize(size);
+
+        // Auto chọn màu mới nếu size đó không còn màu hiện tại
+        const matchedColors = data.variants.filter(variant => variant.size === size);
+        if (!matchedColors.some((v) => v.color === selectedColor)) {
+            setSelectedColor(matchedColors[0]?.color || "Mặc định");
+
+            dispatch(updateVariant({
+                id: data._id,
+                oldSize: size,
+                oldColor: selectedColor,
+                newSize: size,
+                newColor: matchedColors[0]?.color || "Mặc định"
+            }));
+        }
+
         setSizeDropdown(false);
-    };
+    }
 
     const handleColorSelected = (color: string) => {
+        dispatch(updateVariant({
+            id: data._id,
+            oldSize: selectedSize,
+            oldColor: selectedColor,
+            newSize: selectedSize,
+            newColor: color
+        }));
         setSelectedColor(color);
         setColorDropdown(false);
-    };
+    }
 
-    const handleCheckout = (item: ProductCart) => {
+    const handleCheckout = (data: ProductCart) => {
         setChecked(!checked);
-        const existedItem = checkout.filter((existItem) => existItem._id === item._id);
-        if (existedItem.length !== 0) {
-            dispatch(removeItemCheckout(item._id));
+        const existedItems = checkout.filter(
+            (item) =>
+                item._id === data._id &&
+                item.selectedSize === data.selectedSize &&
+                item.selectedColor === data.selectedColor
+        );
+        if (existedItems.length !== 0) {
+            dispatch(removeItemCheckout({id: data._id, selectedSize,selectedColor}));
         } else {
-            dispatch(addItemCheckout({...item}))
+            dispatch(addItemCheckout({...data}))
+        }
+    }
+
+    const changeBgColor = (color: string) => {
+        switch (color) {
+            case "Đỏ":
+                return "#ff0000"
+            case "Xanh":
+                return "#add8e6";
+            case "Trắng":
+                return "#ffffff";
+            case "Xám":
+                return "#808080";
+            default: {
+                return "#ffffff";
+            }
         }
     }
 
     return (
         <div className="w-full bg-white opacity-100 rounded-lg mt-[18px] p-[20px] flex justify-between">
             <button
-                onClick={() => handleCheckout({...data, selectedColor: selectedColor, selectedSize: selectedSize})}
+                onClick={() => handleCheckout(data)}
                 className={`w-6 h-6 ${checked ? 'bg-blue-600 text-white' : 'bg-white'} mt-12 p-1 border rounded flex items-center`}>
                 {checked ? (
                     <Check strokeWidth={4}/>
@@ -113,7 +165,9 @@ export default function ProBox({data}: { data: ProductCart }) {
                                 onClick={() => setColorDropdown(!colorDropdown)}
                                 className="w-full px-2 py-1 border border-gray-200 rounded flex items-center justify-between gap-2 bg-white hover:bg-gray-50 transition-colors duration-200"
                             >
-                                <div className={`w-4 h-4 bg-black rounded-sm`}></div>
+                                <div
+                                    style={{backgroundColor: changeBgColor(selectedColor)}}
+                                    className={`w-4 h-4 border rounded-sm`}></div>
                                 <span className="text-sm">{selectedColor}</span>
                                 <ChevronUp
                                     className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
@@ -126,14 +180,16 @@ export default function ProBox({data}: { data: ProductCart }) {
                                 <div
                                     className="absolute w-full mt-1 right-0 z-50 bg-white rounded-md shadow-lg border border-gray-200 max-h-48 overflow-y-auto">
                                     {data.variants
-                                        .filter((variant) => variant.size === selectedSize)
+                                        .filter((variant) => variant.size === selectedSize && variant.color !== selectedColor)
                                         .map((variant) => (
                                             <button
                                                 key={variant._id}
                                                 onClick={() => handleColorSelected(variant.color)}
                                                 className="w-full px-2 py-1.5 text-left hover:bg-gray-50 flex items-center gap-2 transition-colors duration-200"
                                             >
-                                                <div className="w-4 h-4 bg-black rounded-sm"></div>
+                                                <div
+                                                    style={{backgroundColor: changeBgColor(variant.color)}}
+                                                    className={`w-4 h-4 border rounded-sm`}></div>
                                                 <span className="text-sm text-gray-700">{variant.color}</span>
                                             </button>
                                         ))}
@@ -150,7 +206,11 @@ export default function ProBox({data}: { data: ProductCart }) {
                         </Link>
                         <p>|</p>
                         <button
-                            onClick={() => dispatch(removeItem(data._id))}
+                            onClick={() => dispatch(removeItem({
+                                id: data._id,
+                                selectedSize: selectedSize,
+                                selectedColor: selectedColor
+                            }))}
                             title={`Xóa sản phẩm ${data.name} ?`}
                             className={`cursor-pointer text-gray-600 hover:text-[#D92D20]`}
                         >
@@ -176,7 +236,12 @@ export default function ProBox({data}: { data: ProductCart }) {
                     />
                 </div>
                 <button
-                    onClick={() => dispatch(increaseQuantity(data._id))}
+                    onClick={() => dispatch(increaseQuantity({
+                        id: data._id,
+                        selectedSize,
+                        selectedColor,
+                        stock: productStock
+                    }))}
                     className="w-[25%] flex justify-center items-center rounded hover:bg-[#F2F4F7] hover:shadow-lg"
                 >
                     <Plus className={`w-5`}/>

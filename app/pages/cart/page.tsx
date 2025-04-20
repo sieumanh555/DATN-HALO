@@ -35,6 +35,7 @@ export default function Cart() {
         stock: 0,
     });
     const [voucherPopup, setVoucherPopup] = useState(false);
+
     useEffect(() => {
         fetch("http://localhost:3000/discounts")
             .then((res) => res.json())
@@ -72,6 +73,19 @@ export default function Cart() {
         }
     }
 
+
+    // // get cart lần đầu trống
+    // const getCart = () => {
+    //     const localCart = localStorage.getItem("cart");
+    //     cart = localCart ? JSON.parse(localCart) : []
+    // }
+    //
+    // const setCart = (cart: ProductCart[]) => localStorage.setItem("cart", JSON.stringify(cart || []));
+    //
+    // useEffect(() => {
+    //     setCart(cart);
+    // }, [cart]);
+
     const fetcher = (url: string) => fetch(url).then((res) => res.json());
     const {data, error} = useSWR<ProductResponse[]>("http://localhost:3000/products",
         fetcher,
@@ -79,6 +93,8 @@ export default function Cart() {
     );
     if (!data) return <div>Loading...</div>;
     if (error) return <div>Lỗi fetching data: {error.message}</div>;
+    console.log("Check cart:",cart);
+    // console.log("Check checkout:",checkout);
     return (
         <section className="px-[100px] py-6 bg-[#F2F4F7] tracking-wide">
             {cart.length > 0 ? (
@@ -93,7 +109,7 @@ export default function Cart() {
                                 <p className="w-[14%] text-center">Tổng</p>
                             </div>
                             {cart.map((product: ProductCart) => (
-                                <div key={product._id}>
+                                <div key={`${product._id}_${product.selectedSize}_${product.selectedColor}`}>
                                     <ProBox data={product}/>
                                 </div>
                             ))}
@@ -116,7 +132,7 @@ export default function Cart() {
                         </div>
 
                         {/*checkout.ts information*/}
-                        <div className={`w-[38%] bg-[#fff] rounded-lg mt-[46px] px-10 py-8 space-y-4`}>
+                        <div className={`w-[38%] h-[240px] bg-[#fff] rounded-lg mt-[46px] px-10 py-8 space-y-4`}>
                             <div className="w-full border-b pb-4 flex justify-between">
                                 <p className="w-[40%] text-xl font-semibold uppercase">Tổng cộng</p>
                                 <p className="w-[40%] text-right">
@@ -161,13 +177,13 @@ export default function Cart() {
                             </div>
 
 
-                            {checkout.length > 0 && token!== null ? (
+                            {checkout.length > 0 && token !== null ? (
                                 <button
                                     onClick={() => handleCheckout()}
                                     className="w-full h-10 mt-[18px] bg-blue-700 hover:bg-blue-600 text-[#fff] rounded">
                                     Thanh toán
                                 </button>
-                            ): (
+                            ) : (
                                 <button
                                     disabled
                                     className="w-full h-10 mt-[18px] bg-gray-400  rounded">
