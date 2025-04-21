@@ -69,7 +69,7 @@ export const codPayment = async (checkout: ProductCart[], user: User, total: num
     return await createOrder(user, orderDetail.data, total, discount, address, paymentMethod, shipping);
 }
 
-export const zaloPayment = async (checkout: ProductCart[], user: User, total: number, discount: Discount, address: string, paymentMethod: string, shipping: number) => {
+export const zaloPayment = async (checkout: ProductCart[], user: User, total: number) => {
     try {
         const createOrder = {
             products: [...checkout],

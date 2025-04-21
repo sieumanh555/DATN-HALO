@@ -1,13 +1,13 @@
 import Image from "next/image";
-import Product from "../../models/Product";
+import {ProductResponse} from "../../models/Product";
 
-export default function SubProBox({data}: { data: Product }) {
+export default function SubProBox({data}: { data: ProductResponse }) {
     return (
         <div
             className="relative h-[320px] bg-[#fff] text-gray-600 rounded-lg my-2 p-[14px] hover:shadow-lg flex flex-col gap-3">
             <div className="h-[160px] px-2 flex items-center">
                 <Image
-                    src={`/assets/images/${data.image}`}
+                    src={`/assets/images/default-user`}
                     alt={data.name}
                     width={200}
                     height={200}
@@ -19,9 +19,9 @@ export default function SubProBox({data}: { data: Product }) {
 
             <div className={`font-bold`}>
                 {data.price.toLocaleString("vi-VN")}đ
-                {data.priceSale !== 0 ? (
+                {data.pricePromo !== 0 ? (
                     <span className="font-normal text-gray-400 line-through ml-[8px]">
-                    {data.priceSale.toLocaleString("vi-VN")}đ
+                    {data.pricePromo.toLocaleString("vi-VN")}đ
                     </span>
                 ) : (
                     <div className={`hidden`}></div>

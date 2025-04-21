@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 4000",
+    "dev": "next dev --turbopack -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -19,10 +19,13 @@
     "@preline/dropdown": "^2.5.2",
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.5.1",
+    "@types/react-slick": "^0.23.13",
     "formik": "^2.4.6",
     "framer-motion": "^12.4.10",
     "heroicons": "^2.2.0",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.475.0",
     "next": "^15.1.7",
     "next-auth": "^4.24.11",
@@ -30,6 +33,8 @@
     "react-dom": "^19.0.0",
     "react-fast-marquee": "^1.6.5",
     "react-redux": "^9.2.0",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
     "swr": "^2.3.2",
     "yup": "^1.6.1"
   },

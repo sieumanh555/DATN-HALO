@@ -1,8 +1,7 @@
-// component/dhsize.jsx
 import Image from "next/image";
 import { useState } from "react";
 
-export default function Dhsize({ onClose }) {
+export default function Hdsize({ onClose }) {
     const [activeTab, setActiveTab] = useState("Nam"); // Default to "Nam" tab
 
     // Men's size data (based on the first image)

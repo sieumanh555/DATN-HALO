@@ -190,7 +190,7 @@ export default function UserInformation() {
                                     type="number"
                                     value={zipcode}
                                     readOnly={!isEditing}
-                                    onChange={(e) => setZipCode(Number(e.target.value))}
+                                    onChange={(e) => setZipCode(e.target.value)}
                                     className={`w-full px-4 py-2.5 rounded-lg text-sm text-gray-700 focus:outline-none border
                                         ${!isEditing ? 'bg-gray-50  cursor-not-allowed' : 'bg-white'}`}
                                 />

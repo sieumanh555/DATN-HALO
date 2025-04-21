@@ -38,7 +38,7 @@ export default function CheckOut() {
     const [popup, setPopup] = useState(false);
     const [checkoutPopup, setCheckoutPopup] = useState(false);
     const [checkoutSuccess, setCheckoutSuccess] = useState(false);
-    const [ErrOrderInfo, setErrOrderInfo] = useState(false);
+    // const [ErrOrderInfo, setErrOrderInfo] = useState(false);
 
     const getInformation = () => {
         const info = getPayload();
@@ -101,7 +101,7 @@ export default function CheckOut() {
             }
             case "zalopay": {
                 if (user && user._id) {
-                    const createOrder = await zaloPayment(checkout, user, total, discount, address, paymentMethod, shipping);
+                    const createOrder = await zaloPayment(checkout, user, total);
                     if (createOrder) {
                         window.location.href = `${createOrder.zaloResponse.order_url}`;
                     }
