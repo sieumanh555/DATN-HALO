@@ -1,13 +1,20 @@
 import Image from "next/image";
-import {ProductResponse} from "../../models/Product";
+import type {ProductResponse} from "@/app/models/Product";
+import type Variant from "@/app/models/Variant";
+import {useEffect, useState} from "react";
 
 export default function SubProBox({data}: { data: ProductResponse }) {
+    const [currVariant, setCurrVariant] = useState<Variant>(data.variants[0]);
+    useEffect(() => {
+        console.log("Current variant");
+
+    }, []);
     return (
         <div
             className="relative h-[320px] bg-[#fff] text-gray-600 rounded-lg my-2 p-[14px] hover:shadow-lg flex flex-col gap-3">
             <div className="h-[160px] px-2 flex items-center">
                 <Image
-                    src={`/assets/images/default-user`}
+                    src={currVariant?.images[0]}
                     alt={data.name}
                     width={200}
                     height={200}
@@ -19,13 +26,13 @@ export default function SubProBox({data}: { data: ProductResponse }) {
 
             <div className={`font-bold`}>
                 {data.price.toLocaleString("vi-VN")}đ
-                {data.pricePromo !== 0 ? (
-                    <span className="font-normal text-gray-400 line-through ml-[8px]">
-                    {data.pricePromo.toLocaleString("vi-VN")}đ
-                    </span>
-                ) : (
-                    <div className={`hidden`}></div>
-                )}
+                {/*{data.pricePromo !== 0 ? (*/}
+                {/*    <span className="font-normal text-gray-400 line-through ml-[8px]">*/}
+                {/*    {data.pricePromo.toLocaleString("vi-VN")}đ*/}
+                {/*    </span>*/}
+                {/*) : (*/}
+                {/*    <div className={`hidden`}></div>*/}
+                {/*)}*/}
 
             </div>
             {/*<div className="flex gap-2">*/}

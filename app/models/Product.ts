@@ -34,14 +34,12 @@ export interface ProductRequest {
 
 export interface ProductResponse {
     _id: string,
+    sku_id: string,
     name: string,
     price: number,
-    pricePromo: number,
     hot: boolean,
     mota: string,
-    hinhanh: string,
     quantity: number,
-    isNew: boolean,
     rating: number,
     location: string,
     category: Category,
@@ -54,8 +52,4 @@ export interface ProductCart extends ProductResponse{
     quantityy: number,
 }
 
-export interface CheckoutCart extends ProductResponse{
-    selectedSize: string,
-    selectedColor: string,
-    quantityy: number,
-}
+

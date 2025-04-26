@@ -4,12 +4,15 @@ import Image from "next/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faThumbsDown, faThumbsUp} from "@fortawesome/free-solid-svg-icons";
 import {useParams} from "next/navigation";
+import {useDispatch} from "react-redux";
 
+import {addItem} from "../../../../redux/slices/cartSlice";
 import Product from "../../../components/product";
 import Dhsize from "../../../components/hdsize"
 
 export default function Trangchitiet() {
     const {id} = useParams();
+    const dispatch = useDispatch();
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -137,6 +140,7 @@ export default function Trangchitiet() {
             alert("Vui lòng chọn size và màu sắc hợp lệ!");
             return;
         }
+        dispatch(addItem({...product, selectedSize, selectedColor: selectedColor.color, quantityy: quantity}));
         alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
     };
 
@@ -282,6 +286,7 @@ export default function Trangchitiet() {
     if (error) return <p className="text-center text-red-500">Lỗi: {error}</p>;
     if (!product) return <p className="text-center">Không tìm thấy sản phẩm.</p>;
 
+    console.log(selectedColor);
     return (
         <div className="max-w-[1920px] px-4 md:px-[100px] py-12 md:py-[48px]">
             <div className="grid grid-cols-1 md:grid-cols-10 gap-8 p-4 md:p-6 lg:p-10 bg-white rounded-xl shadow-md">

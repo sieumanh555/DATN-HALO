@@ -1,4 +1,5 @@
-import {CheckoutCart, ProductCart} from "@/app/models/Product";
+import {ProductCart} from "@/app/models/Product";
+import Voucher from "@/app/models/Voucher";
 
 export interface CartState {
     cart: {
@@ -8,6 +9,12 @@ export interface CartState {
 
 export interface CheckoutState {
     checkout: {
-        products: CheckoutCart[];
+        products: ProductCart[];
+    }
+}
+
+export interface VoucherState {
+    voucher: {
+        voucher: Voucher;
     }
 }

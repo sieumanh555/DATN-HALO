@@ -48,7 +48,7 @@ export default function Register() {
         try {
             const {name, password, email} = values;
             const data = {name, password, email};
-            const response = await fetch("http://localhost:3000/users/register", {
+            const response = await fetch("https://datn-api-production.up.railway.app/user/register", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(data),
@@ -56,7 +56,7 @@ export default function Register() {
             const responseData = await response.json();
             if (response.ok) {
                 setCookie(`as_tn`, responseData.access_token, 3);
-                setCookie(`rh_tn`, responseData.refreshToken, 7);
+                setCookie(`rh_tn`, responseData.refresh_token, 7);
                 router.push("/");
             } else {
                 alert(responseData.message);

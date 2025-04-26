@@ -102,7 +102,6 @@ const cartSlice = createSlice({
                 }
             }
         }
-
     },
 });
 

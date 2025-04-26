@@ -35,7 +35,7 @@ export default function Login() {
         try {
             const {email, password} = values;
             const data = {email, password};
-            const response = await fetch("http://localhost:3000/users/login", {
+            const response = await fetch("https://datn-api-production.up.railway.app/user/login", {
                 method: "POST",
                 headers: {"content-type": "application/json"},
                 body: JSON.stringify(data),

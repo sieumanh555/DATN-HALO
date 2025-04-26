@@ -7,9 +7,10 @@ import {ChevronLeft, Package, Ticket, Truck} from "lucide-react";
 import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSideCookie";
 import {codPayment, zaloPayment} from "@/app/payment/payment-method"
 
-import Discount from "../../models/Discount";
 import type User from "@/app/models/User";
 import {CheckoutState} from "../../models/CartState";
+import Voucher from "../../models/Voucher";
+import {ProductCart} from "@/app/models/Product";
 // import {OrderRequest} from "@/app/models/Order";
 // import {changeStock} from "@/app/payment/product";
 
@@ -23,16 +24,9 @@ export default function CheckOut() {
     const [address, setAddress] = useState(user?.address || "");
     const [note, setNote] = useState("");
     const [shipping, setShipping] = useState<number>(40000);
-    const [discounts, setDiscounts] = useState<Discount[]>([]);
-    const [discount, setDiscount] = useState<Discount>({
-        _id: "",
-        name: "",
-        description: "",
-        condition: 0,
-        minus: 0,
-        percent: 0,
-        stock: 0,
-    });
+    const [vouchers, setVouchers] = useState<Voucher[] | []>([]);
+    const [voucher, setVoucher] = useState<Voucher | null>(null);
+
     const [paymentMethod, setPaymentMethod] = useState("cod");
     // const [order, setOrder] = useState<OrderRequest | null>(null);
     const [popup, setPopup] = useState(false);
@@ -46,16 +40,37 @@ export default function CheckOut() {
     }
 
     const subTotal = useMemo(() => {
-        return checkout.reduce((total, item) => total + item.pricePromo * item.quantityy, 0);
+        return checkout.reduce((total: number, item: ProductCart) => {
+            const variant = item.variants.find(
+                (variant) =>
+                    variant.size === item.selectedSize &&
+                    variant.color === item.selectedColor
+            );
+
+            const variantExtraPrice = variant?.price || 0;
+
+            const totalPrice = (item.price + variantExtraPrice) * item.quantityy;
+
+            return total + totalPrice;
+        }, 0);
     }, [checkout]);
 
     const total = useMemo(() => {
-        if (!discount) return subTotal + shipping;
-        const discountValue =
-            discount.minus > 0 ? discount.minus : (subTotal * discount.percent) / 100;
-        const finalTotal = subTotal + shipping - discountValue;
+        if (!voucher) return subTotal;
+        let voucherValue = 0;
+        switch (voucher.type) {
+            case "percent": {
+                voucherValue = (Number(voucher.value) * subTotal) / 100;
+                break;
+            }
+            case "minus": {
+                voucherValue = subTotal - Number(voucher.value);
+                break
+            }
+        }
+        const finalTotal = subTotal - voucherValue;
         return finalTotal > 0 ? finalTotal : 0;
-    }, [subTotal, shipping, discount]);
+    }, [subTotal, voucher]);
 
     const percent = Math.abs(Math.ceil(((total - subTotal + shipping) * 100) / (total + shipping)));
 
@@ -64,7 +79,7 @@ export default function CheckOut() {
             const data = {name, phone, zipcode, address};
             if (user) {
                 const token = getCookieCSide("as_tn");
-                const response = await fetch(`http://localhost:3000/users/${user._id}`, {
+                const response = await fetch(`https://datn-api-production.up.railway.app/user/${user._id}`, {
                     method: "PUT",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -88,10 +103,59 @@ export default function CheckOut() {
     };
 
     const handleCreateOrder = async (currPaymentMethod: string) => {
+        let voucherValue = 0;
+        let shippingMethod = "Giao hàng tiết kiệm";
+        if (voucher) {
+            switch (voucher.type) {
+                case "percent": {
+                    voucherValue = (Number(voucher.value) * subTotal) / 100;
+                    break;
+                }
+                case "fixed_amount": {
+                    voucherValue = subTotal - Number(voucher.value);
+                    break
+                }
+                case "shipping": {
+                    voucherValue = subTotal - Number(voucher.value);
+                    break
+                }
+                default: {
+                    voucherValue = 0;
+                    break;
+                }
+            }
+        }
+
+        switch (shipping) {
+            case 40000: {
+                shippingMethod = "Giao hàng tiết kiệm";
+                break;
+            }
+            case 120000: {
+                shippingMethod = "Giao hàng nhanh";
+                break;
+
+            }
+            default: {
+                shippingMethod = "Giao hàng tiết kiệm";
+                break;
+            }
+        }
+
         switch (currPaymentMethod) {
             case "cod": {
                 if (user && user._id) {
-                    await codPayment(checkout, user, total, discount, address, paymentMethod, shipping);
+                    await codPayment(
+                        checkout,
+                        user,
+                        total,
+                        voucher?._id || "",
+                        voucherValue,
+                        address,
+                        paymentMethod,
+                        shipping,
+                        shippingMethod
+                    );
                     // await Promise.all(checkout.map((item) => changeStock(item)));
                     setCheckoutSuccess(!checkoutSuccess);
                 } else {
@@ -133,11 +197,11 @@ export default function CheckOut() {
         }
     }, [user]);
     useEffect(() => {
-        fetch("http://localhost:3000/discounts")
+        fetch("https://datn-api-production.up.railway.app/voucher")
             .then((res) => res.json())
-            .then((data) => setDiscounts(data))
+            .then((data) => setVouchers(data))
             .catch((err) =>
-                console.error("Lỗi fetching http://localhost:3000/discounts", err)
+                console.error("Lỗi fetch https://datn-api-production.up.railway.app/voucher", err)
             );
     }, []);
 
@@ -389,7 +453,7 @@ export default function CheckOut() {
                                 <p>Mã giảm giá</p>
                             </div>
 
-                            {discount.condition <= subTotal && discount.stock <= 0 ? (
+                            {voucher === null ? (
                                 <button onClick={() => setPopup(true)} title={`Chọn mã`}>
                                     <p className={`text-[#034292]`}>Chưa áp dụng</p>
                                 </button>
@@ -401,7 +465,7 @@ export default function CheckOut() {
                                         title={`Chọn mã`}
                                     >
                                         <p className={`text-[#034292] flex justify-end`}>
-                                            {discount.name}
+                                            {voucher.name}
                                         </p>
                                     </button>
                                 </div>
@@ -409,12 +473,12 @@ export default function CheckOut() {
                         </div>
                         <div
                             className={`${
-                                discount.condition > subTotal && discount.stock <= 0
+                                !voucher
                                     ? `hidden`
                                     : `block`
                             } text-sm flex justify-end`}
                         >
-                            {discount.description}
+                            {voucher?.name}
                         </div>
                     </div>
 
@@ -422,7 +486,7 @@ export default function CheckOut() {
                         <div>
                             <p className={`text-xl text-[#D92D20]`}>Tổng :</p>
                         </div>
-                        {discount.condition > 0 && subTotal >= discount.condition ? (
+                        {voucher ? (
                             <div className="flex gap-4">
                                 <p className="text-[#D92D20]">
                                     {total.toLocaleString("vi-VN")}đ (-{percent}%)
@@ -474,22 +538,22 @@ export default function CheckOut() {
                         </div>
                     </div>
                     <div className={`w-full px-4 flex flex-col gap-2`}>
-                        {discounts.map((discount: Discount) => (
+                        {vouchers.map((voucher: Voucher) => (
                             <div
-                                key={discount._id}
+                                key={voucher._id}
                                 className={`${
-                                    discount.stock <= 0 ? `hidden` : `block`
+                                    voucher.status !== "active" ? `hidden` : `block`
                                 } w-full h-[100px] text-sm py-2 border-2 border-dashed flex justify-between items-center`}
                             >
                                 <Ticket strokeWidth={0.5} className={`w-[120px] h-[80px]`}/>
                                 <div className={`w-[160px] flex flex-col gap-y-1`}>
-                                    <p className={`text-[#124062] uppercase`}>{discount.name}</p>
+                                    <p className={`text-[#124062] uppercase`}>{voucher.code}</p>
                                     <p className={`text-xs text-gray-600`}>
-                                        {discount.description}
+                                        {voucher.name}
                                     </p>
                                     <button
                                         onClick={() => {
-                                            setDiscount(discount);
+                                            setVoucher(voucher);
                                             setPopup(false)
                                         }}
                                         className={`w-[100px] h-6 text-xs text-[#fff] bg-[#165b8d] rounded-xl`}

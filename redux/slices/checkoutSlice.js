@@ -31,8 +31,34 @@ const checkoutSlice = createSlice({
                 )
             );
         },
-    },
-});
+        updateVariantCheckout: (state, action) => {
+            const {id, oldSize, oldColor, newSize, newColor} = action.payload;
 
-export const {addItemCheckout, removeItemCheckout} = checkoutSlice.actions;
+            const productIndex = state.products.findIndex(
+                item =>
+                    item._id === id &&
+                    item.selectedSize === oldSize &&
+                    item.selectedColor === oldColor
+            );
+
+            if (productIndex !== -1) {
+                state.products = state.products.filter((item) =>
+                    item._id === id &&
+                    item.selectedSize === oldSize &&
+                    item.selectedColor === oldColor
+                );
+                state.products = [
+                    ...state.products,
+                    {
+                        ...action.payload.product,
+                        selectedSize: newSize,
+                        selectedColor: newColor
+                    }
+                ]
+
+            }
+        }
+    }
+});
+export const {addItemCheckout, removeItemCheckout, updateVariantCheckout} = checkoutSlice.actions;
 export default checkoutSlice;

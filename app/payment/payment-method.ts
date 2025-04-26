@@ -1,11 +1,10 @@
 import {ProductCart} from "@/app/models/Product";
 import User from "@/app/models/User";
 import {OrderDetailResponse} from "@/app/models/OrderDetail";
-import Discount from "@/app/models/Discount";
 
 export const createOrderDetail = async (checkout: ProductCart[]) => {
     try {
-        const response = await fetch("http://localhost:3000/orderDetails", {
+        const response = await fetch("https://datn-api-production.up.railway.app/orderDetails", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -31,11 +30,22 @@ export const createOrderDetail = async (checkout: ProductCart[]) => {
     }
 };
 
-export const createOrder = async (user: User, orderDetail: OrderDetailResponse, total: number, discount: Discount, address: string, paymentMethod: string, shipping: number) => {
+export const createOrder = async (
+    user: User,
+    orderDetail: OrderDetailResponse,
+    total: number,
+    voucherId: string,
+    voucherValue: number,
+    address: string,
+    paymentMethod: string,
+    shipping: number,
+    shippingMethod: string
+) => {
     try {
         if (user && user._id) {
             const {_id: userId} = user;
-            const response = await fetch("http://localhost:3000/orders", {
+            console.log(">>> check idsUer", userId)
+            const response = await fetch("https://datn-api-production.up.railway.app/order", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -44,11 +54,13 @@ export const createOrder = async (user: User, orderDetail: OrderDetailResponse, 
                     userId: userId,
                     orderDetailId: orderDetail._id,
                     amount: total,
-                    discountId: discount._id,
+                    voucherId: voucherId,
+                    voucherValue: voucherValue || 0,
                     address: address,
                     paymentMethod: paymentMethod,
                     paymentStatus: "Uncompleted",
                     shipping: shipping,
+                    shippingMethod: shippingMethod || 40000,
                     status: "Processing"
                 })
             })
@@ -64,9 +76,29 @@ export const createOrder = async (user: User, orderDetail: OrderDetailResponse, 
     }
 };
 
-export const codPayment = async (checkout: ProductCart[], user: User, total: number, discount: Discount, address: string, paymentMethod: string, shipping: number) => {
+export const codPayment = async (
+    checkout: ProductCart[],
+    user: User,
+    total: number,
+    voucherId: string,
+    voucherValue: number,
+    address: string,
+    paymentMethod: string,
+    shipping: number,
+    shippingMethod: string
+) => {
     const orderDetail = await createOrderDetail(checkout);
-    return await createOrder(user, orderDetail.data, total, discount, address, paymentMethod, shipping);
+    return await createOrder(
+        user,
+        orderDetail.data,
+        total,
+        voucherId,
+        voucherValue,
+        address,
+        paymentMethod,
+        shipping,
+        shippingMethod
+    );
 }
 
 export const zaloPayment = async (checkout: ProductCart[], user: User, total: number) => {
@@ -98,6 +130,7 @@ export const zaloPayment = async (checkout: ProductCart[], user: User, total: nu
     }
 
 }
+
 export const creditPayment = async () => {
 
 }

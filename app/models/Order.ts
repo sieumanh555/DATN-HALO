@@ -1,5 +1,5 @@
 import type User from "./User";
-import type Discount from "@/app/models/Discount"
+import type Discount from "@/app/models/Voucher"
 import type { OrderDetailResponse } from "./OrderDetail";
 
 export interface OrderRequest {

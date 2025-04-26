@@ -1,19 +1,20 @@
 "use client";
 import Link from "next/link";
-import useSWR from "swr";
 import {useRouter} from "next/navigation";
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect, useMemo, useState} from "react";
 import {ArrowLeft, ChevronLeft, Plus, ShoppingCart, Ticket} from "lucide-react";
-import {getCookieCSide} from "@/app/libs/Cookie/clientSideCookie"
 
-import Discount from "@/app/models/Discount";
-import {CartState, CheckoutState} from "../../models/CartState";
-import {ProductCart, ProductResponse} from "@/app/models/Product";
+import type Voucher from "@/app/models/Voucher";
+import type {CartState, CheckoutState, VoucherState} from "@/app/models/CartState";
+import type {ProductCart, ProductResponse} from "@/app/models/Product";
+import {getCookieCSide} from "@/app/libs/Cookie/clientSideCookie"
+import {subTotal, total} from "@/app/libs/cart/calcCart";
 import {removeAll} from "@/redux/slices/cartSlice";
+import {addVoucher} from "@/redux/slices/voucherSlice";
 
 import ProBox from "../../components/cart/proBox";
-// import SubProBox from "../../components/cart/subProBox";
+import SubProBox from "../../components/cart/subProBox";
 import CartEmpty from "../../components/cart/cartEmpty";
 
 
@@ -23,47 +24,24 @@ export default function Cart() {
     const token = getCookieCSide("as_tn");
     const cart = useSelector((state: CartState) => state.cart.products || []);
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || [])
+    const currVoucher = useSelector((state: VoucherState) => state.voucher.voucher || {});
+
+    const [products, setProducts] = useState<ProductResponse[] | []>([]);
+    console.log("1: ", products);
     const [popup, setPopup] = useState(false);
-    const [discounts, setDiscounts] = useState<Discount[]>([]);
-    const [discount, setDiscount] = useState<Discount>({
-        _id: "",
-        name: "",
-        description: "",
-        condition: 0,
-        minus: 0,
-        percent: 0,
-        stock: 0,
-    });
+    const [vouchers, setVouchers] = useState<Voucher[] | []>([]);
+    const [voucher, setVoucher] = useState<Voucher | null>(null);
     const [voucherPopup, setVoucherPopup] = useState(false);
 
-    useEffect(() => {
-        fetch("http://localhost:3000/discounts")
-            .then((res) => res.json())
-            .then((data) => setDiscounts(data))
-            .catch((err) =>
-                console.error("Lỗi fetching http://localhost:3000/discounts", err)
-            );
-    }, []);
+    const calcSubTotal = useMemo(() => subTotal(checkout), [checkout]);
 
-    const subTotal = useMemo(() => {
-        return checkout.reduce(
-            (total: number, item: ProductCart) => total + item.pricePromo * item.quantityy,
-            0
-        );
-    }, [checkout]);
-
-    const total = useMemo(() => {
-        if (!discount) return subTotal;
-        const discountValue =
-            discount.minus > 0 ? discount.minus : (subTotal * discount.percent) / 100;
-        const finalTotal = subTotal - discountValue;
-        return finalTotal > 0 ? finalTotal : 0;
-    }, [subTotal, discount]);
+    const calcTotal = useMemo(() => total(calcSubTotal, currVoucher), [calcSubTotal, currVoucher]);
 
     const handleClosePopup = () => {
         dispatch(removeAll());
         setPopup(false);
     }
+
 
     const handleCheckout = () => {
         if (!token) {
@@ -73,6 +51,14 @@ export default function Cart() {
         }
     }
 
+    useEffect(() => {
+        fetch("https://datn-api-production.up.railway.app/voucher")
+            .then((res) => res.json())
+            .then((data) => setVouchers(data))
+            .catch((err) =>
+                console.error("Lỗi fetching https://datn-api-production.up.railway.app/voucher", err)
+            );
+    }, []);
 
     // // get cart lần đầu trống
     // const getCart = () => {
@@ -86,15 +72,25 @@ export default function Cart() {
     //     setCart(cart);
     // }, [cart]);
 
-    const fetcher = (url: string) => fetch(url).then((res) => res.json());
-    const {data, error} = useSWR<ProductResponse[]>("http://localhost:3000/products",
-        fetcher,
-        {refreshInterval: 3000}
-    );
-    if (!data) return <div>Loading...</div>;
-    if (error) return <div>Lỗi fetching data: {error.message}</div>;
-    console.log("Check cart:",cart);
-    // console.log("Check checkout:",checkout);
+
+    useEffect(() => {
+        const getAllPros = async () => {
+            try {
+                const response = await fetch("https://datn-api-production.up.railway.app/product");
+                const data = await response.json();
+                if (!response.ok) {
+                    console.log("Lỗi: ", data);
+                } else {
+                    setProducts(data);
+                }
+            } catch (error) {
+                console.log("Lỗi lấy products: ", error);
+            }
+        };
+        getAllPros();
+    }, []);
+    console.log("2: ", products);
+
     return (
         <section className="px-[100px] py-6 bg-[#F2F4F7] tracking-wide">
             {cart.length > 0 ? (
@@ -115,7 +111,7 @@ export default function Cart() {
                             ))}
                             {/* navigation pages/shop ? delete cart */}
                             <div className={`w-full mt-[18px] flex justify-between`}>
-                                <Link href="#" className="flex items-center space-x-2">
+                                <Link href="/pages/product" className="flex items-center space-x-2">
                                     <ArrowLeft className={`w-5 h-5`}/>
                                     <p>Tiếp tục mua hàng</p>
                                 </Link>
@@ -136,7 +132,7 @@ export default function Cart() {
                             <div className="w-full border-b pb-4 flex justify-between">
                                 <p className="w-[40%] text-xl font-semibold uppercase">Tổng cộng</p>
                                 <p className="w-[40%] text-right">
-                                    {total.toLocaleString("vi-VN")}đ
+                                    {(calcTotal || 0).toLocaleString("vi-VN")}đ
                                 </p>
                             </div>
 
@@ -147,7 +143,7 @@ export default function Cart() {
                                         <p className={`text-lg`}>Mã giảm giá</p>
                                     </div>
 
-                                    {discount.condition <= subTotal && discount.stock <= 0 ? (
+                                    {!voucher ? (
                                         <button onClick={() => setVoucherPopup(true)} title={`Chọn mã`}>
                                             <p className={`text-[#034292]`}>Áp dụng mã</p>
                                         </button>
@@ -159,20 +155,20 @@ export default function Cart() {
                                                 title={`Chọn mã`}
                                             >
                                                 <p className={`text-[#034292] flex justify-end`}>
-                                                    {discount.name}
+                                                    {voucher.code}
                                                 </p>
                                             </button>
                                         </div>
                                     )}
                                 </div>
+
                                 <div
-                                    className={`${
-                                        discount.condition > subTotal && discount.stock <= 0
-                                            ? `hidden`
-                                            : `block`
+                                    className={`${!voucher
+                                        ? `hidden`
+                                        : `block`
                                     } text-sm flex justify-end`}
                                 >
-                                    {discount.description}
+                                    {voucher?.name}
                                 </div>
                             </div>
 
@@ -201,13 +197,15 @@ export default function Cart() {
             {/* recently viewed product */}
             <div className="mt-12">
                 <p className="text-2xl font-medium">Sản phẩm vừa xem</p>
-                {/*<div className="mt-[18px] flex flex-wrap justify-between">*/}
-                {/*    {data.map((product: Product, index: number) => (*/}
-                {/*        <Link key={index} href="#" className="w-[16%]">*/}
-                {/*            <SubProBox data={product} />*/}
-                {/*        </Link>*/}
-                {/*    ))}*/}
-                {/*</div>*/}
+                <div className="mt-[18px] flex flex-wrap justify-between">
+                    {products
+                        .splice(0, 6)
+                        .map((product: ProductResponse) => (
+                            <Link key={product._id} href={`/pages/product-detail/${product._id}`} className="w-[16%]">
+                                <SubProBox data={product}/>
+                            </Link>
+                        ))}
+                </div>
             </div>
 
             {/* new product */}
@@ -226,14 +224,13 @@ export default function Cart() {
             <div>
                 <div
                     onClick={() => setVoucherPopup(false)}
-                    className={`${
-                        voucherPopup === false ? `hidden` : `fixed top-0 right-0 z-10`
-                    } w-full h-full bg-[#00000066]`}
-                ></div>
+                    className={`${voucherPopup === false ? `hidden` : `fixed top-0 right-0 z-10`} w-full h-full bg-[#00000066]`}>
+
+                </div>
                 <div
                     className={`${
                         voucherPopup === false ? `hidden` : `fixed top-0 right-0 z-10`
-                    } w-[320px] h-full bg-[#fff] flex flex-col justify-between`}
+                    } w-[320px] h-full bg-[#fff] flex flex-col`}
                 >
                     <div className={`w-full h-12 border-b-[2px] flex items-center`}>
                         <ChevronLeft
@@ -245,26 +242,27 @@ export default function Cart() {
                             Mã giảm giá
                         </div>
                     </div>
-                    <div className={`w-full px-4 flex flex-col gap-2`}>
-                        {discounts.map((discount: Discount) => (
+                    <div className={`w-full px-4 py-6 overflow-y-auto flex flex-col gap-2`}>
+                        {vouchers.map((voucher: Voucher) => (
                             <div
-                                key={discount._id}
+                                key={voucher._id}
                                 className={`${
-                                    discount.stock <= 0 ? `hidden` : `block`
+                                    voucher.status !== "active" ? `hidden` : `block`
                                 } w-full h-[100px] text-sm py-2 border-2 border-dashed flex justify-between items-center`}
                             >
                                 <Ticket strokeWidth={0.5} className={`w-[120px] h-[80px]`}/>
                                 <div className={`w-[160px] flex flex-col gap-y-1`}>
-                                    <p className={`text-[#124062] uppercase`}>{discount.name}</p>
+                                    <p className={`text-[#124062] uppercase`}>{voucher.name}</p>
                                     <p className={`text-xs text-gray-600`}>
-                                        {discount.description}
+                                        {voucher.name}
                                     </p>
                                     <button
                                         onClick={() => {
-                                            setDiscount(discount);
-                                            setPopup(false)
+                                            dispatch(addVoucher({...voucher}))
+                                            setVoucher(voucher);
+                                            setVoucherPopup(false)
                                         }}
-                                        className={`w-[100px] h-6 text-xs text-[#fff] bg-[#165b8d] rounded-xl`}
+                                        className={`w-[100px] h-6 text-xs border text-[#fff] bg-[#165b8d] hover:bg-white hover:text-[#165b8d] rounded`}
                                     >
                                         Áp dụng
                                     </button>
@@ -273,8 +271,8 @@ export default function Cart() {
                         ))}
                     </div>
                     <button
-                        onClick={() => setPopup(false)}
-                        className={`w-[90%] h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}
+                        onClick={() => setVoucherPopup(false)}
+                        className={`absolute w-[90%] bottom-0 right-2 z-10 h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}
                     >
                         Quay lại trang thanh toán
                     </button>
