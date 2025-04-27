@@ -12,8 +12,7 @@ import {CheckoutState} from "@/app/models/CartState";
 export default function ProBox({data}: { data: ProductCart }) {
     const dispatch = useDispatch();
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
-
-
+    
     const [selectedSize, setSelectedSize] = useState(data.selectedSize || "Chọn size");
     const [selectedColor, setSelectedColor] = useState(data.selectedColor || "Mặc định");
     const [colorDropdown, setColorDropdown] = useState(false);
@@ -45,8 +44,7 @@ export default function ProBox({data}: { data: ProductCart }) {
 
     const handleDecrease = (product: ProductCart) => {
         if (product.quantityy === 1) {
-            const text = `Xóa sản phẩm ${product.name}`;
-            if (confirm(text) === true) {
+            const text = `Xóa sản phẩm ${product.name}`;        if (confirm(text) === true) {
                 alert("Xóa thành công");
                 dispatch(removeItem({id: product._id, selectedSize, selectedColor}));
             } else {
@@ -59,60 +57,12 @@ export default function ProBox({data}: { data: ProductCart }) {
         }
     };
 
-    // const handleSizeSelected = (size: string) => {
-    //     dispatch(updateVariant({
-    //         id: data._id,
-    //         oldSize: selectedSize,
-    //         oldColor: selectedColor,
-    //         newSize: size,
-    //         newColor: selectedColor
-    //     }));
-    //     dispatch(updateVariantCheckout({
-    //         id: data._id,
-    //         oldSize: selectedSize,
-    //         oldColor: selectedColor,
-    //         newSize: size,
-    //         newColor: selectedColor
-    //     }));
-    //     setSelectedSize(size);
-    //
-    //     // Auto chọn màu mới nếu size đó không còn màu hiện tại
-    //     const matchedColors = data.variants.filter(variant => variant.size === size);
-    //     if (!matchedColors.some((v) => v.color === selectedColor)) {
-    //         setSelectedColor(matchedColors[0]?.color || "Mặc định");
-    //
-    //         dispatch(updateVariant({
-    //             id: data._id,
-    //             oldSize: size,
-    //             oldColor: selectedColor,
-    //             newSize: size,
-    //             newColor: matchedColors[0]?.color || "Mặc định"
-    //         }));
-    //         dispatch(updateVariantCheckout({
-    //             id: data._id,
-    //             oldSize: selectedSize,
-    //             oldColor: selectedColor,
-    //             newSize: size,
-    //             newColor: selectedColor
-    //         }));
-    //     }
-    //
-    //     setSizeDropdown(false);
-    // }
-
     const handleSizeSelected = (size: string) => {
         const matchedColors = data.variants.filter(variant => variant.size === size);
         const hasCurrentColor = matchedColors.some((v) => v.color === selectedColor);
         const newColor = hasCurrentColor ? selectedColor : matchedColors[0]?.color || "Mặc định";
 
         dispatch(updateVariant({
-            ...data,
-            selectedSize: selectedSize,
-            selectedColor: selectedColor,
-            newSize: size,
-            newColor: newColor
-        }));
-        dispatch(updateVariantCheckout({
             ...data,
             selectedSize: selectedSize,
             selectedColor: selectedColor,
@@ -137,7 +87,7 @@ export default function ProBox({data}: { data: ProductCart }) {
         setColorDropdown(false);
     }
 
-    const handleCheckout = (data: ProductCart) => {
+    const addToCheckout = (data: ProductCart) => {
         setChecked(!checked);
         const existedItems = checkout.filter(
             (item) =>
@@ -145,7 +95,7 @@ export default function ProBox({data}: { data: ProductCart }) {
                 item.selectedSize === selectedSize &&
                 item.selectedColor === selectedColor
         );
-        if (existedItems.length !== 0) {
+        if (existedItems.length > 0) {
             dispatch(removeItemCheckout({id: data._id, selectedSize, selectedColor}));
         } else {
             dispatch(addItemCheckout({...data}))
@@ -154,25 +104,26 @@ export default function ProBox({data}: { data: ProductCart }) {
 
     const changeBgColor = (color: string) => {
         switch (color) {
-            case "Đỏ":
+            case "red":
                 return "#ff0000"
-            case "Xanh":
+            case "blue":
                 return "#add8e6";
-            case "Trắng":
+            case "white":
                 return "#ffffff";
-            case "Xám":
+            case "black":
+                return "000000";
+            case "gray":
                 return "#808080";
             default: {
                 return "#ffffff";
             }
         }
     }
-
-    console.log(">>> checkout: ", checkout);
+    
     return (
         <div className="w-full bg-white opacity-100 rounded-lg mt-4 py-5 px-2 flex justify-between">
             <button
-                onClick={() => handleCheckout(data)}
+                onClick={() => addToCheckout(data)}
                 className={`w-5 h-5 ${checked ? 'bg-blue-600 text-white' : 'bg-white'} mt-16 p-1 border rounded flex items-center`}>
                 {checked ? (
                     <Check strokeWidth={4}/>
