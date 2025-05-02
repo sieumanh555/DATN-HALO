@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {Check, ChevronUp, Minus, Plus, Trash2} from "lucide-react";
 
 import {decreaseQuantity, increaseQuantity, removeItem, updateVariant} from "@/redux/slices/cartSlice";
-import {addItemCheckout, removeItemCheckout, updateVariantCheckout} from "@/redux/slices/checkoutSlice";
+import {addItemCheckout, removeItemCheckout} from "@/redux/slices/checkoutSlice";
 import {ProductCart} from "../../models/Product";
 import {CheckoutState} from "@/app/models/CartState";
 
@@ -13,12 +13,14 @@ export default function ProBox({data}: { data: ProductCart }) {
     const dispatch = useDispatch();
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
 
-
     const [selectedSize, setSelectedSize] = useState(data.selectedSize || "Chọn size");
     const [selectedColor, setSelectedColor] = useState(data.selectedColor || "Mặc định");
     const [colorDropdown, setColorDropdown] = useState(false);
     const [sizeDropdown, setSizeDropdown] = useState(false);
     const [checked, setChecked] = useState(false);
+    const [alertPopup, setAlertPopup] = useState(false);
+
+
     const currentVariant = data.variants.find((variant) => variant.size === selectedSize && variant.color === selectedColor);
     const productStock = currentVariant?.stock;
 
@@ -28,7 +30,7 @@ export default function ProBox({data}: { data: ProductCart }) {
 
     useEffect(() => {
         availableColors(selectedColor);
-    }, [availableColors,selectedColor]);
+    }, [availableColors, selectedColor]);
 
     const isChecked = useCallback((data: ProductCart) => {
         const check = checkout.find((item) =>
@@ -59,60 +61,12 @@ export default function ProBox({data}: { data: ProductCart }) {
         }
     };
 
-    // const handleSizeSelected = (size: string) => {
-    //     dispatch(updateVariant({
-    //         id: data._id,
-    //         oldSize: selectedSize,
-    //         oldColor: selectedColor,
-    //         newSize: size,
-    //         newColor: selectedColor
-    //     }));
-    //     dispatch(updateVariantCheckout({
-    //         id: data._id,
-    //         oldSize: selectedSize,
-    //         oldColor: selectedColor,
-    //         newSize: size,
-    //         newColor: selectedColor
-    //     }));
-    //     setSelectedSize(size);
-    //
-    //     // Auto chọn màu mới nếu size đó không còn màu hiện tại
-    //     const matchedColors = data.variants.filter(variant => variant.size === size);
-    //     if (!matchedColors.some((v) => v.color === selectedColor)) {
-    //         setSelectedColor(matchedColors[0]?.color || "Mặc định");
-    //
-    //         dispatch(updateVariant({
-    //             id: data._id,
-    //             oldSize: size,
-    //             oldColor: selectedColor,
-    //             newSize: size,
-    //             newColor: matchedColors[0]?.color || "Mặc định"
-    //         }));
-    //         dispatch(updateVariantCheckout({
-    //             id: data._id,
-    //             oldSize: selectedSize,
-    //             oldColor: selectedColor,
-    //             newSize: size,
-    //             newColor: selectedColor
-    //         }));
-    //     }
-    //
-    //     setSizeDropdown(false);
-    // }
-
     const handleSizeSelected = (size: string) => {
         const matchedColors = data.variants.filter(variant => variant.size === size);
         const hasCurrentColor = matchedColors.some((v) => v.color === selectedColor);
         const newColor = hasCurrentColor ? selectedColor : matchedColors[0]?.color || "Mặc định";
 
         dispatch(updateVariant({
-            ...data,
-            selectedSize: selectedSize,
-            selectedColor: selectedColor,
-            newSize: size,
-            newColor: newColor
-        }));
-        dispatch(updateVariantCheckout({
             ...data,
             selectedSize: selectedSize,
             selectedColor: selectedColor,
@@ -137,7 +91,7 @@ export default function ProBox({data}: { data: ProductCart }) {
         setColorDropdown(false);
     }
 
-    const handleCheckout = (data: ProductCart) => {
+    const addToCheckout = (data: ProductCart) => {
         setChecked(!checked);
         const existedItems = checkout.filter(
             (item) =>
@@ -145,8 +99,8 @@ export default function ProBox({data}: { data: ProductCart }) {
                 item.selectedSize === selectedSize &&
                 item.selectedColor === selectedColor
         );
-        if (existedItems.length !== 0) {
-            dispatch(removeItemCheckout({id: data._id, selectedSize, selectedColor}));
+        if (existedItems.length > 0) {
+            dispatch(removeItemCheckout({id: data._id, selectedSize, selectedColor, quantitty: data.quantityy}));
         } else {
             dispatch(addItemCheckout({...data}))
         }
@@ -154,13 +108,15 @@ export default function ProBox({data}: { data: ProductCart }) {
 
     const changeBgColor = (color: string) => {
         switch (color) {
-            case "Đỏ":
+            case "red":
                 return "#ff0000"
-            case "Xanh":
+            case "blue":
                 return "#add8e6";
-            case "Trắng":
+            case "white":
                 return "#ffffff";
-            case "Xám":
+            case "black":
+                return "000000";
+            case "gray":
                 return "#808080";
             default: {
                 return "#ffffff";
@@ -168,11 +124,44 @@ export default function ProBox({data}: { data: ProductCart }) {
         }
     }
 
-    console.log(">>> checkout: ", checkout);
+    const handleAction = (a: string) => {
+        if (checked) {
+            setAlertPopup(true);
+        } else {
+            switch (a) {
+                case "plus": {
+                    dispatch(increaseQuantity({
+                        id: data._id,
+                        selectedSize,
+                        selectedColor,
+                        stock: productStock
+                    }))
+                    break;
+                }
+                case "minus": {
+                    handleDecrease(data);
+                    break;
+                }
+                case "selectSize": {
+                    setSizeDropdown(!sizeDropdown)
+                    break;
+                }
+                case "selectColor": {
+                    setColorDropdown(!colorDropdown)
+                    break;
+                }
+                default: {
+                    break;
+                }
+
+            }
+        }
+    }
+
     return (
         <div className="w-full bg-white opacity-100 rounded-lg mt-4 py-5 px-2 flex justify-between">
             <button
-                onClick={() => handleCheckout(data)}
+                onClick={() => addToCheckout(data)}
                 className={`w-5 h-5 ${checked ? 'bg-blue-600 text-white' : 'bg-white'} mt-16 p-1 border rounded flex items-center`}>
                 {checked ? (
                     <Check strokeWidth={4}/>
@@ -196,7 +185,7 @@ export default function ProBox({data}: { data: ProductCart }) {
                         <div>Chọn size:</div>
                         <div className="relative w-[70px]">
                             <button
-                                onClick={() => setSizeDropdown(!sizeDropdown)}
+                                onClick={() => handleAction("selectSize")}
                                 className="w-full px-2 py-1 border border-gray-200 rounded flex items-center justify-between gap-2 bg-white hover:bg-gray-50 transition-colors duration-200"
                             >
                                 <div className={`text-sm text-gray-700`}>{selectedSize}</div>
@@ -225,8 +214,7 @@ export default function ProBox({data}: { data: ProductCart }) {
                         <div className="text-gray-700">Chọn màu:</div>
                         <div className="relative w-[100px]">
                             <button
-                                disabled={availableColors.length !== 0}
-                                onClick={() => setColorDropdown(!colorDropdown)}
+                                onClick={() => handleAction("selectColor")}
                                 className="w-full px-2 py-1 border border-gray-200 rounded flex items-center justify-between gap-2 bg-white hover:bg-gray-50 transition-colors duration-200"
                             >
                                 <div
@@ -286,8 +274,8 @@ export default function ProBox({data}: { data: ProductCart }) {
             </div>
             <div className="w-[14%] h-[24px] flex">
                 <button
-                    onClick={() => handleDecrease(data)}
-                    className="w-[25%] flex justify-center items-center rounded hover:bg-[#F2F4F7] hover:shadow-lg"
+                    onClick={() => handleAction("minus")}
+                    className="w-[25%] flex justify-center items-center rounded"
                 >
                     <Minus className={`w-5`}/>
                 </button>
@@ -301,22 +289,27 @@ export default function ProBox({data}: { data: ProductCart }) {
                     />
                 </div>
                 <button
-                    onClick={() => dispatch(increaseQuantity({
-                        id: data._id,
-                        selectedSize,
-                        selectedColor,
-                        stock: productStock
-                    }))}
-                    className="w-[25%] flex justify-center items-center rounded hover:bg-[#F2F4F7] hover:shadow-lg"
+                    onClick={() => handleAction("plus")}
+                    className="w-[25%] flex justify-center items-center rounded"
                 >
                     <Plus className={`w-5`}/>
                 </button>
             </div>
             <div className="w-[14%] flex justify-center">
-                <p>{(data.price + currentVariant?.price).toLocaleString("vi-VN")}đ</p>
+                <p>{(currentVariant ? data.price + currentVariant.price : data.price).toLocaleString("vi-VN")}đ</p>
             </div>
             <div className="w-[14%] flex justify-center">
-                <p>{((data.price + currentVariant?.price) * data.quantityy).toLocaleString("vi-VN")}đ</p>
+                <p>{((currentVariant ? data.price + currentVariant.price : data.price) * data.quantityy).toLocaleString("vi-VN")}đ</p>
+            </div>
+
+            {/*product change popup*/}
+            <div className={`${alertPopup === false ? `hidden` : `block`}`}>
+                <div
+                    onClick={() => setAlertPopup(!alertPopup)}
+                    className={`bg-[#00000066] w-full h-full fixed top-0 right-0 z-10`}
+                >
+                </div>
+                <div>Vui lòng bỏ chọn sản phẩm trước thêm hoặc chỉnh sửa size, màu sắc của sản phẩm</div>
             </div>
         </div>
     );

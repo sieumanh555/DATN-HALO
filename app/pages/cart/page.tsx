@@ -9,12 +9,11 @@ import type Voucher from "@/app/models/Voucher";
 import type {CartState, CheckoutState, VoucherState} from "@/app/models/CartState";
 import type {ProductCart, ProductResponse} from "@/app/models/Product";
 import {getCookieCSide} from "@/app/libs/Cookie/clientSideCookie"
-import {subTotal, total} from "@/app/libs/cart/calcCart";
+import {percent, subTotal, total} from "@/app/libs/cart/calcCart";
 import {removeAll} from "@/redux/slices/cartSlice";
 import {addVoucher} from "@/redux/slices/voucherSlice";
 
 import ProBox from "../../components/cart/proBox";
-import SubProBox from "../../components/cart/subProBox";
 import CartEmpty from "../../components/cart/cartEmpty";
 
 
@@ -27,15 +26,14 @@ export default function Cart() {
     const currVoucher = useSelector((state: VoucherState) => state.voucher.voucher || {});
 
     const [products, setProducts] = useState<ProductResponse[] | []>([]);
-    console.log("1: ", products);
     const [popup, setPopup] = useState(false);
     const [vouchers, setVouchers] = useState<Voucher[] | []>([]);
     const [voucher, setVoucher] = useState<Voucher | null>(null);
     const [voucherPopup, setVoucherPopup] = useState(false);
 
     const calcSubTotal = useMemo(() => subTotal(checkout), [checkout]);
-
     const calcTotal = useMemo(() => total(calcSubTotal, currVoucher), [calcSubTotal, currVoucher]);
+    const calcVoucherPercent = useMemo(() => percent(calcSubTotal, calcTotal), [calcSubTotal, calcTotal])
 
     const handleClosePopup = () => {
         dispatch(removeAll());
@@ -89,7 +87,6 @@ export default function Cart() {
         };
         getAllPros();
     }, []);
-    console.log("2: ", products);
 
     return (
         <section className="px-[100px] py-6 bg-[#F2F4F7] tracking-wide">
@@ -131,9 +128,14 @@ export default function Cart() {
                         <div className={`w-[38%] h-[240px] bg-[#fff] rounded-lg mt-[46px] px-10 py-8 space-y-4`}>
                             <div className="w-full border-b pb-4 flex justify-between">
                                 <p className="w-[40%] text-xl font-semibold uppercase">Tổng cộng</p>
-                                <p className="w-[40%] text-right">
-                                    {(calcTotal || 0).toLocaleString("vi-VN")}đ
-                                </p>
+                                <div className={`flex justify-between`}>
+                                    <p className="w-[40%] text-right">
+                                        {calcTotal.toLocaleString("vi-VN")}đ
+                                    </p>
+                                    <p className={`${calcVoucherPercent > 0 ? `block` : `hidden`}`}>
+                                        (-{calcVoucherPercent}%)
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="w-full border-b pb-4 flex flex-col">
@@ -197,15 +199,15 @@ export default function Cart() {
             {/* recently viewed product */}
             <div className="mt-12">
                 <p className="text-2xl font-medium">Sản phẩm vừa xem</p>
-                <div className="mt-[18px] flex flex-wrap justify-between">
-                    {products
-                        .splice(0, 6)
-                        .map((product: ProductResponse) => (
-                            <Link key={product._id} href={`/pages/product-detail/${product._id}`} className="w-[16%]">
-                                <SubProBox data={product}/>
-                            </Link>
-                        ))}
-                </div>
+                {/*<div className="mt-[18px] flex flex-wrap justify-between">*/}
+                {/*    {products*/}
+                {/*        .splice(0, 6)*/}
+                {/*        .map((product: ProductResponse) => (*/}
+                {/*            <Link key={product._id} href={`/pages/product-detail/${product._id}`} className="w-[16%]">*/}
+                {/*                <SubProBox data={product}/>*/}
+                {/*            </Link>*/}
+                {/*        ))}*/}
+                {/*</div>*/}
             </div>
 
             {/* new product */}

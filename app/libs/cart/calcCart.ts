@@ -23,11 +23,11 @@ export const total = (subTotal: number, voucher: Voucher): number => {
                 break;
             }
             case "fixed_amount": {
-                voucherValue = subTotal - (Number(voucher.value));
+                voucherValue = Number(voucher.value) * 1000;
                 break;
             }
             case "shipping": {
-                voucherValue = subTotal - (Number(voucher.value));
+                voucherValue = Number(voucher.value) * 1000;
                 break;
             }
             default : {
@@ -38,4 +38,9 @@ export const total = (subTotal: number, voucher: Voucher): number => {
     }
     const finalTotal = subTotal - voucherValue;
     return finalTotal > 0 ? finalTotal : 0;
+}
+
+export const percent = (subTotal: number, total: number): number => {
+    const value = Math.ceil(((subTotal - total) * 100) / subTotal);
+    return value > 0 ? value : 0;
 }
