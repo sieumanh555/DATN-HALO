@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {useCallback, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Check, ChevronUp, Minus, Plus, Trash2} from "lucide-react";
+import {Check, ChevronUp, CircleAlert, Minus, Plus, Trash2} from "lucide-react";
 
 import {decreaseQuantity, increaseQuantity, removeItem, updateVariant} from "@/redux/slices/cartSlice";
 import {addItemCheckout, removeItemCheckout} from "@/redux/slices/checkoutSlice";
@@ -150,6 +150,14 @@ export default function ProBox({data}: { data: ProductCart }) {
                     setColorDropdown(!colorDropdown)
                     break;
                 }
+                case "delete": {
+                    dispatch(removeItem({
+                        id: data._id,
+                        selectedSize: selectedSize,
+                        selectedColor: selectedColor
+                    }))
+                    break;
+                }
                 default: {
                     break;
                 }
@@ -259,11 +267,7 @@ export default function ProBox({data}: { data: ProductCart }) {
                         </Link>
                         <p>|</p>
                         <button
-                            onClick={() => dispatch(removeItem({
-                                id: data._id,
-                                selectedSize: selectedSize,
-                                selectedColor: selectedColor
-                            }))}
+                            onClick={() => handleAction("delete")}
                             title={`Xóa sản phẩm ${data.name} ?`}
                             className={`cursor-pointer text-gray-600 hover:text-[#D92D20]`}
                         >
@@ -303,14 +307,21 @@ export default function ProBox({data}: { data: ProductCart }) {
             </div>
 
             {/*product change popup*/}
-            <div className={`${alertPopup === false ? `hidden` : `block`}`}>
-                <div
-                    onClick={() => setAlertPopup(!alertPopup)}
-                    className={`bg-[#00000066] w-full h-full fixed top-0 right-0 z-10`}
-                >
+            {alertPopup && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div
+                        onClick={() => setAlertPopup(false)}
+                        className="absolute inset-0"
+                    />
+                    <div className="relative z-10 w-[90%] max-w-md bg-white rounded-xl px-6 py-8 shadow-lg flex">
+                        <CircleAlert size={36}/>
+                        <p className="text-center text-base sm:text-lg text-gray-800">
+                            Vui lòng bỏ chọn sản phẩm trước khi chỉnh sửa size, màu sắc hoặc xóa sản phẩm.
+                        </p>
+                    </div>
                 </div>
-                <div>Vui lòng bỏ chọn sản phẩm trước thêm hoặc chỉnh sửa size, màu sắc của sản phẩm</div>
-            </div>
+            )}
+
         </div>
     );
 }

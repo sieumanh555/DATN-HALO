@@ -1,22 +1,28 @@
 "use client";
 import Image from "next/image";
 import {useEffect, useMemo, useState} from "react";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 // import {useRouter} from "next/navigation";
 import {ChevronLeft, Package, Ticket, Truck} from "lucide-react";
 import {getCookieCSide, getPayload, setCookie} from "@/app/libs/Cookie/clientSideCookie";
-import {codPayment, zaloPayment} from "@/app/payment/payment-method"
+import {codPayment, zaloPayment} from "@/app/payment/payment-method";
+import {percent, subTotal, total} from "@/app/libs/cart/calcCart"
 
 import type User from "@/app/models/User";
-import {CheckoutState} from "../../models/CartState";
-import Voucher from "../../models/Voucher";
-import {ProductCart} from "@/app/models/Product";
+import type {CheckoutState, VoucherState} from "../../models/CartState";
+import type Voucher from "../../models/Voucher";
+import {addVoucher} from "@/redux/slices/voucherSlice";
+
 // import {OrderRequest} from "@/app/models/Order";
 // import {changeStock} from "@/app/payment/product";
 
 export default function CheckOut() {
     // const router = useRouter()
+    const dispatch = useDispatch();
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
+    const voucher = useSelector((state: VoucherState) => state.voucher.voucher || {});
+
+
     const [user, setUser] = useState<User | null>(null);
     const [name, setName] = useState(user?.name || "");
     const [phone, setPhone] = useState(user?.phone || "");
@@ -25,11 +31,10 @@ export default function CheckOut() {
     const [note, setNote] = useState("");
     const [shipping, setShipping] = useState<number>(40000);
     const [vouchers, setVouchers] = useState<Voucher[] | []>([]);
-    const [voucher, setVoucher] = useState<Voucher | null>(null);
 
     const [paymentMethod, setPaymentMethod] = useState("cod");
     // const [order, setOrder] = useState<OrderRequest | null>(null);
-    const [popup, setPopup] = useState(false);
+    const [voucherPopup, setVoucherPopup] = useState(false);
     const [checkoutPopup, setCheckoutPopup] = useState(false);
     const [checkoutSuccess, setCheckoutSuccess] = useState(false);
     // const [ErrOrderInfo, setErrOrderInfo] = useState(false);
@@ -39,40 +44,9 @@ export default function CheckOut() {
         setUser(info);
     }
 
-    const subTotal = useMemo(() => {
-        return checkout.reduce((total: number, item: ProductCart) => {
-            const variant = item.variants.find(
-                (variant) =>
-                    variant.size === item.selectedSize &&
-                    variant.color === item.selectedColor
-            );
-
-            const variantExtraPrice = variant?.price || 0;
-
-            const totalPrice = (item.price + variantExtraPrice) * item.quantityy;
-
-            return total + totalPrice;
-        }, 0);
-    }, [checkout]);
-
-    const total = useMemo(() => {
-        if (!voucher) return subTotal;
-        let voucherValue = 0;
-        switch (voucher.type) {
-            case "percent": {
-                voucherValue = (Number(voucher.value) * subTotal) / 100;
-                break;
-            }
-            case "minus": {
-                voucherValue = subTotal - Number(voucher.value);
-                break
-            }
-        }
-        const finalTotal = subTotal - voucherValue;
-        return finalTotal > 0 ? finalTotal : 0;
-    }, [subTotal, voucher]);
-
-    const percent = Math.abs(Math.ceil(((total - subTotal + shipping) * 100) / (total + shipping)));
+    const calcSubTotal = useMemo(() => subTotal(checkout), [checkout]);
+    const calcTotal = useMemo(() => total(calcSubTotal, voucher), [calcSubTotal, voucher]);
+    const calcVoucherPercent = useMemo(() => percent(calcSubTotal, calcTotal), [calcSubTotal, calcTotal])
 
     const updateUserInfo = async () => {
         try {
@@ -108,15 +82,15 @@ export default function CheckOut() {
         if (voucher) {
             switch (voucher.type) {
                 case "percent": {
-                    voucherValue = (Number(voucher.value) * subTotal) / 100;
+                    voucherValue = (Number(voucher.value) * calcSubTotal) / 100;
                     break;
                 }
                 case "fixed_amount": {
-                    voucherValue = subTotal - Number(voucher.value);
+                    voucherValue = Number(voucher.value) * 1000;
                     break
                 }
                 case "shipping": {
-                    voucherValue = subTotal - Number(voucher.value);
+                    voucherValue = Number(voucher.value) * 1000;
                     break
                 }
                 default: {
@@ -148,7 +122,7 @@ export default function CheckOut() {
                     await codPayment(
                         checkout,
                         user,
-                        total,
+                        calcTotal,
                         voucher?._id || "",
                         voucherValue,
                         address,
@@ -165,7 +139,7 @@ export default function CheckOut() {
             }
             case "zalopay": {
                 if (user && user._id) {
-                    const createOrder = await zaloPayment(checkout, user, total);
+                    const createOrder = await zaloPayment(checkout, user, calcTotal);
                     if (createOrder) {
                         window.location.href = `${createOrder.zaloResponse.order_url}`;
                     }
@@ -342,7 +316,7 @@ export default function CheckOut() {
             <div className="grid-cols-1">
                 <p className="text-3xl font-bold">Phương thức thanh toán</p>
                 {/*payment*/}
-                <div className="bg-[#fff] mt-[24px] rounded-lg px-[30px] py-[20px] flex justify-evenly">
+                <div className="bg-[#fff] mt-[24px] rounded-lg px-4 py-5 flex justify-between">
 
                     <div className="w-[240px] flex justify-center items-center">
                         <input
@@ -373,19 +347,19 @@ export default function CheckOut() {
                         </label>
                     </div>
 
-                    <div className="w-[240px] flex justify-center items-center">
-                        <input
-                            id="creditCard"
-                            name="paymentMethod"
-                            type="radio"
-                            value="creditCard"
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="w-[14px] h-[14px] cursor-pointer"
-                        />
-                        <label htmlFor="creditCard" className="ml-[8px] cursor-pointer">
-                            Thẻ ngân hàng
-                        </label>
-                    </div>
+                    {/*<div className="w-[240px] flex justify-center items-center">*/}
+                    {/*    <input*/}
+                    {/*        id="creditCard"*/}
+                    {/*        name="paymentMethod"*/}
+                    {/*        type="radio"*/}
+                    {/*        value="creditCard"*/}
+                    {/*        onChange={(e) => setPaymentMethod(e.target.value)}*/}
+                    {/*        className="w-[14px] h-[14px] cursor-pointer"*/}
+                    {/*    />*/}
+                    {/*    <label htmlFor="creditCard" className="ml-[8px] cursor-pointer">*/}
+                    {/*        Thẻ ngân hàng*/}
+                    {/*    </label>*/}
+                    {/*</div>*/}
 
                 </div>
 
@@ -395,12 +369,13 @@ export default function CheckOut() {
                     <div className="w-full mt-[18px] flex justify-between items-center">
                         <div className="h-19 flex items-center gap-2">
                             <Package strokeWidth={1} className={`w-9 h-9`}/>
-                            <button
-                                onClick={() => setCheckoutPopup(!checkoutPopup)}
-                                className={`hover:text-blue-600`}>{checkout.length} sản phẩm
+                            <p>{checkout.length} sản phẩm</p>
+                            <button onClick={() => setCheckoutPopup(!checkoutPopup)}>
+                                <p className={`hover:text-blue-600`}>( Xem chi tiết )</p>
                             </button>
                         </div>
-                        <p>{subTotal.toLocaleString("vi-VN")}đ</p>
+
+                        <p>{calcSubTotal.toLocaleString("vi-VN")}đ</p>
                     </div>
 
                     <div className={`w-full mt-[18px]`}>
@@ -453,19 +428,19 @@ export default function CheckOut() {
                                 <p>Mã giảm giá</p>
                             </div>
 
-                            {voucher === null ? (
-                                <button onClick={() => setPopup(true)} title={`Chọn mã`}>
+                            {Object.keys(voucher).length === 0 ? (
+                                <button onClick={() => setVoucherPopup(true)} title={`Chọn mã`}>
                                     <p className={`text-[#034292]`}>Chưa áp dụng</p>
                                 </button>
                             ) : (
                                 <div>
                                     <button
-                                        onClick={() => setPopup(true)}
+                                        onClick={() => setVoucherPopup(true)}
                                         className={`w-full flex justify-end`}
                                         title={`Chọn mã`}
                                     >
                                         <p className={`text-[#034292] flex justify-end`}>
-                                            {voucher.name}
+                                            {voucher.code}
                                         </p>
                                     </button>
                                 </div>
@@ -489,16 +464,16 @@ export default function CheckOut() {
                         {voucher ? (
                             <div className="flex gap-4">
                                 <p className="text-[#D92D20]">
-                                    {total.toLocaleString("vi-VN")}đ (-{percent}%)
+                                    {calcTotal.toLocaleString("vi-VN")}đ (-{calcVoucherPercent}%)
                                 </p>
                                 <p className="line-through">
-                                    {(subTotal + shipping).toLocaleString("vi-VN")}đ
+                                    {(calcSubTotal + shipping).toLocaleString("vi-VN")}đ
                                 </p>
                             </div>
                         ) : (
                             <div>
                                 <p className="text-[#D92D20]">
-                                    {total.toLocaleString("vi-VN")}đ
+                                    {calcTotal.toLocaleString("vi-VN")}đ
                                 </p>
                             </div>
                         )}
@@ -517,19 +492,18 @@ export default function CheckOut() {
             {/* Voucher popup */}
             <div>
                 <div
-                    onClick={() => setPopup(false)}
-                    className={`${
-                        popup === false ? `hidden` : `fixed top-0 right-0 z-10`
-                    } w-full h-full bg-[#00000066]`}
-                ></div>
+                    onClick={() => setVoucherPopup(false)}
+                    className={`${voucherPopup === false ? `hidden` : `fixed top-0 right-0 z-10`} w-full h-full bg-[#00000066]`}>
+
+                </div>
                 <div
                     className={`${
-                        popup === false ? `hidden` : `fixed top-0 right-0 z-10`
-                    } w-[320px] h-full bg-[#fff] flex flex-col justify-between`}
+                        voucherPopup === false ? `hidden` : `fixed top-0 right-0 z-10`
+                    } w-[320px] h-full bg-[#fff] flex flex-col`}
                 >
                     <div className={`w-full h-12 border-b-[2px] flex items-center`}>
                         <ChevronLeft
-                            onClick={() => setPopup(false)}
+                            onClick={() => setVoucherPopup(false)}
                             strokeWidth={1.5}
                             className={`w-[10%] cursor-pointer`}
                         />
@@ -537,7 +511,7 @@ export default function CheckOut() {
                             Mã giảm giá
                         </div>
                     </div>
-                    <div className={`w-full px-4 flex flex-col gap-2`}>
+                    <div className={`w-full px-4 py-6 overflow-y-auto flex flex-col gap-2`}>
                         {vouchers.map((voucher: Voucher) => (
                             <div
                                 key={voucher._id}
@@ -553,10 +527,10 @@ export default function CheckOut() {
                                     </p>
                                     <button
                                         onClick={() => {
-                                            setVoucher(voucher);
-                                            setPopup(false)
+                                            dispatch(addVoucher({...voucher}))
+                                            setVoucherPopup(false)
                                         }}
-                                        className={`w-[100px] h-6 text-xs text-[#fff] bg-[#165b8d] rounded-xl`}
+                                        className={`w-[100px] h-6 text-xs border text-[#fff] bg-[#165b8d] hover:bg-white hover:text-[#165b8d] rounded`}
                                     >
                                         Áp dụng
                                     </button>
@@ -565,10 +539,10 @@ export default function CheckOut() {
                         ))}
                     </div>
                     <button
-                        onClick={() => setPopup(false)}
-                        className={`w-[90%] h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}
+                        onClick={() => setVoucherPopup(false)}
+                        className={`absolute w-[90%] bottom-0 right-2 z-10 h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}
                     >
-                        Quay lại trang thanh toán
+                        Quay lại trang giỏ hàng
                     </button>
                 </div>
             </div>
@@ -606,10 +580,14 @@ export default function CheckOut() {
                                     <tr key={`${item._id}_${item.selectedSize}_${item.selectedColor}`}
                                         className="border-t border-gray-200 hover:bg-gray-50/50 text-center transition-colors">
                                         <td className="p-4">
-                                            <div className="flex justify-center">
+                                            <div className="flex justify-center" title={item.name}>
                                                 <Image
-                                                    src="/assets/images/MLB-Chunky-Runner-NY-Black-White(1).png"
-                                                    alt="MLB Chunky Runner NY Black White"
+                                                    src={`${item.variants.find(
+                                                        (variant) =>
+                                                            variant.size === item.selectedSize &&
+                                                            variant.color === item.selectedColor
+                                                    )?.images[0]}`}
+                                                    alt={item.name}
                                                     width={80}
                                                     height={80}
                                                     className="rounded-lg object-cover shadow-sm"
@@ -619,8 +597,19 @@ export default function CheckOut() {
                                         <td className="p-4 font-medium">{item.selectedColor}</td>
                                         <td className="p-4 font-medium">{item.selectedSize}</td>
                                         <td className="p-4 font-medium">{item.quantityy}</td>
-                                        <td className="p-4 font-medium">{item.pricePromo.toLocaleString("vi-VN")} VND</td>
-                                        <td className="p-4 font-medium">{(item.pricePromo * item.quantityy).toLocaleString("vi-VN")} VND</td>
+                                        <td className="p-4 font-medium">{
+                                            (item.price + (item.variants.find(
+                                                (variant) =>
+                                                    variant.size === item.selectedSize &&
+                                                    variant.color === item.selectedColor
+                                            )?.price || 0)).toLocaleString("vi-VN")} VND
+                                        </td>
+                                        <td className="p-4 font-medium">{((item.price + (item.variants.find(
+                                            (variant) =>
+                                                variant.size === item.selectedSize &&
+                                                variant.color === item.selectedColor
+                                        )?.price || 0)) * item.quantityy).toLocaleString("vi-VN")} VND
+                                        </td>
                                     </tr>
                                 ))}
                                 </tbody>

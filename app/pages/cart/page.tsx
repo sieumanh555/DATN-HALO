@@ -18,21 +18,20 @@ import CartEmpty from "../../components/cart/cartEmpty";
 
 
 export default function Cart() {
-    const router = useRouter();
     const dispatch = useDispatch();
+    const router = useRouter();
     const token = getCookieCSide("as_tn");
     const cart = useSelector((state: CartState) => state.cart.products || []);
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || [])
-    const currVoucher = useSelector((state: VoucherState) => state.voucher.voucher || {});
+    const voucher = useSelector((state: VoucherState) => state.voucher.voucher || {});
 
     const [products, setProducts] = useState<ProductResponse[] | []>([]);
     const [popup, setPopup] = useState(false);
     const [vouchers, setVouchers] = useState<Voucher[] | []>([]);
-    const [voucher, setVoucher] = useState<Voucher | null>(null);
     const [voucherPopup, setVoucherPopup] = useState(false);
 
     const calcSubTotal = useMemo(() => subTotal(checkout), [checkout]);
-    const calcTotal = useMemo(() => total(calcSubTotal, currVoucher), [calcSubTotal, currVoucher]);
+    const calcTotal = useMemo(() => total(calcSubTotal, voucher), [calcSubTotal, voucher]);
     const calcVoucherPercent = useMemo(() => percent(calcSubTotal, calcTotal), [calcSubTotal, calcTotal])
 
     const handleClosePopup = () => {
@@ -57,6 +56,7 @@ export default function Cart() {
                 console.error("Lỗi fetching https://datn-api-production.up.railway.app/voucher", err)
             );
     }, []);
+
 
     // // get cart lần đầu trống
     // const getCart = () => {
@@ -145,7 +145,7 @@ export default function Cart() {
                                         <p className={`text-lg`}>Mã giảm giá</p>
                                     </div>
 
-                                    {!voucher ? (
+                                    {Object.keys(voucher).length === 0 ? (
                                         <button onClick={() => setVoucherPopup(true)} title={`Chọn mã`}>
                                             <p className={`text-[#034292]`}>Áp dụng mã</p>
                                         </button>
@@ -162,6 +162,7 @@ export default function Cart() {
                                             </button>
                                         </div>
                                     )}
+
                                 </div>
 
                                 <div
@@ -254,14 +255,13 @@ export default function Cart() {
                             >
                                 <Ticket strokeWidth={0.5} className={`w-[120px] h-[80px]`}/>
                                 <div className={`w-[160px] flex flex-col gap-y-1`}>
-                                    <p className={`text-[#124062] uppercase`}>{voucher.name}</p>
+                                    <p className={`text-[#124062] uppercase`}>{voucher.code}</p>
                                     <p className={`text-xs text-gray-600`}>
                                         {voucher.name}
                                     </p>
                                     <button
                                         onClick={() => {
-                                            dispatch(addVoucher({...voucher}))
-                                            setVoucher(voucher);
+                                            dispatch(addVoucher({...voucher}));
                                             setVoucherPopup(false)
                                         }}
                                         className={`w-[100px] h-6 text-xs border text-[#fff] bg-[#165b8d] hover:bg-white hover:text-[#165b8d] rounded`}
@@ -276,7 +276,7 @@ export default function Cart() {
                         onClick={() => setVoucherPopup(false)}
                         className={`absolute w-[90%] bottom-0 right-2 z-10 h-10 mx-auto my-4 text-[#04aae7] hover:text-[#fff] border-[2px] rounded border-[#04aae7] hover:bg-[#04aae7] `}
                     >
-                        Quay lại trang thanh toán
+                        Quay lại trang giỏ hàng
                     </button>
                 </div>
             </div>

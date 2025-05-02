@@ -71,7 +71,7 @@ export default function Register() {
 
     return (
         <section
-            className="min-h-screen bg-[#fbfcfd] tracking-wider py-12 px-4 md:px-0 flex flex-col items-center gap-4">
+            className="min-h-screen bg-[#fbfcfd] tracking-wider py-9 px-4 md:px-0 flex flex-col items-center gap-4">
             <div className="full-shadow w-full md:w-[600px] lg:w-[500px] mx-auto flex flex-col items-center gap-4">
                 <div className="w-full bg-white px-4 sm:px-6 md:px-8 py-6 rounded-lg shadow-md">
                     <p className="text-2xl sm:text-3xl text-[#034292] text-center font-bold tracking-wider mb-6">

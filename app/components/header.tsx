@@ -1,19 +1,25 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Heart, User, ShoppingBag, Menu } from "lucide-react";
-import { useSelector } from "react-redux";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import {Heart, Menu, Search, ShoppingBag, User} from "lucide-react";
+import {useSelector} from "react-redux";
+import {useEffect, useState} from "react";
+import {usePathname, useRouter} from "next/navigation";
 import {CartState} from "@/app/models/CartState";
+import {getCookieCSide} from "@/app/libs/Cookie/clientSideCookie";
 
 export default function Header() {
+    const pathname = usePathname();
     const cart = useSelector((state: CartState) => state.cart.products || []);
     const cartQuantity = cart.length;
     const [isOpen, setIsOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const router = useRouter();
+    const [isLogin, setIsLogin] = useState(false);
+    const hiddenRoutes = ["/pages/login", "/pages/register", "/pages/user"];
+
+    const hide = hiddenRoutes.some((prefix) => pathname.startsWith(prefix));
 
     const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
         if ("key" in e && e.key === "Enter" || e.type === "click") {
@@ -38,12 +44,21 @@ export default function Header() {
         }
     };
 
+    useEffect(() => {
+        const token = getCookieCSide("as_tn");
+        setIsLogin(!!token);
+    }, [pathname]);
+
+    // ẩn các routes trong hiddenRoutes
+    if (hide) return null;
+
     return (
         <header className="text-xl text-gray-800 font-medium mx-4 md:mx-12 py-4">
             <div className="">
-                <div className="w-full text-center mx-auto uppercase pb-2 border-b-[3px] flex justify-between items-center">
+                <div
+                    className="w-full text-center mx-auto uppercase pb-2 border-b-[3px] flex justify-between items-center">
                     <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-                        <Menu className="w-6 h-6" />
+                        <Menu className="w-6 h-6"/>
                     </button>
                     <Link href="/" className="hidden md:block w-[20%] hover:text-gray-400">
                         trang chủ
@@ -58,7 +73,7 @@ export default function Header() {
                                 alt="Logo"
                                 width={100}
                                 height={100}
-                                style={{ mixBlendMode: "darken" }}
+                                style={{mixBlendMode: "darken"}}
                             />
                         </div>
                     </Link>
@@ -83,19 +98,29 @@ export default function Header() {
                                             className="w-full p-2 text-sm text-gray-700 border-none focus:outline-none"
                                         />
                                         <button onClick={handleSearch} className="ml-2">
-                                            <Search className="w-5 h-5 text-gray-600" />
+                                            <Search className="w-5 h-5 text-gray-600"/>
                                         </button>
                                     </div>
                                 </div>
                             )}
                         </div>
-                        <Heart className="w-6 h-6 cursor-pointer" />
-                        <User className="w-6 h-6 cursor-pointer" />
+                        <Heart className="w-6 h-6 cursor-pointer"/>
+                        {isLogin ? (
+                            <Link href={`/pages/user`}>
+                                <User className="w-6 h-6 cursor-pointer"/>
+                            </Link>
+                        ) : (
+                            <Link href={`/pages/login`}>
+                                <User className="w-6 h-6 cursor-pointer"/>
+                            </Link>
+                        )}
+
                         <Link href="/pages/cart">
                             <div className="relative">
-                                <ShoppingBag className="w-6 h-6 cursor-pointer" />
+                                <ShoppingBag className="w-6 h-6 cursor-pointer"/>
                                 {cartQuantity > 0 && (
-                                    <div className="absolute top-3 -right-2 w-[20px] h-[20px] bg-[#034292] rounded-full flex items-center justify-center">
+                                    <div
+                                        className="absolute top-3 -right-2 w-[20px] h-[20px] bg-[#034292] rounded-full flex items-center justify-center">
                                         <span className="text-xs text-white">{cartQuantity}</span>
                                     </div>
                                 )}
@@ -107,7 +132,8 @@ export default function Header() {
             {isOpen && (
                 <div className="md:hidden bg-white py-4 px-6 space-y-4 text-center">
                     <Link href="/pages/product" className="block hover:text-gray-400">TẤT CẢ SẢN PHẨM</Link>
-                    <Link href="/pages/product?filter=discount" className="block hover:text-gray-400">SẢN PHẨM ƯU ĐÃI</Link>
+                    <Link href="/pages/product?filter=discount" className="block hover:text-gray-400">SẢN PHẨM ƯU
+                        ĐÃI</Link>
                     <Link href="/pages/product?gender=Nam" className="block hover:text-gray-400">GIÀY NAM</Link>
                     <Link href="/pages/product?gender=Nữ" className="block hover:text-gray-400">GIÀY NỮ</Link>
                     <Link href="/pages/product?category=Phụ Kiện" className="block hover:text-gray-400">PHỤ KIỆN</Link>
