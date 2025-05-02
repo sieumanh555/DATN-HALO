@@ -12,7 +12,6 @@ import {CheckoutState} from "@/app/models/CartState";
 export default function ProBox({data}: { data: ProductCart }) {
     const dispatch = useDispatch();
     const checkout = useSelector((state: CheckoutState) => state.checkout.products || []);
-
     const [selectedSize, setSelectedSize] = useState(data.selectedSize || "Chọn size");
     const [selectedColor, setSelectedColor] = useState(data.selectedColor || "Mặc định");
     const [colorDropdown, setColorDropdown] = useState(false);
@@ -47,8 +46,7 @@ export default function ProBox({data}: { data: ProductCart }) {
 
     const handleDecrease = (product: ProductCart) => {
         if (product.quantityy === 1) {
-            const text = `Xóa sản phẩm ${product.name}`;
-            if (confirm(text) === true) {
+            const text = `Xóa sản phẩm ${product.name}`;        if (confirm(text) === true) {
                 alert("Xóa thành công");
                 dispatch(removeItem({id: product._id, selectedSize, selectedColor}));
             } else {
