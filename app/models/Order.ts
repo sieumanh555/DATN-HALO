@@ -1,5 +1,5 @@
 import type User from "./User";
-import type Discount from "@/app/models/Voucher"
+// import type Discount from "@/app/models/Voucher"
 import type { OrderDetailResponse } from "./OrderDetail";
 
 export interface OrderRequest {
@@ -25,11 +25,13 @@ export interface OrderResponse {
     orderDetailId: OrderDetailResponse,
     amount: number,
     description: string,
-    discountId: Discount,
+    voucherId: string,
+    voucherValue: number,
     address: string,
     paymentMethod: string,
     paymentStatus: string,
     shipping: number,
+    shippingMethod: string,
     status: string,
     createdAt: Date,
     updatedAt: Date

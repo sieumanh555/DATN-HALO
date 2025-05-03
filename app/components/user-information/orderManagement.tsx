@@ -39,10 +39,10 @@ export default function OrderManagement({data}: { data: OrderResponse[] }) {
 
     const cancelOrder = async (id: string) => {
         try {
-            const res = await fetch(`http://localhost:3000/orders/${id}`);
+            const res = await fetch(`https://datn-api-production.up.railway.app/order/${id}`);
             if (!res.ok) return;
             const {data: order} = await res.json();
-            await fetch(`http://localhost:3000/orders/${id}`, {
+            await fetch(`https://datn-api-production.up.railway.app/order/${id}`, {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({...order, status: "Cancelled"})
@@ -174,15 +174,16 @@ export default function OrderManagement({data}: { data: OrderResponse[] }) {
                                 <div className="space-y-2">
                                     <p className="flex items-center gap-2">
                                         <span className="font-semibold text-gray-600">Tiền sản phẩm:</span>
-                                        <span className="font-medium">{order.amount.toLocaleString("vi-VN")} VND</span>
+                                        <span className="font-medium">{order.amount.toLocaleString("vi-VN")} đ</span>
                                     </p>
                                     <p className="flex items-center gap-2">
                                         <span className="font-semibold text-gray-600">Chi phí vận chuyển:</span>
-                                        <span className="font-medium">50.000 VND</span>
+                                        <span className="font-medium">{order.shipping.toLocaleString("vi-VN")} đ</span>
+                                        <span>({order.shippingMethod})</span>
                                     </p>
                                     <p className="flex items-center gap-2">
                                         <span className="font-semibold text-gray-600">Tổng hóa đơn:</span>
-                                        <span className="font-medium">10.050.000 VND</span>
+                                        <span className="font-medium">{order.amount.toLocaleString("vi-VN")} đ</span>
                                     </p>
 
 
