@@ -1,0 +1,81 @@
+{
+  "orderDetail": [
+    {
+      "items": [
+        {
+          "productId": "67da58d162fa74d0d3da5cb5",
+          "selectedColor": "Đen",
+          "selectedSize": "40",
+          "quantity": 2,
+          "price": 2800000
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "productId": "67da58d162fa74d0d3da5cbb",
+          "selectedColor": "Trắng",
+          "selectedSize": "39",
+          "quantity": 1,
+          "price": 2680000
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "productId": "67da58d162fa74d0d3da5cbf",
+          "selectedColor": "Đen",
+          "selectedSize": "41",
+          "quantity": 10,
+          "price": 2900000
+        }
+      ]
+    }
+  ],
+  "order": [
+    {
+      "userId": "6801d49c5c432790e036b0e2",
+      "orderDetailId": "thay id của orderDetail ngay đây",
+      "amount": 1000000,
+      "description": "",
+      "voucherId":"67c22b37d835e88269b5aa1e",
+      "voucherValue": 0,
+      "address": "Việt Name",
+      "paymentMethod": "cod",
+      "paymentStatus": "Uncompleted",
+      "shipping": 40000,
+      "shippingMethod": "Giao hàng tiết kiệm",
+      "status": "Processing"
+    },
+    {
+      "userId": "6801d49c5c432790e036b0e2",
+      "orderDetailId": "thay id của orderDetail ngay đây",
+      "amount": 20000000,
+      "description": "",
+      "voucherId":"67c22b37d835e88269b5aa1e",
+      "voucherValue": 0,
+      "address": "Việt Name",
+      "paymentMethod": "cod",
+      "paymentStatus": "Uncompleted",
+      "shipping": 120000,
+      "shippingMethod": "Giao hàng nhanh",
+      "status": "Processing"
+    },
+    {
+      "userId": "680349400d95a46f0918236e",
+      "orderDetailId": "thay id của orderDetail ngay đây",
+      "amount": 2800000,
+      "description": "",
+      "voucherId":"67c22b37d835e88269b5aa1e",
+      "voucherValue": 0,
+      "address": "Việt Name",
+      "paymentMethod": "zaloPay",
+      "paymentStatus": "Completed",
+      "shipping": 120000,
+      "shippingMethod": "Giao hàng nhanh",
+      "status": "Processing"
+    }
+  ]
+}
