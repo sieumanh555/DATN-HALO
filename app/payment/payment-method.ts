@@ -44,7 +44,6 @@ export const createOrder = async (
     try {
         if (user && user._id) {
             const {_id: userId} = user;
-            console.log(">>> check idsUer", userId)
             const response = await fetch("https://datn-api-production.up.railway.app/order", {
                 method: "POST",
                 headers: {
@@ -67,7 +66,7 @@ export const createOrder = async (
             const data = await response.json()
             if (!response.ok) {
                 console.log(">>> Lỗi tạo đơn hàng: ", data);
-                return;
+                return data;
             }
             return data;
         }

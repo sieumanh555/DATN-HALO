@@ -2,7 +2,6 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import {useRouter} from "next/navigation";
 import { Check, ChevronLeft, Package, Ticket, Truck } from "lucide-react";
 import {
   getCookieCSide,
@@ -11,6 +10,7 @@ import {
 } from "@/app/libs/Cookie/clientSideCookie";
 import { codPayment, zaloPayment } from "@/app/payment/payment-method";
 import { percent, subTotal, total } from "@/app/libs/cart/calcCart";
+import { sendOrderConfirmation } from "@/app/libs/send-email";
 
 import type User from "@/app/models/User";
 import type { CheckoutState, VoucherState } from "../../models/CartState";
@@ -79,7 +79,7 @@ export default function CheckOut() {
           {
             method: "PUT",
             headers: {
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               "Content-type": "application/json",
             },
             body: JSON.stringify(data),
@@ -142,7 +142,7 @@ export default function CheckOut() {
     switch (currPaymentMethod) {
       case "cod": {
         if (user && user._id) {
-          await codPayment(
+          const response = await codPayment(
             checkout,
             user,
             calcTotal,
@@ -153,8 +153,13 @@ export default function CheckOut() {
             shipping,
             shippingMethod
           );
+          if (response.status === 200) {
+            await sendOrderConfirmation(response.data, user.email);
+            setCheckoutSuccess(!checkoutSuccess);
+          } else {
+            console.log("Lỗi tạo đơn hàng: ", response);
+          }
           // await Promise.all(checkout.map((item) => changeStock(item)));
-          setCheckoutSuccess(!checkoutSuccess);
         } else {
           console.log("Vui lòng đăng nhập");
         }
@@ -204,6 +209,7 @@ export default function CheckOut() {
         )
       );
   }, []);
+
 
   return (
     <section className="container grid grid-cols-1 md:grid-cols-2 gap-8 px-[100px] py-10 tracking-wide">
